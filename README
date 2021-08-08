@@ -1,0 +1,8 @@
+echo "export PYTHONPATH=$PYTHONPATH:/Users/zhangdong/Desktop" >> ~/.bash_profile
+echo "export USERNAME=" >> ~/.bash_profile
+echo "export PASSWORD=" >> ~/.bash_profile
+echo "export ADDRESS=" >> ~/.bash_profile
+echo "export PORT=" >> ~/.bash_profile
+echo "export DB_FUND=" >> ~/.bash_profile
+echo "export DB_NETVALUE=" >> ~/.bash_profile
+source ~/.bash_profile
