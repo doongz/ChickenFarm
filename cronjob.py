@@ -1,7 +1,7 @@
-from service.tsp_service import transport
-from db_model.tbl_info import InfoTable
-from db_model.database import Database
-from config.buy_config import buy_list
+from apollo.src.service.tsp_service import transport
+from apollo.src.db_model.tbl_info import InfoTable
+from apollo.src.db_model.database import Database
+from apollo.src.config.buy_config import buy_list
 
 def main():
 

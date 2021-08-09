@@ -1,5 +1,6 @@
 import pandas as pd
 from sqlalchemy import create_engine
+from sqlalchemy import DateTime, DECIMAL
 
 from apollo.src.config.mysql import USER, PWD, ADDRESS, PORT, DB_NETVALUE
 
@@ -12,7 +13,14 @@ class FundNetValue():
         self.engine = create_engine(f"mysql+pymysql://{USER}:{PWD}@{ADDRESS}:{PORT}/{DB_NETVALUE}")
 
     def to_sql(self, price_df):
-        price_df.to_sql(self.tbl, self.engine, if_exists="append", index=True)
+
+        DTYPES = {'date':DateTime, 'netvalue':DECIMAL(10,4), 'totvalue':DECIMAL(10,4)}
+
+        price_df.to_sql(name=self.tbl, 
+                        con=self.engine, 
+                        if_exists="replace", # 重复的行数据也会追加
+                        index=False,
+                        dtype=DTYPES)
         return self.tbl
 
     def read_sql(self):

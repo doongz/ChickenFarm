@@ -14,6 +14,7 @@ logger = get_logger()
 def transport(codes):
     """
     :params codes 基金代码 list
+    todo:可以改成多进程加速
     """
     for code in codes:
         upload_netvalue_and_info(code)
