@@ -1,7 +1,13 @@
 import logging
 
 def get_logger(path="/Users/zhangdong/Desktop/fund.log"):
+
     logger = logging.getLogger(__file__)
+
+    if logger.handlers:
+        # 解决日志重复打印的问题
+        return logger
+
     logger.setLevel(logging.DEBUG)
     # 建立一个filehandler来把日志记录在文件里，级别为debug以上
     fh = logging.FileHandler(path)
@@ -18,3 +24,4 @@ def get_logger(path="/Users/zhangdong/Desktop/fund.log"):
     logger.addHandler(fh)
 
     return logger
+
