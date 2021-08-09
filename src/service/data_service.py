@@ -3,6 +3,7 @@ from apollo.src.db_model.tbl_depository import DepositoryTable
 from apollo.src.db_model.tbl_info import InfoTable
 from apollo.src.util.log import get_logger
 
+
 logger = get_logger()
 
 

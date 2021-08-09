@@ -3,8 +3,14 @@ Automatic Investment Plan
 周定投
 月定投
 """
+from datetime import datetime, timedelta
+
 from apollo.src.prof_model.fund_netvalue import FundNetValue
 from apollo.src.db_model.tbl_info import InfoTable
+from apollo.src.util.log import get_logger
+
+
+logger = get_logger()
 
 
 def invest_week(code, start, end, amount):
@@ -19,7 +25,7 @@ def invest_week(code, start, end, amount):
     """
     fund_val = FundNetValue(code)
     price_df = fund_val.read_sql()
-    print(InfoTable.get_by_code(code).name)
+    logger.info(InfoTable.get_by_code(code).name)
     
     start_index = price_df.loc[price_df['date'] == start].index[0]
     end_index = price_df.loc[price_df['date'] == end].index[0]
@@ -36,15 +42,16 @@ def invest_week(code, start, end, amount):
         count[weekday] += amount
 
     for index, unit in enumerate(total):
-        print(f"每周 {index+1} 定投，累计投入 {count[index]} 单位金额，",
-              f"最终卖出 {round(sell_price*unit,2)} 单位金额，",
-              f"收益率 {round(100*(sell_price*unit-count[index])/count[index],2)}% ;")
+        logger.info(f"每周 {index+1} 定投，累计投入 {count[index]} 单位金额，"
+                    f"最终卖出 {round(sell_price*unit,2)} 单位金额，"
+                    f"收益率 {round(100*(sell_price*unit-count[index])/count[index],2)}% ;")
 
 
 def invest_month(code, start, end, amount, day_list=['05', '10', '15', '20', '25']):
-    fund = xa.fundinfo(code)
-    price_df = fund.price
-    print(fund.info())
+
+    fund_val = FundNetValue(code)
+    price_df = fund_val.read_sql()
+    logger.info(InfoTable.get_by_code(code).name)
     
     start_index = price_df.loc[price_df['date'] == start].index[0]
     end_index = price_df.loc[price_df['date'] == end].index[0]
@@ -69,6 +76,6 @@ def invest_month(code, start, end, amount, day_list=['05', '10', '15', '20', '25
             cost_dict[day] = cost_dict.get(day, 0) + amount
     
     for day in day_list:
-        print(f"每月 {day} 日定投，累计投入 {cost_dict[day]} 单位金额，",
-              f"最终卖出 {round(sell_price*shares_dict[day], 2)} 单位金额，",
-              f"收益率 {round(100*(sell_price*shares_dict[day] - cost_dict[day])/cost_dict[day],2)}% ;")
+        logger.info(f"每月 {day} 日定投，累计投入 {cost_dict[day]} 单位金额，"
+                    f"最终卖出 {round(sell_price*shares_dict[day], 2)} 单位金额，"
+                    f"收益率 {round(100*(sell_price*shares_dict[day] - cost_dict[day])/cost_dict[day],2)}% ;")
