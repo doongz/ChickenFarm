@@ -1,11 +1,15 @@
 from apollo.src.service.data_service import add_fund, delete_fund, update_fund, show_fund
 from apollo.src.service.tsp_service import upload_netvalue_and_info
-from apollo.src.prof_model.fund_types import Filed, Status
-from apollo.src.db_model.tbl_info import InfoTable
+from apollo.src.model_prof.fund_types import Filed, Status
+from apollo.src.model_db.tbl_info import InfoTable
 from apollo.src.service.aip_service import invest_week, invest_month
+from apollo.src.service import data_service
+
 
 
 def main():
+
+    data_service.update_total_for_field()
     # add_fund(code='519185', 
     #          filed=Filed.FINANCE, 
     #          buying=450, 
@@ -24,9 +28,8 @@ def main():
     # upload_netvalue_and_info(code = '005827')
     # print(InfoTable.get_by_code('005827').name)
     # invest_week('005827', '2020-08-04', '2021-08-03', 100)
-    invest_month('005827', '2020-08-04', '2021-08-06', 400)
+    # invest_month('005827', '2020-08-04', '2021-08-06', 400)
+
 
 if __name__ == "__main__":
     main()
-    Total for each field
-    tbl_total_for_field

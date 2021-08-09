@@ -1,6 +1,8 @@
 from apollo.src.model_db.database import Database
 from apollo.src.model_db.tbl_depository import DepositoryTable
 from apollo.src.model_db.tbl_info import InfoTable
+from apollo.src.model_db.tbl_total_for_field import TotalForField
+from apollo.src.model_prof.fund_types import Filed
 from apollo.src.util.log import get_logger
 
 
@@ -65,6 +67,32 @@ def buy_fund():
 
 def sell_fund():
     pass
+
+def update_total_for_field():
+    '''
+    从 tbl_depository 表中获取每个领域基金的数据
+    合计每个领域的投入、赎回、持仓、收益，计算收益率
+    上传到 tbl_total_for_field 表
+    '''
+    fileds = Filed().get_fileds()
+    for filed in fileds:
+        funds = DepositoryTable.get_by_filed(filed)
+        tot_field = TotalForField.get_by_filed(filed)
+
+        tot_field.buying = sum([fund.buying for fund in funds])
+        tot_field.selling = sum([fund.selling for fund in funds])
+        tot_field.position = sum([fund.position for fund in funds])
+        tot_field.profit = sum([fund.profit for fund in funds])
+        tot_field.profit_rate = round(tot_field.profit/tot_field.buying, 4)
+
+        Database().update()
+        logger.info(f"update total for {filed}, buying:{tot_field.buying}."
+                    f"selling:{tot_field.selling}, position:{tot_field.position}, "
+                    f"profit:{tot_field.profit}, profit_rate:{tot_field.profit_rate}")
+
+
+
+
 
 
 # def add_fund(code, filed, buying, selling, position, status, comment=None):

@@ -19,7 +19,7 @@ class DepositoryTable(Base):
     buying = Column(DECIMAL(10, 2), nullable=False)
     selling = Column(DECIMAL(10, 2), default=0)
     position = Column(DECIMAL(10, 2), nullable=False)
-    profit = Column(DECIMAL(5, 2), default=0)
+    profit = Column(DECIMAL(10, 2), default=0)
     profit_rate = Column(DECIMAL(5, 4), default=0)
     priority = Column(INT, default=0)
     status = Column(VARCHAR(32), default=Status.HOLD, nullable=False)
@@ -30,6 +30,10 @@ class DepositoryTable(Base):
     @staticmethod
     def get_by_code(code):
         return Database().query(DepositoryTable).filter_by(code=code).one()
+
+    @staticmethod
+    def get_by_filed(filed):
+        return Database().query(DepositoryTable).filter_by(filed=filed).all()
 
     def get_attrs(self):
         attrs = []

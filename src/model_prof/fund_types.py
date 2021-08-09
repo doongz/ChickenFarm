@@ -10,6 +10,14 @@ class Filed:
     BLUE = "blue_chip"
     FINANCE= "finance_estate"
 
+    def get_fileds(self):
+        fileds = []
+        for attr in self.__dir__():
+            if attr.startswith('_') or attr.startswith('get'):
+                continue
+            fileds.append(getattr(Filed, attr))
+        return fileds
+
 
 class Status:
 
