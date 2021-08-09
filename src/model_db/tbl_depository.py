@@ -2,8 +2,8 @@ from datetime import datetime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, DateTime, DECIMAL, VARCHAR, CHAR, INT
 
-from apollo.src.db_model.database import Database
-from apollo.src.prof_model.fund_types import Status
+from apollo.src.model_db.database import Database
+from apollo.src.model_prof.fund_types import Status
 
 
 Base = declarative_base()

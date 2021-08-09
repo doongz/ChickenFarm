@@ -1,6 +1,6 @@
-from apollo.src.db_model.database import Database
-from apollo.src.db_model.tbl_depository import DepositoryTable
-from apollo.src.db_model.tbl_info import InfoTable
+from apollo.src.model_db.database import Database
+from apollo.src.model_db.tbl_depository import DepositoryTable
+from apollo.src.model_db.tbl_info import InfoTable
 from apollo.src.util.log import get_logger
 
 

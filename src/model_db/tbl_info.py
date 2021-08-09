@@ -2,7 +2,7 @@ from datetime import datetime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, DateTime, DECIMAL, VARCHAR, CHAR
 
-from apollo.src.db_model.database import Database
+from apollo.src.model_db.database import Database
 
 
 Base = declarative_base()
@@ -22,19 +22,3 @@ class InfoTable(Base):
     @staticmethod
     def get_by_code(code):
         return Database().query(InfoTable).filter_by(code=code).first()
-
-    def get_attrs(self):
-        attrs = []
-        for attr in self.__dir__():
-            if attr.startswith('_') or attr.startswith('get'):
-                continue
-            if attr == 'metadata':
-                continue
-            attrs.append(attr)
-        return attrs
-
-
-
-
-
-

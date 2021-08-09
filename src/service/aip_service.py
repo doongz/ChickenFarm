@@ -5,8 +5,8 @@ Automatic Investment Plan
 """
 from datetime import datetime, timedelta
 
-from apollo.src.prof_model.fund_netvalue import FundNetValue
-from apollo.src.db_model.tbl_info import InfoTable
+from apollo.src.model_prof.fund_netvalue import FundNetValue
+from apollo.src.model_db.tbl_info import InfoTable
 from apollo.src.util.log import get_logger
 
 

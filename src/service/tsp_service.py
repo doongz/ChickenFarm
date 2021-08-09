@@ -4,9 +4,9 @@
 """
 import xalpha as xa
 
-from apollo.src.db_model.database import Database
-from apollo.src.db_model.tbl_info import InfoTable
-from apollo.src.prof_model.fund_netvalue import FundNetValue
+from apollo.src.model_db.database import Database
+from apollo.src.model_db.tbl_info import InfoTable
+from apollo.src.model_prof.fund_netvalue import FundNetValue
 from apollo.src.util.log import get_logger
 
 logger = get_logger()
