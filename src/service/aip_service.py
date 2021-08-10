@@ -17,6 +17,7 @@ logger = get_logger()
 def invest_week(code, start, end, amount):
     """
     每周定投
+    todo: ut 
 
     :param code:    基金代码        str      '005827'
     :param start:   定投开始日       str     '2020-08-04'
@@ -26,18 +27,18 @@ def invest_week(code, start, end, amount):
     """
     fund_val = FundNetValue(code)
     price_df = fund_val.read_sql()
-    logger.info(InfoTable.get_by_code(code).name)
+    logger.info(f"invest week, {InfoTable.get_by_code(code).name} "
+                f"{code} start:{start} end:{end}.")
 
+    if not is_trade_day(start):
+        logger.error(f"Start date:{start} is not trading day.")
+        return
+    if not is_trade_day(end):
+        logger.error(f"End date:{end} is not trading day.")
+        return
+    
     start = datetime.strptime(start, '%Y-%m-%d')
     end = datetime.strptime(end, '%Y-%m-%d')
-    while not is_trade_day(start):
-        # 如果不是交易日取后一个交易日
-        start = start + timedelta(days = 1)
-    while not is_trade_day(end):
-        # 如果不是交易日取后一个交易日
-        end = end + timedelta(days = -1)
-    logger.warning(f"Repair trading day, start:{start} end:{end}")
-    
     start_index = price_df.loc[price_df['date'] == start].index[0]
     end_index = price_df.loc[price_df['date'] == end].index[0]
     buy_df = price_df.iloc[start_index : end_index] # 待买df
@@ -56,7 +57,7 @@ def invest_week(code, start, end, amount):
     for index, unit in enumerate(total):
         profit_rate = round((sell_price*unit-count[index])/count[index], 4)
         res.append(profit_rate)
-        logger.info(f"每周 {index+1} 定投，累计投入 {count[index]} 单位金额，"
+        logger.debug(f"每周 {index+1} 定投，累计投入 {count[index]} 单位金额，"
                     f"最终卖出 {round(sell_price*unit,2)} 单位金额，"
                     f"收益率 {100*profit_rate}% ;")
     return res
