@@ -1,3 +1,5 @@
+禁止service互相调用
+
 echo "export PYTHONPATH=$PYTHONPATH:/Users/zhangdong/Desktop" >> ~/.bash_profile
 echo "export USERNAME=" >> ~/.bash_profile
 echo "export PASSWORD=" >> ~/.bash_profile

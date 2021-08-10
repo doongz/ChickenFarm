@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 
 from apollo.src.model_prof.fund_netvalue import FundNetValue
 from apollo.src.model_db.tbl_info import InfoTable
+from apollo.src.util.tools import is_trade_day
 from apollo.src.util.log import get_logger
 
 
@@ -20,12 +21,22 @@ def invest_week(code, start, end, amount):
     :param code:    基金代码        str      '005827'
     :param start:   定投开始日       str     '2020-08-04'
     :param end:     定投结束日       str     '2021-08-03'
-    :param amount:  每次投资的金额    int     400
+    :param amount:  每次投资的金额    int     100
     :return: 
     """
     fund_val = FundNetValue(code)
     price_df = fund_val.read_sql()
     logger.info(InfoTable.get_by_code(code).name)
+
+    start = datetime.strptime(start, '%Y-%m-%d')
+    end = datetime.strptime(end, '%Y-%m-%d')
+    while not is_trade_day(start):
+        # 如果不是交易日取后一个交易日
+        start = start + timedelta(days = 1)
+    while not is_trade_day(end):
+        # 如果不是交易日取后一个交易日
+        end = end + timedelta(days = -1)
+    logger.warning(f"Repair trading day, start:{start} end:{end}")
     
     start_index = price_df.loc[price_df['date'] == start].index[0]
     end_index = price_df.loc[price_df['date'] == end].index[0]
