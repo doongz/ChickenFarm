@@ -52,10 +52,15 @@ def invest_week(code, start, end, amount):
         total[weekday] = total[weekday] + amount/float(row['totvalue']) 
         count[weekday] += amount
 
+    res = []
     for index, unit in enumerate(total):
+        profit_rate = round((sell_price*unit-count[index])/count[index], 4)
+        res.append(profit_rate)
         logger.info(f"每周 {index+1} 定投，累计投入 {count[index]} 单位金额，"
                     f"最终卖出 {round(sell_price*unit,2)} 单位金额，"
-                    f"收益率 {round(100*(sell_price*unit-count[index])/count[index],2)}% ;")
+                    f"收益率 {100*profit_rate}% ;")
+    return res
+
 
 
 def invest_month(code, start, end, amount, day_list=['05', '10', '15', '20', '25']):
