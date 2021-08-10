@@ -1,7 +1,9 @@
 import pandas as pd
 
 from apollo.src.service.aip_service import invest_week
+from apollo.src.plot.box_plot import show_box_plot
 from apollo.src.util.tools import is_trade_day, get_between_day
+
 
 
 pd.set_option('display.max_columns', None)
@@ -14,7 +16,7 @@ pd.set_option('display.width', 180) # 设置打印宽度(**重要**)
 def code_005827():
 
     code = '005827'
-    start_interval = ('2021-02-23', '2021-03-04')
+    start_interval = ('2021-01-08', '2021-02-23')
     end = '2021-08-09'
     amount = 100
 
@@ -31,7 +33,9 @@ def code_005827():
                             '收益率':rate}, 
                             ignore_index=True)
 
-    print(df)
+    show_box_plot(df)
+
+    # return df
 
 
 
