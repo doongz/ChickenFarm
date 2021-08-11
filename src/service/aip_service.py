@@ -3,15 +3,44 @@ Automatic Investment Plan
 周定投
 月定投
 """
+import pandas as pd
 from datetime import datetime, timedelta
 
 from apollo.src.model_prof.fund_netvalue import FundNetValue
 from apollo.src.model_db.tbl_info import InfoTable
-from apollo.src.util.tools import is_trade_day
+from apollo.src.util.tools import is_trade_day, get_between_day
 from apollo.src.util.log import get_logger
 
 
 logger = get_logger()
+
+
+def invest_week_with_start_interval(code, start_interval, end, amount):
+    """
+    每周定投 起始日为一个区间
+    todo: ut 
+
+    :param code:             基金代码         str     '005827'
+    :param start_interval:   定投开始日       tuple    ('2021-01-08', '2021-02-23')
+    :param end:              定投结束日       str     '2021-08-09'
+    :param amount:           每次投资的金额    int     100
+    :return df                               dataframe
+    """
+
+    df = pd.DataFrame(columns=['start', 'week', 'profit_rate'])
+
+    for start in get_between_day(start_interval[0], start_interval[1]):
+        if not is_trade_day(start):
+            continue
+        res_in_week = invest_week(code, start, end, amount)
+
+        for index, rate in enumerate(res_in_week):
+            df = df.append({'start':start, 
+                            'week':index+1, 
+                            'profit_rate':rate*100}, 
+                            ignore_index=True)
+    logger.info(f"统计完成，{code} 每周定投{amount}，起始日区间为{start_interval}, 结束日为{end}.")
+    return df
 
 
 def invest_week(code, start, end, amount):
@@ -23,11 +52,11 @@ def invest_week(code, start, end, amount):
     :param start:   定投开始日       str     '2020-08-04'
     :param end:     定投结束日       str     '2021-08-03'
     :param amount:  每次投资的金额    int     100
-    :return: 
+    :return res:    list
     """
     fund_val = FundNetValue(code)
     price_df = fund_val.read_sql()
-    logger.info(f"invest week, {InfoTable.get_by_code(code).name} "
+    logger.debug(f"invest week, {InfoTable.get_by_code(code).name} "
                 f"{code} start:{start} end:{end}.")
 
     if not is_trade_day(start):

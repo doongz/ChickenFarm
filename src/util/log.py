@@ -1,4 +1,44 @@
+import inspect
+import os
 import logging
+from logging.config import fileConfig
+
+# logging.config.fileConfig(
+#     os.path.join(os.path.dirname(os.path.abspath(__file__)), "logging.conf"))
+
+# if os.name == 'nt':
+#     LOG_FILENAME = os.path.join("controller_service.log")
+# else:
+#     LOG_FILENAME = os.path.join("/var/log/controller_service.log")
+
+# preheat_log_dir = "/var/log/preheat/"
+
+
+def get_logger_new(name):
+    logger = logging.getLogger(name)
+    return logger
+
+
+def log_function_call(func):
+    """
+    Decorator to print function call details.
+
+    This includes parameters names and effective values.
+    """
+
+    def wrapper(*args, **kwargs):
+        func_args = inspect.signature(func).bind(*args, **kwargs).arguments
+        func_args_str = ", ".join(
+            "{} = {!r}".format(*item) for item in func_args.items() if item[0] != 'password'
+        )
+        log = get_logger(f"{func.__module__}.{func.__qualname__}")
+        log.info(f"{func.__module__}.{func.__qualname__} ( {func_args_str} )")
+        return func(*args, **kwargs)
+
+    return wrapper
+
+
+
 
 def get_logger(path="/Users/zhangdong/Desktop/fund.log"):
 
