@@ -94,3 +94,44 @@ def show_one_box_plot(df_dict, figsize=(20, 10), notch=True, vert=True):
         
     
     plt.show()
+
+
+def show_diff_violin_plot(df_dict, figsize=(20, 7)):
+    '''
+    一次可以看多个基金的周定投-小提琴图
+    
+    :param df_dict: 基金字典    dict  {'LanChou':df_005827, 'GuoTaiChe':df_001790, 'ZhongOuYiliao':df_003095}
+    :param figsize: 画布大小    tuple (20, 7)
+    '''
+    
+    funds_cnt = len(df_dict)
+    ax_list = [None for _ in range(funds_cnt)]
+    plot_list = []
+    labels = [f"week {day}" for day in range(1, 6)]
+    
+    fig, ax_list = plt.subplots(nrows=1, ncols=funds_cnt, figsize=figsize)
+    
+    i = 0
+    for fund, fund_df in df_dict.items():
+        # 每周一个box
+        bodies = [fund_df.loc[fund_df['week'] == day]['profit_rate'] for day in range(1, 6)]
+        
+        violin_plot = ax_list[i].violinplot(bodies,
+                                         showmeans=False,
+                                         showmedians=True)
+        ax_list[i].set_title(fund)
+        plot_list.append(violin_plot)
+        i += 1
+        
+    # adding horizontal grid lines
+    for ax in ax_list:
+        ax.yaxis.grid(True)
+#         ax.set_xticks([i+1 for i in range(5)])
+#         ax.set_xlabel('Four separate samples')
+        ax.set_ylabel('Profit Rate / %')
+
+    # add x-tick labels
+    plt.setp(ax_list, xticks=[i+1 for i in range(5)],
+             xticklabels=labels)
+    
+    plt.show()
