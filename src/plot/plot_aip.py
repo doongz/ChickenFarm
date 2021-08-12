@@ -1,5 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+
+plt.rcParams['font.sans-serif'] = ['Arial Unicode MS']
  
 
 def show_diff_box_plot(df_dict, figsize=(20, 7), notch=True, vert=True):
