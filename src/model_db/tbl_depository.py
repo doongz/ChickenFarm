@@ -45,6 +45,17 @@ class DepositoryTable(Base):
             attrs.append(attr)
         return attrs
 
+def get_fund_dic_from_dpt(code):
+    # 获取的结果，仅可作为展示
+    fund_dpt = DepositoryTable.get_by_code(code)
+    if not fund_dpt: return {}
+
+    fund_dpt_dic = {}
+    for attr in fund_dpt.get_attrs():
+        value = getattr(fund_dpt, attr)
+        fund_dpt_dic[attr] = str(value)
+    return fund_dpt_dic
+
 
 
 

@@ -23,3 +23,11 @@ class Status:
 
     HOLD = "Holding"
     CLEAR = "Clearance"
+
+
+class OperateType:
+
+    BUY = 'buy'
+    SELL = 'sell'
+    UPDATE = 'update'
+    DELETE = 'delete'

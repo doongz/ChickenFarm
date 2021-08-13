@@ -11,6 +11,12 @@ from apollo.src.util.log import get_logger
 
 logger = get_logger()
 
+
+def get_fundinfo_from_xalpha(code):
+    fundinfo = xa.fundinfo(code)
+    return fundinfo
+
+
 def transport(codes):
     """
     :params codes 基金代码 list
@@ -22,7 +28,10 @@ def transport(codes):
 
 
 def upload_netvalue_and_info(code):
-
+    '''
+    把基金的历史净值上传至 db_netvalue 数据库中
+    并更新 db_fund.tbl_info 中的信息
+    '''
     fundinfo = get_fundinfo_from_xalpha(code)
 
     fund_val = FundNetValue(code)
@@ -49,9 +58,7 @@ def upload_netvalue_and_info(code):
     logger.info(f"Update the data({info.name}) to the table({fund_val.tbl}, {info.__tablename__}).")
 
 
-def get_fundinfo_from_xalpha(code):
-    fundinfo = xa.fundinfo(code)
-    return fundinfo
+
 
 
 

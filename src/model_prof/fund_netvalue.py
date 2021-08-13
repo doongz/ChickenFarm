@@ -18,7 +18,7 @@ class FundNetValue():
 
         price_df.to_sql(name=self.tbl, 
                         con=self.engine, 
-                        if_exists="replace", # 重复的行数据也会追加
+                        if_exists="replace", # append 重复的行数据也会追加
                         index=False,
                         dtype=DTYPES)
         return self.tbl
