@@ -9,7 +9,8 @@ from apollo.src.model_db.tbl_info import InfoTable
 from apollo.src.model_prof.fund_netvalue import FundNetValue
 from apollo.src.util.log import get_logger
 
-logger = get_logger()
+
+logger = get_logger(__file__)
 
 
 def get_fundinfo_from_xalpha(code):

@@ -4,7 +4,6 @@ from sqlalchemy import Column, DateTime, DECIMAL, VARCHAR, CHAR
 
 from apollo.src.model_db.database import Database
 
-
 Base = declarative_base()
 
 

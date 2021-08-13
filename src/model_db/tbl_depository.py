@@ -5,7 +5,6 @@ from sqlalchemy import Column, DateTime, DECIMAL, VARCHAR, CHAR, INT
 from apollo.src.model_db.database import Database
 from apollo.src.model_prof.fund_types import Status
 
-
 Base = declarative_base()
 
 
@@ -44,6 +43,7 @@ class DepositoryTable(Base):
                 continue
             attrs.append(attr)
         return attrs
+
 
 def get_fund_dic_from_dpt(code):
     # 获取的结果，仅可作为展示

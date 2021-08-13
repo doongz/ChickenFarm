@@ -7,7 +7,7 @@ from apollo.src.util.tools import auth, record
 from apollo.src.util.log import get_logger
 
 
-logger = get_logger()
+logger = get_logger(__file__)
 
 
 @auth

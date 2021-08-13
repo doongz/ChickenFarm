@@ -4,7 +4,9 @@ from apollo.src.service.data_service import add_fund, delete_fund, update_fund, 
 from apollo.src.service.data_service import buy_fund, sell_fund, update_position
 from apollo.src.service.data_service import update_total_for_field
 from apollo.src.model_prof.fund_types import Filed
+from apollo.src.util.log import get_logger
 
+logger = get_logger(__file__)
 
 
 def main():
@@ -17,8 +19,8 @@ def main():
     # update_total_for_field()
 
     # 删除基金
-    # delete_fund(code='519674', key='AK06@w33D')
-    # update_total_for_field()
+    delete_fund(code='519674', key='AK06@w33D')
+    update_total_for_field()
 
     # 加仓基金
     # buy_fund(code='519674', amount=100, key='AK06@w33D')

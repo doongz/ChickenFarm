@@ -11,7 +11,7 @@ from apollo.src.config.key import KEY
 from apollo.src.util.log import get_logger
 
 
-logger = get_logger()
+logger = get_logger(__file__)
 
 
 # 得到当前日期是否为股票交易日

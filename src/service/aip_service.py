@@ -12,7 +12,7 @@ from apollo.src.util.tools import is_trade_day, get_between_day
 from apollo.src.util.log import get_logger
 
 
-logger = get_logger()
+logger = get_logger(__file__)
 
 
 def invest_week_with_start_interval(code, start_interval, end, amount):

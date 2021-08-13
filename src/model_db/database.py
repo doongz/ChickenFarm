@@ -3,6 +3,7 @@ from sqlalchemy.orm import sessionmaker
 
 from apollo.src.config.mysql import USER, PWD, ADDRESS, PORT, DB_FUND
 
+
 class Singleton(type):
     _instances = {}
 
