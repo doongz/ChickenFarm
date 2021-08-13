@@ -8,3 +8,9 @@ echo "export PORT=" >> ~/.bash_profile
 echo "export DB_FUND=" >> ~/.bash_profile
 echo "export DB_NETVALUE=" >> ~/.bash_profile
 source ~/.bash_profile
+
+
+买一个基金步骤
+1、将基金代码写入 buy_list 中
+2、执行 python cronjob.py
+3、

@@ -9,64 +9,126 @@ from apollo.src.util.log import get_logger
 logger = get_logger()
 
 
-def add_fund(code, buying, filed=None, comment=None):
-
+def add_fund(code, amount, filed=None, comment=None):
+    '''
+    向 tbl_depository 添加第一次购买的基金
+    '''
     fund_info = InfoTable.get_by_code(code)
     if not fund_info:
         logger.error(f"Please upload {code} netvalue and info, firstly.")
         raise Exception(f"Not found {code} in tbl_info.")
 
-    dpt_tbl = DepositoryTable()
-    dpt_tbl.name = fund_info.name
-    dpt_tbl.code = code
-    dpt_tbl.filed = filed
-    dpt_tbl.buying = buying
-    dpt_tbl.position = buying
-    dpt_tbl.comment = comment
+    fund_dpt = DepositoryTable.get_by_code(code)
+    if fund_dpt:
+        logger.error(f"{fund_dpt.code}({fund_dpt.name}) has been in tbl_depository.")
+        return
 
-    Database().add(dpt_tbl)
-    logger.info(f"add {dpt_tbl.name}({dpt_tbl.code}) to tbl_depository successfully, "
-                f"filed:{dpt_tbl.filed}, buying:{dpt_tbl.buying}, comment:{dpt_tbl.comment}.")
+    fund_dpt = DepositoryTable()
+    fund_dpt.name = fund_info.name
+    fund_dpt.code = code
+    fund_dpt.filed = filed
+    fund_dpt.buying = amount
+    fund_dpt.position = amount
+    fund_dpt.comment = comment
+
+    Database().add(fund_dpt)
+    logger.info(f"Add {fund_dpt.name}({fund_dpt.code}) to tbl_depository successfully, "
+                f"filed:{fund_dpt.filed}, buying:{fund_dpt.buying}, comment:{fund_dpt.comment}.")
 
 
 def update_fund(code, update_data):
     """
+    更新 tbl_depository 表中基金的数据，直接指定数据
     :param update_data: dict {"name": name, "profit": profit,}
     """
-    dpt_tbl = DepositoryTable.get_by_code(code)
+    fund_dpt = DepositoryTable.get_by_code(code)
 
-    for attr in dpt_tbl.get_attrs():
+    for attr in fund_dpt.get_attrs():
         value = update_data.get(attr, None)
         if value:
-            setattr(dpt_tbl, attr, value)
-            # logger.debug(getattr(dpt_tbl, attr))
+            setattr(fund_dpt, attr, value)
+            # logger.debug(getattr(fund_dpt, attr))
 
     Database().update()
-    logger.info(f"update {dpt_tbl.name}({dpt_tbl.code}) data({update_data}).")
+    logger.info(f"Update {fund_dpt.name}({fund_dpt.code}) data({update_data}).")
 
 
 def delete_fund(code):
+    '''
+    删除 tbl_depository 表中一条基金记录
+    '''
+    fund_dpt = DepositoryTable.get_by_code(code)
+    if not fund_dpt:
+        logger.error(f"Not found {code} in tbl_depository.")
+        return
 
-    dpt_tbl = DepositoryTable.get_by_code(code)
-    Database().delete(dpt_tbl)
-    
-    logger.info(f"delete {dpt_tbl.name}({dpt_tbl.code}) from tbl_depository.")
+    Database().delete(fund_dpt)
+    logger.info(f"Delete {fund_dpt.name}({fund_dpt.code}) from tbl_depository.")
 
 
 def show_fund(code):
-
-    dpt_tbl = DepositoryTable.get_by_code(code)
-    for attr in dpt_tbl.get_attrs():
-        value = getattr(dpt_tbl, attr)
+    '''
+    展示 tbl_depository 表中一条基金记录
+    '''
+    fund_dpt = DepositoryTable.get_by_code(code)
+    for attr in fund_dpt.get_attrs():
+        value = getattr(fund_dpt, attr)
         logger.info(f"{attr}: {value}")
 
 
-def buy_fund():
-    pass
+def buy_fund(code, amount):
+    '''
+    加仓基金，更新 tbl_depository 表中该基金的 buying position profit_rate 数据
+    '''
+    fund_dpt = DepositoryTable.get_by_code(code)
+    if not fund_dpt:
+        logger.error(f"Not found {code} in tbl_depository.")
+        return
+
+    fund_dpt.buying += amount
+    fund_dpt.position += amount
+    fund_dpt.profit_rate = round(fund_dpt.profit/fund_dpt.buying, 4)
+
+    Database().update()
+    logger.info(f"Buy fund {fund_dpt.name}({fund_dpt.code}), amount({amount}), buying({fund_dpt.buying}), "
+                f"position({fund_dpt.position}), profit_rate({fund_dpt.profit_rate}).")
 
 
-def sell_fund():
-    pass
+def sell_fund(code, amount):
+    '''
+    卖出基金，更新 tbl_depository 表中该基金的 selling position 数据
+    '''
+    fund_dpt = DepositoryTable.get_by_code(code)
+    if not fund_dpt:
+        logger.error(f"Not found {code} in tbl_depository.")
+        return
+
+    fund_dpt.selling += amount
+    fund_dpt.position -= amount
+
+    Database().update()
+    logger.info(f"Sell fund {fund_dpt.name}({fund_dpt.code}), amount({amount}), "
+                f"selling({fund_dpt.selling}), position({fund_dpt.position}).")
+
+
+def update_position(code, amount):
+    '''
+    上传基金最新持仓，更新 tbl_depository 表中该基金的 position profit profit_rate 数据
+    '''
+    fund_dpt = DepositoryTable.get_by_code(code)
+    if not fund_dpt:
+        logger.error(f"Not found {code} in tbl_depository.")
+        return
+
+    fund_dpt.position = amount
+    fund_dpt.profit = fund_dpt.position + fund_dpt.selling - fund_dpt.buying
+    fund_dpt.profit_rate = round(fund_dpt.profit/fund_dpt.buying, 4)
+
+    Database().update()
+    logger.info(f"Update position {fund_dpt.name}({fund_dpt.code}), amount({amount}), "
+                f"position({fund_dpt.position}), profit({fund_dpt.profit}), "
+                f"profit_rate({fund_dpt.profit_rate}).")
+
 
 def update_total_for_field():
     '''

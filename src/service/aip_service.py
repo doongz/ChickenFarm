@@ -18,7 +18,7 @@ logger = get_logger()
 def invest_week_with_start_interval(code, start_interval, end, amount):
     """
     每周定投 起始日为一个区间
-    todo: ut 
+    todo: 多进程 
 
     :param code:             基金代码         str     '005827'
     :param start_interval:   定投开始日       tuple    ('2021-01-08', '2021-02-23')

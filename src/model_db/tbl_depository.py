@@ -29,7 +29,7 @@ class DepositoryTable(Base):
 
     @staticmethod
     def get_by_code(code):
-        return Database().query(DepositoryTable).filter_by(code=code).one()
+        return Database().query(DepositoryTable).filter_by(code=code).first()
 
     @staticmethod
     def get_by_filed(filed):

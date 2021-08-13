@@ -1,34 +1,38 @@
+import argparse
+
 from apollo.src.service.data_service import add_fund, delete_fund, update_fund, show_fund
-from apollo.src.service.tsp_service import upload_netvalue_and_info
+from apollo.src.service.data_service import buy_fund, sell_fund, update_position
+from apollo.src.service.data_service import update_total_for_field
 from apollo.src.model_prof.fund_types import Filed, Status
-from apollo.src.model_db.tbl_info import InfoTable
-from apollo.src.service.aip_service import invest_week, invest_month
-from apollo.src.service import data_service
+
+
 
 
 
 def main():
 
-    data_service.update_total_for_field()
-    # add_fund(code='519185', 
-    #          filed=Filed.FINANCE, 
-    #          buying=450, 
-    #          selling=0, 
-    #          position=387.73,
-    #          status=Status.HOLD,
-    #          comment='停止买入')
+    # 新买入基金
+    # add_fund(code='519674', 
+    #          amount=50,
+    #          filed=Filed.SEMI)
+    # update_total_for_field()
 
+    # 删除基金
+    # delete_fund(code='519674')
+    # update_total_for_field()
 
-    # update_fund(code='165520', 
-    #             update_data={'profit':418.91,
-    #                          'profit_rate':0.2889})
+    # 加仓基金
+    # buy_fund(code='519674', amount=100)
+    # update_total_for_field()
 
-    # show_fund(code='165520')
+    # 卖出基金
+    # sell_fund(code='519674', amount=100)
+    # update_total_for_field()
 
-    # upload_netvalue_and_info(code = '005827')
-    # print(InfoTable.get_by_code('005827').name)
-    # invest_week('005827', '2020-08-04', '2021-08-03', 100)
-    # invest_month('005827', '2020-08-04', '2021-08-06', 400)
+    # 更新基金的最新持仓
+    # update_position(code='519674', amount=500)
+    # update_total_for_field()
+    pass
 
 
 if __name__ == "__main__":
