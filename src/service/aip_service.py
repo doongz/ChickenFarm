@@ -4,6 +4,7 @@ Automatic Investment Plan
 月定投
 """
 import pandas as pd
+import multiprocessing
 from datetime import datetime, timedelta
 
 from apollo.src.model_prof.fund_netvalue import FundNetValue
@@ -40,6 +41,32 @@ def invest_week_with_start_interval(code, start_interval, end, amount):
                             'profit_rate':rate*100}, 
                             ignore_index=True)
     logger.info(f"统计完成，{code} 每周定投{amount}，起始日区间为{start_interval}, 结束日为{end}.")
+    return df
+
+
+def invest_week_with_start_interval_speed(code, start_interval, end, amount, cpus=8):
+
+    results = []
+    job_cnt = min(multiprocessing.cpu_count(), int(cpus))
+    pool = multiprocessing.Pool(processes=job_cnt)
+
+    for start in get_between_day(start_interval[0], start_interval[1]):
+        if not is_trade_day(start):
+            continue
+        res = pool.apply_async(invest_week, args=(code, start, end, amount, ))
+        results.append((start, res))
+    pool.close()
+    pool.join()
+
+    df = pd.DataFrame(columns=['start', 'week', 'profit_rate'])
+    for res_in_week in results:
+        for index, rate in enumerate(res_in_week[1].get()):
+            df = df.append({'start':res_in_week[0], 
+                            'week':index+1, 
+                            'profit_rate':rate*100}, 
+                            ignore_index=True)
+
+    logger.info(f"统计（加速）完成，{code} 每周定投{amount}，起始日区间为{start_interval}, 结束日为{end}.")
     return df
 
 

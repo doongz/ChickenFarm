@@ -2,6 +2,7 @@
 将xalpha的数据搬运到自建数据库
 只有函数 get_fundinfo_from_xalpha() 读取xalpha数据，其他脚本一律读取数据库中数据
 """
+import multiprocessing
 import xalpha as xa
 
 from apollo.src.model_db.database import Database
@@ -21,11 +22,25 @@ def get_fundinfo_from_xalpha(code):
 def transport(codes):
     """
     :params codes 基金代码 list
-    todo:可以改成多进程加速
     """
     for code in codes:
         upload_netvalue_and_info(code)
+
     logger.info(f"Transport {len(codes)} data successful.")
+
+
+def transport_speed(codes, cpus=8):
+    results = []
+    job_cnt = min(multiprocessing.cpu_count(), int(cpus))
+    pool = multiprocessing.Pool(processes=job_cnt)
+
+    for code in codes:
+        ret = pool.apply_async(upload_netvalue_and_info, args=(code, ))
+        results.append((code, ret))
+    pool.close()
+    pool.join()
+
+    logger.info(f"Transport-Speed {len(codes)} data successful.")
 
 
 def upload_netvalue_and_info(code):
@@ -33,30 +48,36 @@ def upload_netvalue_and_info(code):
     把基金的历史净值上传至 db_netvalue 数据库中
     并更新 db_fund.tbl_info 中的信息
     '''
-    fundinfo = get_fundinfo_from_xalpha(code)
+    try:
+        fundinfo = get_fundinfo_from_xalpha(code)
 
-    fund_val = FundNetValue(code)
-    fund_val.to_sql(fundinfo.price)
+        fund_val = FundNetValue(code)
+        fund_val.to_sql(fundinfo.price)
 
-    info = InfoTable.get_by_code(code)
-    if not info:
-        info = InfoTable()
+        info = InfoTable.get_by_code(code)
+        if not info:
+            info = InfoTable()
+            info.name = fundinfo.name
+            info.code = fundinfo.code
+            info.rate = fundinfo.rate / 100
+            info.feeinfo = str(fundinfo.feeinfo)
+            info.url = fundinfo._url
+            Database().add(info)
+            logger.info(f"Add the data({info.name}) to the table({fund_val.tbl}, {info.__tablename__}).")
+            return True
+
         info.name = fundinfo.name
         info.code = fundinfo.code
         info.rate = fundinfo.rate / 100
         info.feeinfo = str(fundinfo.feeinfo)
         info.url = fundinfo._url
-        Database().add(info)
-        logger.info(f"Add the data({info.name}) to the table({fund_val.tbl}, {info.__tablename__}).")
-        return
+        Database().update()
+        logger.info(f"Update the data({info.name}) to the table({fund_val.tbl}, {info.__tablename__}).")
+        return True
 
-    info.name = fundinfo.name
-    info.code = fundinfo.code
-    info.rate = fundinfo.rate / 100
-    info.feeinfo = str(fundinfo.feeinfo)
-    info.url = fundinfo._url
-    Database().update()
-    logger.info(f"Update the data({info.name}) to the table({fund_val.tbl}, {info.__tablename__}).")
+    except Exception as error:
+        logger.error(f"Upload netvalue and info occurre an error: {error}.")
+        return False
 
 
 
