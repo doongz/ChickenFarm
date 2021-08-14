@@ -1,3 +1,6 @@
+'''
+操作模块，负责添加、删除、更新、购买、卖出、更新持仓等功能
+'''
 from apollo.src.model_db.database import Database
 from apollo.src.model_db.tbl_depository import DepositoryTable, get_fund_dic_from_dpt
 from apollo.src.model_db.tbl_info import InfoTable

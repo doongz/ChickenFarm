@@ -1,8 +1,8 @@
 import pandas as pd
 from pandas.testing import assert_frame_equal
 
-from apollo.src.service.aip_service import invest_week_with_start_interval
-from apollo.src.service.aip_service import invest_week_with_start_interval_speed
+from apollo.src.module.aip_mod import invest_week_with_start_interval
+from apollo.src.module.aip_mod import invest_week_with_start_interval_speed
 
 
 pd.set_option('display.max_columns', None)
