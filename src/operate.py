@@ -11,17 +11,17 @@ def run():
 
     # 新买入基金
     # add_fund(code='519674', 
-    #          amount=1000,
+    #          amount=50,
     #          filed=Filed.SEMI,
     #          key='AK06@w33D')
     # update_total_for_field()
 
     # 删除基金
-    delete_fund(code='519674', key='AK06@w33D')
-    update_total_for_field()
+    # delete_fund(code='519674', key='AK06@w33D')
+    # update_total_for_field()
 
     # 加仓基金
-    # buy_fund(code='519674', amount=100, key='AK06@w33D')
+    # buy_fund(code='167301', amount=50, key='AK06@w33D')
     # update_total_for_field()
 
     # 卖出基金
@@ -29,8 +29,8 @@ def run():
     # update_total_for_field()
 
     # 更新基金的最新持仓
-    # update_position(code='519674', amount=1000, key='AK06@w33D')
-    # update_total_for_field()
+    update_position(code='320007', amount=1292.62, key='AK06@w33D')
+    update_total_for_field()
 
     # 展示基金
     # show_fund(code='519674')

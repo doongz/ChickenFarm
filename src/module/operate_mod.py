@@ -1,6 +1,8 @@
 '''
 操作模块，负责添加、删除、更新、购买、卖出、更新持仓等功能
 '''
+from decimal import Decimal
+
 from apollo.src.model_db.database import Database
 from apollo.src.model_db.tbl_depository import DepositoryTable, get_fund_dic_from_dpt
 from apollo.src.model_db.tbl_info import InfoTable
@@ -26,7 +28,7 @@ def add_fund(code, amount, filed=None, comment=None, *args, **kwargs):
     fund_dpt = DepositoryTable.get_by_code(code)
     if fund_dpt:
         logger.error(f"{fund_dpt.code}({fund_dpt.name}) has been in tbl_depository.")
-        return
+        raise Exception(f"{fund_dpt.code}({fund_dpt.name}) has been in tbl_depository.")
 
     fund_dpt = DepositoryTable()
     fund_dpt.name = fund_info.name
@@ -49,6 +51,9 @@ def update_fund(code, update_data, *args, **kwargs):
     :param update_data: dict {"name": name, "profit": profit,}
     """
     fund_dpt = DepositoryTable.get_by_code(code)
+    if not fund_dpt:
+        logger.error(f"Not found {code} in tbl_depository.")
+        raise Exception(f"Not found {code} in tbl_depository.")
 
     for attr in fund_dpt.get_attrs():
         value = update_data.get(attr, None)
@@ -69,7 +74,7 @@ def delete_fund(code, *args, **kwargs):
     fund_dpt = DepositoryTable.get_by_code(code)
     if not fund_dpt:
         logger.error(f"Not found {code} in tbl_depository.")
-        return
+        raise Exception(f"Not found {code} in tbl_depository.")
 
     Database().delete(fund_dpt)
     logger.info(f"Delete {fund_dpt.name}({fund_dpt.code}) from tbl_depository.")
@@ -81,10 +86,12 @@ def buy_fund(code, amount, *args, **kwargs):
     '''
     加仓基金，更新 tbl_depository 表中该基金的 buying position profit_rate 数据
     '''
+    amount = Decimal(amount).quantize(Decimal('0.00'))
+    
     fund_dpt = DepositoryTable.get_by_code(code)
     if not fund_dpt:
         logger.error(f"Not found {code} in tbl_depository.")
-        return
+        raise Exception(f"Not found {code} in tbl_depository.")
 
     fund_dpt.buying += amount
     fund_dpt.position += amount
@@ -101,10 +108,12 @@ def sell_fund(code, amount, *args, **kwargs):
     '''
     卖出基金，更新 tbl_depository 表中该基金的 selling position 数据
     '''
+    amount = Decimal(amount).quantize(Decimal('0.00'))
+
     fund_dpt = DepositoryTable.get_by_code(code)
     if not fund_dpt:
         logger.error(f"Not found {code} in tbl_depository.")
-        return
+        raise Exception(f"Not found {code} in tbl_depository.")
 
     fund_dpt.selling += amount
     fund_dpt.position -= amount
@@ -120,10 +129,12 @@ def update_position(code, amount, *args, **kwargs):
     '''
     上传基金最新持仓，更新 tbl_depository 表中该基金的 position profit profit_rate 数据
     '''
+    amount = Decimal(amount).quantize(Decimal('0.00'))
+
     fund_dpt = DepositoryTable.get_by_code(code)
     if not fund_dpt:
         logger.error(f"Not found {code} in tbl_depository.")
-        return
+        raise Exception(f"Not found {code} in tbl_depository.")
 
     fund_dpt.position = amount
     fund_dpt.profit = fund_dpt.position + fund_dpt.selling - fund_dpt.buying

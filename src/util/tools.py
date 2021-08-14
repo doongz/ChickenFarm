@@ -72,7 +72,7 @@ def record_operation(operate_type):
             opr.amount = kwargs.get("amount", None)
             opr.info_after_change = "Waiting for operation"
             opr.info_before_change = json.dumps(dpt_before_change)
-            Database().add(opr)
+            Database().add(opr) # 如果下面的函数发生异常，这里将会插入一条垃圾数据
 
             func(*args, **kwargs)
 
