@@ -1,7 +1,5 @@
 __pycache__/
 .ipynb_checkpoints
 .DS_Store
-start.sh
 dev.ipynb
 dev.py
-*.csv
