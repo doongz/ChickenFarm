@@ -1,3 +1,5 @@
+零、请自备数据库
+
 一、初次使用需要添加环境变量
 echo "export PYTHONPATH=$PYTHONPATH:/Users/zhangdong/Desktop" >> ~/.bash_profile
 echo "export DB_USERNAME=" >> ~/.bash_profile
@@ -26,3 +28,10 @@ source ~/.bash_profile
   3）更新持仓，现将基金的最新持仓维护至 position.csv 中，然后一键运行                
 3、统计并记录本周各个领域的投入、持仓、收益   python -m apollo.src.statistics
 4、导出图表                              python operate.py
+
+
+TODO:
+1、近半年、近一年、近三年定投分析
+2、cli 部分操作加入yes判断
+3、识别手机截屏录入最新净值
+4、readme
