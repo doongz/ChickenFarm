@@ -2,6 +2,7 @@ from apollo.src.module.operate_mod import add_fund, delete_fund, update_fund, sh
 from apollo.src.module.operate_mod import buy_fund, sell_fund, update_position
 from apollo.src.module.statistics_mod import update_total_for_field
 from apollo.src.model_prof.fund_types import Filed
+from apollo.src.util.sheet import read_latest_position
 from apollo.src.util.log import get_logger
 
 logger = get_logger(__file__)
@@ -28,12 +29,18 @@ def run():
     # sell_fund(code='519674', amount=200, key='AK06@w33D')
     # update_total_for_field()
 
-    # 更新基金的最新持仓
-    update_position(code='320007', amount=1292.62, key='AK06@w33D')
-    update_total_for_field()
+    # 一条一条更新基金的最新持仓
+    # update_position(code='320007', amount=1292.62, key='AK06@w33D')
+    # update_total_for_field()
+
+    # 读取 position.csv 中基金的最新持仓
+    # latest_position = read_latest_position()
+    # for code, position in latest_position:
+    #     update_position(code=code, amount=position, key='AK06@w33D')
+    # update_total_for_field()
 
     # 展示基金
-    # show_fund(code='519674')
+    show_fund(code='519674')
 
     pass
 

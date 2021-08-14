@@ -11,14 +11,14 @@ source ~/.bash_profile
 
 
 二、新买一个基金需要将基金的历史数据上传至数据库中
-1、将基金代码写入 buy_list 中
+1、将基金代码写入 position.csv 中
 2、执行                    python cronjob.py 
 
 
 三、每周末需要做
 1、更新净值数据库                         python -m apollo.src.cronjob
 1、将本周的交易记录下来                    python operate.py
-  1）处理加仓 
-  2）处理卖出
-  3）更新持仓                 
+  1）处理加仓，一条一条基金执行
+  2）处理卖出，一条一条基金执行
+  3）更新持仓，现将基金的最新持仓维护至 position.csv 中，然后一键运行                
 2、统计并记录本周各个领域的投入、持仓、收益   python -m apollo.src.statistics

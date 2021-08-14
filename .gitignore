@@ -4,3 +4,4 @@ __pycache__/
 start.sh
 dev.ipynb
 dev.py
+*.csv
