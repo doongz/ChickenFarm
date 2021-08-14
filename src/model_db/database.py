@@ -1,3 +1,4 @@
+import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -15,9 +16,9 @@ class Singleton(type):
 
 class Database(metaclass=Singleton):
     def __init__(self):
-        engine = create_engine(f"mysql+pymysql://{USER}:{PWD}@{ADDRESS}:{PORT}/{DB_FUND}")
+        self.engine = create_engine(f"mysql+pymysql://{USER}:{PWD}@{ADDRESS}:{PORT}/{DB_FUND}")
         # 创建DBSession类型:
-        DBSession = sessionmaker(bind=engine)
+        DBSession = sessionmaker(bind=self.engine)
         # 创建session对象:
         self.session = DBSession()
 
@@ -38,6 +39,10 @@ class Database(metaclass=Singleton):
     def update(self):
         # work
         self.session.commit()
+
+    def to_df(self, tbl_name):
+        # work
+        return pd.read_sql(tbl_name, self.engine)
 
     def rollback(self):
         self.session.rollback()

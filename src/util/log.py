@@ -1,10 +1,12 @@
-import inspect
 import os
+import inspect
 import logging
 from logging.config import fileConfig
 
-logging.config.fileConfig(
-    os.path.join(os.path.dirname(os.path.abspath(__file__)), "../config/logging.conf"))
+from apollo.src.config.path import LOG_PATH
+
+
+logging.config.fileConfig(LOG_PATH)
 
 
 def get_logger(filename):

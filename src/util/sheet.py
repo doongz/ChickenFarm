@@ -1,10 +1,12 @@
 import os
 import pandas as pd
 
-if os.getenv('POSITION_CSV_PATH', None):
-    POSITION_CSV_PATH = os.getenv('POSITION_CSV_PATH')
-else:
-    POSITION_CSV_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../config/position.csv")
+from apollo.src.model_db.database import Database
+from apollo.src.config.path import POSITION_CSV_PATH, EXPORT_TABLE_PATH
+from apollo.src.util.log import get_logger
+
+
+logger = get_logger(__file__)
 
 
 # 从 position.csv 中读取已购买基金的代码列表
@@ -22,3 +24,25 @@ def read_latest_position():
         latest_position.append((row['code'], row['position']))
 
     return latest_position
+
+
+# 从数据库中导出csv文件
+def export_tables():
+    table_names = ['tbl_depository', 'tbl_total_for_field', 'tbl_history_buying', 
+                   'tbl_history_position', 'tbl_history_profit']
+
+    for tbl in table_names:
+        df = Database().to_df(tbl)
+        tbl_path = os.path.join(EXPORT_TABLE_PATH, tbl+'.csv')
+        df.to_csv(tbl_path)
+
+        logger.info(f"Export table:{tbl} to {tbl_path} success.")
+
+
+
+
+
+
+
+
+

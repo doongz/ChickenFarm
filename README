@@ -8,6 +8,8 @@ echo "export DB_FUND=" >> ~/.bash_profile
 echo "export DB_NETVALUE=" >> ~/.bash_profile
 echo "export OPERATION_KEY=" >> ~/.bash_profile
 echo "export POSITION_CSV_PATH=" >> ~/.bash_profile
+echo "export EXPORT_TABLE_PATH=" >> ~/.bash_profile
+echo "export EXPORT_CHART_PATH=" >> ~/.bash_profile
 source ~/.bash_profile
 
 
