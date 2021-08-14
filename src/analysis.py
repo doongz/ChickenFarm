@@ -12,7 +12,7 @@ pd.set_option('display.unicode.east_asian_width', True)
 pd.set_option('display.width', 180) # 设置打印宽度(**重要**)
 
 
-def main(is_speed=True):
+def run(is_speed=True):
 
     if is_speed:
         df = invest_week_with_start_interval_speed('005827', ('2021-01-08', '2021-02-23'), '2021-08-09', 100)
@@ -23,6 +23,6 @@ def main(is_speed=True):
 
 if __name__ == "__main__":
 
-    main(is_speed=True)
+    run(is_speed=True)
 
 

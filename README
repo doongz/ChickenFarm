@@ -16,6 +16,6 @@ source ~/.bash_profile
 
 
 三、每周末需要做
-1、更新净值数据库           python cronjob.py
-1、将本周的交易记录下来      python operate.py
-2、刷新各种统计表
+1、更新净值数据库                         python -m apollo.src.cronjob
+1、将本周的交易记录下来                    python operate.py
+2、统计并记录本周各个领域的投入、持仓、收益   python -m apollo.src.statistics

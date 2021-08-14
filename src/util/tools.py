@@ -58,7 +58,7 @@ def auth(func):
 
 # 将操作前和操作后的 tbl_depository 中的基金进行记录
 # 必须需要参数 code
-def record(operate_type):
+def record_operation(operate_type):
     def inner(func):
         def wrapper(*args, **kwargs):
 
