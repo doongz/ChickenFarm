@@ -40,7 +40,7 @@ def run():
     # update_total_for_field()
 
     # 展示基金
-    # show_fund(code='519674')
+    show_fund(code='519674')
 
     pass
 
