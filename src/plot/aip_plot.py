@@ -1,7 +1,9 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-plt.rcParams['font.sans-serif'] = ['Arial Unicode MS']
+
+plt.rcParams['font.sans-serif'] = ['Arial Unicode MS'] # 显示中文
+plt.rcParams['figure.dpi'] = 300  # 显示分辨率
  
 
 def show_diff_box_plot(df_dict, figsize=(20, 7), notch=True, vert=True):

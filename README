@@ -25,4 +25,4 @@ source ~/.bash_profile
   2）处理卖出，一条一条基金执行
   3）更新持仓，现将基金的最新持仓维护至 position.csv 中，然后一键运行                
 3、统计并记录本周各个领域的投入、持仓、收益   python -m apollo.src.statistics
-4、导出图表
+4、导出图表                              python operate.py

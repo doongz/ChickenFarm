@@ -1,6 +1,6 @@
 from datetime import datetime
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, DateTime, DECIMAL, VARCHAR
+from sqlalchemy import Column, DateTime, DECIMAL, VARCHAR, INT
 
 from apollo.src.model_db.database import Database
 
@@ -12,7 +12,9 @@ class TotalForField(Base):
 
     __tablename__ = 'tbl_total_for_field'
 
-    filed = Column(VARCHAR(255), primary_key=True)
+    id = Column(INT, primary_key=True, autoincrement=True)
+    filed = Column(VARCHAR(255))
+    filed_cn = Column(VARCHAR(255))
     buying = Column(DECIMAL(10, 2))
     selling = Column(DECIMAL(10, 2))
     position = Column(DECIMAL(10, 2))

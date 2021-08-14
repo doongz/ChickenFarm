@@ -2,6 +2,9 @@ from apollo.src.module.operate_mod import add_fund, delete_fund, update_fund, sh
 from apollo.src.module.operate_mod import buy_fund, sell_fund, update_position
 from apollo.src.module.statistics_mod import update_total_for_field
 from apollo.src.model_prof.fund_types import Filed
+from apollo.src.plot.statistics_plot import export_position_bar_chart, export_profit_bar_chart
+from apollo.src.plot.statistics_plot import export_position_profit_bar_chart, export_profit_rate_bar_chart
+from apollo.src.plot.statistics_plot import export_position_pie_chart
 from apollo.src.util.sheet import read_latest_position, export_tables
 from apollo.src.util.log import get_logger
 
@@ -43,7 +46,14 @@ def run():
     # show_fund(code='519674')
 
     # 导出数据库中的table
-    export_tables()
+    # export_tables()
+
+    # 绘制图表
+    # export_position_bar_chart()
+    # export_profit_bar_chart()
+    # export_position_profit_bar_chart()
+    # export_profit_rate_bar_chart()
+    # export_position_pie_chart()
 
     pass
 
