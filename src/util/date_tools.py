@@ -20,7 +20,7 @@ def is_trade_day(date):
 def get_recent_trading_day(date):
     '''
     得到最近的交易日，往前找
-    :param  date     string/datetime  '2021-08-13'
+    :param  date     string/datetime  '2021-08-15'
     :return date     string           '2021-08-13'
     '''
     if isinstance(date, str):

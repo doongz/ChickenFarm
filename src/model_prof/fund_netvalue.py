@@ -32,7 +32,14 @@ class FundNetValue():
 
     @property
     def release_date(self):
+        # 为数据库中第一条
         pd = self.read_sql()
         return pd.iloc[0]['date']
+
+    @property
+    def last_date(self):
+        # 为数据库中最后一条
+        pd = self.read_sql()
+        return pd.iloc[-1]['date']
 
     

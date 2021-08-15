@@ -17,7 +17,18 @@ from apollo.src.util.log import get_logger
 logger = get_logger(__file__)
 
 
-def invest_weekly_nearly_day(code, before_days, size=60, amount=100):
+def upload_backtest_data(code):
+
+    backtest_df = pd.DataFrame()
+
+    for days in [180, 365, 356*3]:
+        df = invest_weekly_nearly_day(code=code, before_days=days)
+        backtest_df = pd.concat([backtest_df, df])
+
+    return backtest_df
+
+
+def invest_weekly_nearly_day(code, before_days, size=60):
     '''
     距离今天指定时间前（半年、一年、三年）的定投分析
 
@@ -27,27 +38,32 @@ def invest_weekly_nearly_day(code, before_days, size=60, amount=100):
     :param amount:           每次投资的金额    int     100
     :return df                               dataframe
     '''
-    
+    fund_value = FundNetValue(code)
+
+    # 处理起始区间，如果起始点在发行日之前，就调整为发行日那天
     start_interval = get_before_date_interval(before_days, size)
     start = datetime.strptime(start_interval[0], "%Y-%m-%d")
-    release_date = FundNetValue(code).release_date
-    if start < release_date:
-        start_interval = (release_date.strftime("%Y-%m-%d"),
-                          (release_date + timedelta(days=size)).strftime("%Y-%m-%d")
+    if start < fund_value.release_date:
+        start_interval = (fund_value.release_date.strftime("%Y-%m-%d"),
+                          (fund_value.release_date + timedelta(days=size)).strftime("%Y-%m-%d")
                           )
-        logger.warning(f"起始日:{start} 超过首发日:{release_date}, start_interval修复为{start_interval}.")
+        logger.warning(f"基金:{code}, 起始日:{start} 超过首发日:{fund_value.release_date}, "
+                       f"start_interval修复为{start_interval}.")
 
-    
+    # 处理结束的那天，如果结束的那天在数据库里还没上传，就调整为数据库中最后的日子
     end = get_recent_trading_day(datetime.today())
+    if datetime.strptime(end, "%Y-%m-%d") > fund_value.last_date:
+        end = fund_value.last_date.strftime("%Y-%m-%d")
+        logger.warning(f"基金:{code}, 结束日在数据库中不存在, 修复为{end}.")
+
     logger.info(f"开始统计，{code} 前{before_days}天每周定投，区间大小:{size}"
                 f" 起始区间:{start_interval}, 结束日:{end}.")
 
-    df = invest_weekly_with_start_interval_speed(code, start_interval, end, amount)
+    df = invest_weekly_with_start_interval(code, start_interval, end, before_days)
     return df
 
 
-
-def invest_weekly_with_start_interval(code, start_interval, end, amount=100):
+def invest_weekly_with_start_interval(code, start_interval, end, before_days, amount=100):
     """
     每周定投 起始日为一个区间
     须确保end为交易日，起始区间内的非交易日会被自动剔除 
@@ -62,7 +78,7 @@ def invest_weekly_with_start_interval(code, start_interval, end, amount=100):
         logger.error(f"End date:{end} is not trading day.")
         return
 
-    df = pd.DataFrame(columns=['start', 'week', 'profit_rate'])
+    df = pd.DataFrame(columns=['start', 'week', 'algorithm', 'before_days', 'profit_rate'])
 
     for start in get_between_data(start_interval[0], start_interval[1]):
         if not is_trade_day(start):
@@ -71,7 +87,9 @@ def invest_weekly_with_start_interval(code, start_interval, end, amount=100):
 
         for index, rate in enumerate(res_in_week):
             df = df.append({'start':start, 
-                            'week':index+1, 
+                            'week':index+1,
+                            'algorithm':'stupid',
+                            'before_days':before_days,
                             'profit_rate':rate*100}, 
                             ignore_index=True)
     logger.info(f"统计完成，{code} 每周定投{amount}，起始日区间为{start_interval}, 结束日为{end}.")
@@ -79,6 +97,7 @@ def invest_weekly_with_start_interval(code, start_interval, end, amount=100):
 
 
 def invest_weekly_with_start_interval_speed(code, start_interval, end, amount=100, cpus=8):
+    # 多进程仅可在一次调用中使用
     
     if not is_trade_day(end):
         logger.error(f"End date:{end} is not trading day.")
