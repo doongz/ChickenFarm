@@ -32,7 +32,15 @@ class DepositoryTable(Base):
 
     @staticmethod
     def get_by_filed(filed):
+        # 包含持仓和清仓的基金
         return Database().query(DepositoryTable).filter_by(filed=filed).all()
+
+    @staticmethod
+    def get_holding_by_filed(filed):
+        # 仅包含持仓中的基金
+        return Database().query(DepositoryTable).filter_by(filed=filed) \
+                                                .filter_by(status=Status.HOLD) \
+                                                .all()
 
     @staticmethod
     def get_all_holding():

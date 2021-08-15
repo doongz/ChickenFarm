@@ -1,9 +1,21 @@
+import os
+import math
 import pandas as pd
 import matplotlib.pyplot as plt
+
+from apollo.src.module.aip_mod import InvestmentCycle
+from apollo.src.model_db.tbl_depository import DepositoryTable
+from apollo.src.model_prof.fund_backtest import FundBacktest
+from apollo.src.config.path import EXPORT_AIP_PLOT_PATH
+from apollo.src.util.log import get_logger
+
+
+logger = get_logger(__file__)
 
 
 plt.rcParams['font.sans-serif'] = ['Arial Unicode MS'] # 显示中文
 plt.rcParams['figure.dpi'] = 300  # 显示分辨率
+plt.rcParams['savefig.dpi'] = 300  # 保存图片分辨率
  
 
 def show_diff_box_plot(df_dict, figsize=(20, 7), notch=True, vert=True):
@@ -140,5 +152,62 @@ def show_diff_violin_plot(df_dict, figsize=(20, 7)):
              xticklabels=labels)
     
     plt.show()
+
+
+def export_filed_aip_violin_plot(filed, show=False):
+    '''
+    导出指定领域基金的周定投-小提琴图
+    '''
+    fund_list = DepositoryTable.get_holding_by_filed(filed)
+    df_dict = {}
+
+    for fund in fund_list:
+        for days in InvestmentCycle.CYCLES:
+            df = FundBacktest(fund.code).read_sql()
+            df_dict[f'{fund.name}-{days}天'] = df.loc[df['before_days'] == days]
+            logger.debug(f"Loaded {fund.name}-{days} to df_dict.")
+
+    df_cnt = len(df_dict)
+    rows = math.ceil(df_cnt/3)
+    cols = 3
+    
+    fig, axs = plt.subplots(nrows=rows, 
+                            ncols=cols, 
+                            figsize=(10, 5*rows),# Width, height
+                            ) 
+    plt.subplots_adjust(wspace=0.3, hspace=0.3)
+    
+    i = 0
+    for fund, fund_df in df_dict.items():
+        # 这里 *100 变为百分比
+        bodies = [fund_df.loc[fund_df['week'] == day]['profit_rate']*100 for day in range(1, 6)]
+        
+        violin_plot = axs[math.floor(i/cols)][i%cols].violinplot(bodies,
+                                            showmeans=False, # 均值
+                                            showmedians=True, # 中位数
+                                            showextrema=True,  # 极值
+                                           ) 
+        axs[math.floor(i/cols)][i%cols].set_title(fund)
+        i += 1
+        
+    # adding horizontal grid lines
+    for r in range(rows):
+        for c in range(cols):
+            axs[r][c].yaxis.grid(True)
+            axs[r][c].set_xticks([i+1 for i in range(5)])
+            if c == 0:
+                axs[r][c].set_ylabel('Profit Rate / %')
+            
+
+    # add x-tick labels
+    labels = [f"week {day}" for day in range(1, 6)]
+    plt.setp(axs, xticks=[i+1 for i in range(5)],
+             xticklabels=labels)
+    
+    if show:
+        plt.show()
+    else:
+        plt.savefig(os.path.join(EXPORT_AIP_PLOT_PATH, f'{filed}.png'))
+        logger.info(f"Successfully exported {filed} aip violin plot.")
 
 

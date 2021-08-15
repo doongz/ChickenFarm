@@ -18,13 +18,23 @@ from apollo.src.util.log import get_logger
 logger = get_logger(__file__)
 
 
+class InvestmentCycle:
+
+    CYCLES = [180, 365, 1095]
+    HALF_YEAR = 180
+    ONE_YEAR = 365
+    THREE_YEAR = 1095
+
+
+
 def upload_backtest_data(code):
     '''
     向 db_backtest 数据库上传基金的，半年、一年、三年回测数据
+    todo: 将半年、一年、三年固定
     '''
     try:
         backtest_df = pd.DataFrame()
-        for days in [180, 365, 356*3]:
+        for days in InvestmentCycle.CYCLES:
             df = invest_weekly_nearly_day(code=code, before_days=days)
             backtest_df = pd.concat([backtest_df, df])
 
