@@ -34,6 +34,14 @@ class DepositoryTable(Base):
     def get_by_filed(filed):
         return Database().query(DepositoryTable).filter_by(filed=filed).all()
 
+    @staticmethod
+    def get_all_holding():
+        return Database().query(DepositoryTable).filter_by(status=Status.HOLD).all()
+
+    @staticmethod
+    def get_all():
+        return Database().query(DepositoryTable).all()
+
     def get_attrs(self):
         attrs = []
         for attr in self.__dir__():

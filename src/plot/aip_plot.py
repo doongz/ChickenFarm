@@ -121,17 +121,18 @@ def show_diff_violin_plot(df_dict, figsize=(20, 7)):
         bodies = [fund_df.loc[fund_df['week'] == day]['profit_rate'] for day in range(1, 6)]
         
         violin_plot = ax_list[i].violinplot(bodies,
-                                         showmeans=False,
-                                         showmedians=True)
+                                            showmeans=False, # 均值
+                                            showmedians=True, # 中位数
+                                            showextrema=True,  # 极值
+                                           ) 
         ax_list[i].set_title(fund)
         plot_list.append(violin_plot)
         i += 1
         
     # adding horizontal grid lines
-    for ax in ax_list:
+    for i, ax in enumerate(ax_list):
         ax.yaxis.grid(True)
-#         ax.set_xticks([i+1 for i in range(5)])
-#         ax.set_xlabel('Four separate samples')
+        ax.set_xticks([i+1 for i in range(5)])
         ax.set_ylabel('Profit Rate / %')
 
     # add x-tick labels
@@ -139,3 +140,5 @@ def show_diff_violin_plot(df_dict, figsize=(20, 7)):
              xticklabels=labels)
     
     plt.show()
+
+

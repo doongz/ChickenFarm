@@ -17,7 +17,7 @@ from apollo.src.util.log import get_logger
 logger = get_logger(__file__)
 
 
-def invest_weekly_nearly_day(code, before_days, size=30, amount=100):
+def invest_weekly_nearly_day(code, before_days, size=60, amount=100):
     '''
     距离今天指定时间前（半年、一年、三年）的定投分析
 
@@ -42,7 +42,7 @@ def invest_weekly_nearly_day(code, before_days, size=30, amount=100):
     logger.info(f"开始统计，{code} 前{before_days}天每周定投，区间大小:{size}"
                 f" 起始区间:{start_interval}, 结束日:{end}.")
 
-    df = invest_weekly_with_start_interval(code, start_interval, end, amount)
+    df = invest_weekly_with_start_interval_speed(code, start_interval, end, amount)
     return df
 
 

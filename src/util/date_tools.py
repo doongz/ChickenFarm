@@ -70,7 +70,7 @@ def get_before_date_interval(days, size=30):
     '''
     nearly_date = get_before_date(days)
     begin_date = nearly_date
-    end_date = nearly_date + timedelta(days=days)
+    end_date = nearly_date + timedelta(days=size)
 
     return (begin_date.strftime("%Y-%m-%d"), 
             end_date.strftime("%Y-%m-%d"))
