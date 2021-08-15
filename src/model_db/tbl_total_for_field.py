@@ -20,7 +20,7 @@ class TotalForField(Base):
     position = Column(DECIMAL(10, 2))
     profit = Column(DECIMAL(10, 2))
     profit_rate = Column(DECIMAL(5, 4))
-    update_time = Column(DateTime, onupdate=datetime.now, default=datetime.now)
+    update_time = Column(DateTime, onupdate=datetime.now(), default=datetime.now())
 
     @staticmethod
     def get_by_filed(filed):

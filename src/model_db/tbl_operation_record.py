@@ -16,5 +16,5 @@ class OperationRecordTable(Base):
     amount = Column(DECIMAL(10, 2))
     info_after_change = Column(VARCHAR(2048), nullable=False)
     info_before_change = Column(VARCHAR(2048), nullable=False)
-    operate_time = Column(DateTime, default=datetime.now, nullable=False)
+    operate_time = Column(DateTime, default=datetime.now(), nullable=False)
     comment = Column(VARCHAR(255))

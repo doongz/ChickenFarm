@@ -16,7 +16,7 @@ class InfoTable(Base):
     rate = Column(DECIMAL(5, 4))
     feeinfo = Column(VARCHAR(255))
     url = Column(VARCHAR(255))
-    update_time = Column(DateTime, onupdate=datetime.now, default=datetime.now)
+    update_time = Column(DateTime, onupdate=datetime.now(), default=datetime.now())
 
     @staticmethod
     def get_by_code(code):

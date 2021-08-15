@@ -22,8 +22,8 @@ class DepositoryTable(Base):
     profit_rate = Column(DECIMAL(5, 4), default=0)
     priority = Column(INT, default=0)
     status = Column(VARCHAR(32), default=Status.HOLD, nullable=False)
-    update_time = Column(DateTime, onupdate=datetime.now, default=datetime.now)
-    create_time = Column(DateTime, default=datetime.now)
+    update_time = Column(DateTime, onupdate=datetime.now(), default=datetime.now())
+    create_time = Column(DateTime, default=datetime.now())
     comment = Column(VARCHAR(255))
 
     @staticmethod

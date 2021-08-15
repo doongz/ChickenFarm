@@ -8,6 +8,7 @@ echo "export DB_ADDRESS=" >> ~/.bash_profile
 echo "export DB_PORT=" >> ~/.bash_profile
 echo "export DB_FUND=" >> ~/.bash_profile
 echo "export DB_NETVALUE=" >> ~/.bash_profile
+echo "export DB_BACKTEST=" >> ~/.bash_profile
 echo "export OPERATION_KEY=" >> ~/.bash_profile
 echo "export POSITION_CSV_PATH=" >> ~/.bash_profile
 echo "export EXPORT_TABLE_PATH=" >> ~/.bash_profile
@@ -27,7 +28,11 @@ source ~/.bash_profile
   2）处理卖出，一条一条基金执行
   3）更新持仓，现将基金的最新持仓维护至 position.csv 中，然后一键运行                
 3、统计并记录本周各个领域的投入、持仓、收益   python -m apollo.src.statistics
-4、导出图表                              python operate.py
+4、导出个人数据统计图表                              python operate.py
+
+选做：
+6、更新回测分析数据
+5、导出回测分析图表
 
 
 TODO:

@@ -1,6 +1,6 @@
 import pandas as pd
 from sqlalchemy import create_engine
-from sqlalchemy import DateTime, DECIMAL, INT
+from sqlalchemy import DateTime, DECIMAL, INT, VARCHAR
 
 from apollo.src.config.mysql import USER, PWD, ADDRESS, PORT, DB_BACKTEST
 
@@ -14,11 +14,12 @@ class FundBacktest():
 
     def to_sql(self, df):
 
-        DTYPES = {'start':DateTime,
+        DTYPES = {'start':VARCHAR(64),
                   'week':INT,
                   'algorithm':VARCHAR(64),
                   'before_days':INT,
-                  'profit_rate':DECIMAL(5, 4)
+                  'profit_rate':DECIMAL(5, 4),
+                  'test_date':DateTime
                   }
 
         df.to_sql(name=self.tbl, 

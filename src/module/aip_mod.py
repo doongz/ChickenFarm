@@ -8,6 +8,7 @@ import multiprocessing
 from datetime import datetime, timedelta
 
 from apollo.src.model_prof.fund_netvalue import FundNetValue
+from apollo.src.model_prof.fund_backtest import FundBacktest
 from apollo.src.model_db.tbl_info import InfoTable
 from apollo.src.util.date_tools import is_trade_day, get_between_data, get_before_date_interval
 from apollo.src.util.date_tools import get_recent_trading_day
@@ -18,14 +19,20 @@ logger = get_logger(__file__)
 
 
 def upload_backtest_data(code):
+    '''
+    向 db_backtest 数据库上传基金的，半年、一年、三年回测数据
+    '''
 
     backtest_df = pd.DataFrame()
-
-    for days in [180, 365, 356*3]:
+    # for days in [180, 365, 356*3]:
+    for days in [180]:
         df = invest_weekly_nearly_day(code=code, before_days=days)
         backtest_df = pd.concat([backtest_df, df])
-
     return backtest_df
+
+    btest = FundBacktest(code)
+    btest.to_sql(backtest_df)
+    log.info(f"Upload backtest data({code}) success.")
 
 
 def invest_weekly_nearly_day(code, before_days, size=60):
@@ -78,7 +85,7 @@ def invest_weekly_with_start_interval(code, start_interval, end, before_days, am
         logger.error(f"End date:{end} is not trading day.")
         return
 
-    df = pd.DataFrame(columns=['start', 'week', 'algorithm', 'before_days', 'profit_rate'])
+    df = pd.DataFrame(columns=['start', 'week', 'algorithm', 'before_days', 'profit_rate', 'test_date'])
 
     for start in get_between_data(start_interval[0], start_interval[1]):
         if not is_trade_day(start):
@@ -90,7 +97,8 @@ def invest_weekly_with_start_interval(code, start_interval, end, before_days, am
                             'week':index+1,
                             'algorithm':'stupid',
                             'before_days':before_days,
-                            'profit_rate':rate*100}, 
+                            'profit_rate':rate*100,
+                            'test_date':datetime.now()}, 
                             ignore_index=True)
     logger.info(f"统计完成，{code} 每周定投{amount}，起始日区间为{start_interval}, 结束日为{end}.")
     return df
