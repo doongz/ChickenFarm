@@ -29,3 +29,10 @@ class FundNetValue():
     def query_sql(self, sql):
         sql = f"select * from {self.tbl};"
         return pd.read_sql_query(sql, self.engine)
+
+    @property
+    def release_date(self):
+        pd = self.read_sql()
+        return pd.iloc[0]['date']
+
+    

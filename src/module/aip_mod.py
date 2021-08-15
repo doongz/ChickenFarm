@@ -9,17 +9,48 @@ from datetime import datetime, timedelta
 
 from apollo.src.model_prof.fund_netvalue import FundNetValue
 from apollo.src.model_db.tbl_info import InfoTable
-from apollo.src.util.tools import is_trade_day, get_between_day
+from apollo.src.util.date_tools import is_trade_day, get_between_data, get_before_date_interval
+from apollo.src.util.date_tools import get_recent_trading_day
 from apollo.src.util.log import get_logger
 
 
 logger = get_logger(__file__)
 
 
-def invest_week_with_start_interval(code, start_interval, end, amount):
+def invest_weekly_nearly_day(code, before_days, size=30, amount=100):
+    '''
+    距离今天指定时间前（半年、一年、三年）的定投分析
+
+    :param code:             基金代码         str     '005827'
+    :param before_days:      多少天前开始      int     180, 365, 365*3
+    :param size:             起始区间大小      int     30
+    :param amount:           每次投资的金额    int     100
+    :return df                               dataframe
+    '''
+    
+    start_interval = get_before_date_interval(before_days, size)
+    start = datetime.strptime(start_interval[0], "%Y-%m-%d")
+    release_date = FundNetValue(code).release_date
+    if start < release_date:
+        start_interval = (release_date.strftime("%Y-%m-%d"),
+                          (release_date + timedelta(days=size)).strftime("%Y-%m-%d")
+                          )
+        logger.warning(f"起始日:{start} 超过首发日:{release_date}, start_interval修复为{start_interval}.")
+
+    
+    end = get_recent_trading_day(datetime.today())
+    logger.info(f"开始统计，{code} 前{before_days}天每周定投，区间大小:{size}"
+                f" 起始区间:{start_interval}, 结束日:{end}.")
+
+    df = invest_weekly_with_start_interval(code, start_interval, end, amount)
+    return df
+
+
+
+def invest_weekly_with_start_interval(code, start_interval, end, amount=100):
     """
     每周定投 起始日为一个区间
-    todo: 多进程 
+    须确保end为交易日，起始区间内的非交易日会被自动剔除 
 
     :param code:             基金代码         str     '005827'
     :param start_interval:   定投开始日       tuple    ('2021-01-08', '2021-02-23')
@@ -27,13 +58,16 @@ def invest_week_with_start_interval(code, start_interval, end, amount):
     :param amount:           每次投资的金额    int     100
     :return df                               dataframe
     """
+    if not is_trade_day(end):
+        logger.error(f"End date:{end} is not trading day.")
+        return
 
     df = pd.DataFrame(columns=['start', 'week', 'profit_rate'])
 
-    for start in get_between_day(start_interval[0], start_interval[1]):
+    for start in get_between_data(start_interval[0], start_interval[1]):
         if not is_trade_day(start):
             continue
-        res_in_week = invest_week(code, start, end, amount)
+        res_in_week = invest_weekly(code, start, end, amount)
 
         for index, rate in enumerate(res_in_week):
             df = df.append({'start':start, 
@@ -44,16 +78,20 @@ def invest_week_with_start_interval(code, start_interval, end, amount):
     return df
 
 
-def invest_week_with_start_interval_speed(code, start_interval, end, amount, cpus=8):
+def invest_weekly_with_start_interval_speed(code, start_interval, end, amount=100, cpus=8):
+    
+    if not is_trade_day(end):
+        logger.error(f"End date:{end} is not trading day.")
+        return
 
     results = []
     job_cnt = min(multiprocessing.cpu_count(), int(cpus))
     pool = multiprocessing.Pool(processes=job_cnt)
 
-    for start in get_between_day(start_interval[0], start_interval[1]):
+    for start in get_between_data(start_interval[0], start_interval[1]):
         if not is_trade_day(start):
             continue
-        res = pool.apply_async(invest_week, args=(code, start, end, amount, ))
+        res = pool.apply_async(invest_weekly, args=(code, start, end, amount, ))
         results.append((start, res))
     pool.close()
     pool.join()
@@ -70,9 +108,9 @@ def invest_week_with_start_interval_speed(code, start_interval, end, amount, cpu
     return df
 
 
-def invest_week(code, start, end, amount):
+def invest_weekly(code, start, end, amount=100):
     """
-    每周定投
+    每周定投，须确保输入的 start, end 为交易日
     todo: ut 
 
     :param code:    基金代码        str      '005827'
@@ -81,22 +119,31 @@ def invest_week(code, start, end, amount):
     :param amount:  每次投资的金额    int     100
     :return res:    list
     """
-    fund_val = FundNetValue(code)
-    price_df = fund_val.read_sql()
-    logger.debug(f"invest week, {InfoTable.get_by_code(code).name} "
-                f"{code} start:{start} end:{end}.")
-
     if not is_trade_day(start):
         logger.error(f"Start date:{start} is not trading day.")
         return
     if not is_trade_day(end):
         logger.error(f"End date:{end} is not trading day.")
         return
+
+    fund_val = FundNetValue(code)
+    price_df = fund_val.read_sql()
+    logger.debug(f"Invest week, {InfoTable.get_by_code(code).name} "
+                f"{code} start:{start} end:{end}.")
     
     start = datetime.strptime(start, '%Y-%m-%d')
     end = datetime.strptime(end, '%Y-%m-%d')
-    start_index = price_df.loc[price_df['date'] == start].index[0]
-    end_index = price_df.loc[price_df['date'] == end].index[0]
+    try:
+        start_index = price_df.loc[price_df['date'] == start].index[0]
+    except Exception as error:
+        logger.warning(f"Not found start:{start} in price_df, error:{error}.")
+        return []
+    try:
+        end_index = price_df.loc[price_df['date'] == end].index[0]
+    except Exception as error:
+        logger.warning(f"Not found end:{end} in price_df, error:{error}.")
+        return []
+    
     buy_df = price_df.iloc[start_index : end_index] # 待买df
     sell_price = float(price_df.loc[price_df['date'] == end]['totvalue']) # 要卖那天的累计净值
     
@@ -120,7 +167,7 @@ def invest_week(code, start, end, amount):
 
 
 
-def invest_month(code, start, end, amount, day_list=['05', '10', '15', '20', '25']):
+def invest_month(code, start, end, amount=100, day_list=['05', '10', '15', '20', '25']):
 
     fund_val = FundNetValue(code)
     price_df = fund_val.read_sql()
