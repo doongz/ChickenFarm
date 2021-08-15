@@ -22,17 +22,20 @@ def upload_backtest_data(code):
     '''
     向 db_backtest 数据库上传基金的，半年、一年、三年回测数据
     '''
+    try:
+        backtest_df = pd.DataFrame()
+        for days in [180, 365, 356*3]:
+            df = invest_weekly_nearly_day(code=code, before_days=days)
+            backtest_df = pd.concat([backtest_df, df])
 
-    backtest_df = pd.DataFrame()
-    # for days in [180, 365, 356*3]:
-    for days in [180]:
-        df = invest_weekly_nearly_day(code=code, before_days=days)
-        backtest_df = pd.concat([backtest_df, df])
-    return backtest_df
+        btest = FundBacktest(code)
+        btest.to_sql(backtest_df)
+        logger.info(f"Upload backtest data({code}) success.")
+        return True
 
-    btest = FundBacktest(code)
-    btest.to_sql(backtest_df)
-    log.info(f"Upload backtest data({code}) success.")
+    except Exception as error:
+        logger.error(f"Upload backtest data occur error:{error}.")
+        return False
 
 
 def invest_weekly_nearly_day(code, before_days, size=60):
@@ -97,41 +100,10 @@ def invest_weekly_with_start_interval(code, start_interval, end, before_days, am
                             'week':index+1,
                             'algorithm':'stupid',
                             'before_days':before_days,
-                            'profit_rate':rate*100,
+                            'profit_rate':rate,
                             'test_date':datetime.now()}, 
                             ignore_index=True)
     logger.info(f"统计完成，{code} 每周定投{amount}，起始日区间为{start_interval}, 结束日为{end}.")
-    return df
-
-
-def invest_weekly_with_start_interval_speed(code, start_interval, end, amount=100, cpus=8):
-    # 多进程仅可在一次调用中使用
-    
-    if not is_trade_day(end):
-        logger.error(f"End date:{end} is not trading day.")
-        return
-
-    results = []
-    job_cnt = min(multiprocessing.cpu_count(), int(cpus))
-    pool = multiprocessing.Pool(processes=job_cnt)
-
-    for start in get_between_data(start_interval[0], start_interval[1]):
-        if not is_trade_day(start):
-            continue
-        res = pool.apply_async(invest_weekly, args=(code, start, end, amount, ))
-        results.append((start, res))
-    pool.close()
-    pool.join()
-
-    df = pd.DataFrame(columns=['start', 'week', 'profit_rate'])
-    for res_in_week in results:
-        for index, rate in enumerate(res_in_week[1].get()):
-            df = df.append({'start':res_in_week[0], 
-                            'week':index+1, 
-                            'profit_rate':rate*100}, 
-                            ignore_index=True)
-
-    logger.info(f"统计（加速）完成，{code} 每周定投{amount}，起始日区间为{start_interval}, 结束日为{end}.")
     return df
 
 

@@ -14,7 +14,7 @@ class HistroyProfitTable(Base):
     __tablename__ = 'tbl_history_profit'
 
     id = Column(BIGINT, primary_key=True, autoincrement=True)
-    date = Column(DateTime, default=datetime.now)
+    date = Column(DateTime, default=datetime.now())
     total = Column(DECIMAL(10, 2))
 
     ENERGY = Column(DECIMAL(10, 2), name=Filed.ENERGY)

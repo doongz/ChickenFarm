@@ -35,3 +35,4 @@ class FundBacktest():
     def query_sql(self, sql):
         sql = f"select * from {self.tbl};"
         return pd.read_sql_query(sql, self.engine)
+
