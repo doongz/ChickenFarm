@@ -8,25 +8,26 @@ from apollo.src.config.mysql import USER, PWD, ADDRESS, PORT, DB_BACKTEST
 class FundBacktest():
 
     def __init__(self, code):
+
+        self.engine = create_engine(f"mysql+pymysql://{USER}:{PWD}@{ADDRESS}:{PORT}/{DB_BACKTEST}")
         self.code = code
         self.tbl = f"tbl_{self.code}"
-        self.engine = create_engine(f"mysql+pymysql://{USER}:{PWD}@{ADDRESS}:{PORT}/{DB_BACKTEST}")
+
+        self.columns = {'start': VARCHAR(64),
+                        'week': INT,
+                        'algorithm': VARCHAR(64),
+                        'before_days': INT,
+                        'profit_rate': DECIMAL(5, 4),
+                        'test_date': DateTime
+                        }
 
     def to_sql(self, df):
-
-        DTYPES = {'start':VARCHAR(64),
-                  'week':INT,
-                  'algorithm':VARCHAR(64),
-                  'before_days':INT,
-                  'profit_rate':DECIMAL(5, 4),
-                  'test_date':DateTime
-                  }
 
         df.to_sql(name=self.tbl, 
                   con=self.engine, 
                   if_exists="replace",
                   index=False,
-                  dtype=DTYPES)
+                  dtype=self.columns)
         return self.tbl
 
     def read_sql(self):
