@@ -11,8 +11,8 @@ from apollo.src.util.log import get_logger
 logger = get_logger(__file__)
 
 
-# 验证是否有权限，必须需要参数 key
 def auth(func):
+    # 验证是否有权限，必须需要参数 key
     def wrapper(*args, **kwargs):
 
         key = kwargs.get("key", None)
@@ -29,9 +29,11 @@ def auth(func):
     return wrapper
 
 
-# 将操作前和操作后的 tbl_depository 中的基金进行记录
-# 必须需要参数 code
 def record_operation(operate_type):
+    """
+    将操作前和操作后的 tbl_depository 中的基金进行记录
+    必须需要参数 code
+    """
     def inner(func):
         def wrapper(*args, **kwargs):
 
@@ -61,5 +63,3 @@ def record_operation(operate_type):
         return wrapper
     return inner
 
-
- 

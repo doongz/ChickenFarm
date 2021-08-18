@@ -91,25 +91,6 @@ class AutomaticInvestmentPlan(ABC):
         df = self.invest_with_start_interval(code, start_interval, end, cycle)
         return df
 
-    def upload_backtest_data(self, code):
-        '''
-        向 db_backtest 数据库上传基金的，半年、一年、三年回测数据
-        todo: 将半年、一年、三年固定
-        '''
-        try:
-            backtest_df = pd.DataFrame()
-            for cycle in AutomaticInvestmentPlan.InvestmentCycles:
-                df = self.analysis_realtime(code=code, cycle=cycle)
-                backtest_df = pd.concat([backtest_df, df])
-
-            btest = FundBacktest(code)
-            btest.to_sql(backtest_df)
-            logger.info(f"Upload backtest data({code}) success.")
-            return True
-
-        except Exception as error:
-            logger.error(f"Upload backtest data occur error:{error}.")
-            return False
 
 
 class StupidPlan(AutomaticInvestmentPlan):
