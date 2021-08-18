@@ -16,7 +16,7 @@ class FundBacktest():
         self.columns = {'start': VARCHAR(64),
                         'week': INT,
                         'algorithm': VARCHAR(64),
-                        'before_days': INT,
+                        'cycle': INT,
                         'profit_rate': DECIMAL(5, 4),
                         'test_date': DateTime
                         }

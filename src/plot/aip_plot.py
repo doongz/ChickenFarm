@@ -3,7 +3,7 @@ import math
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from apollo.src.module.aip_mod import InvestmentCycle
+from apollo.src.module.aip_mod import AutomaticInvestmentPlan
 from apollo.src.model_db.tbl_depository import DepositoryTable
 from apollo.src.model_prof.fund_backtest import FundBacktest
 from apollo.src.config.path import EXPORT_AIP_PLOT_PATH
@@ -154,7 +154,7 @@ def show_diff_violin_plot(df_dict, figsize=(20, 7)):
     plt.show()
 
 
-def export_filed_aip_violin_plot(filed, show=False):
+def export_aip_violin_plot_by_filed(filed, show=False):
     '''
     导出指定领域基金的周定投-小提琴图
     '''
@@ -162,10 +162,10 @@ def export_filed_aip_violin_plot(filed, show=False):
     df_dict = {}
 
     for fund in fund_list:
-        for days in InvestmentCycle.CYCLES:
+        for cycle in AutomaticInvestmentPlan.InvestmentCycles:
             df = FundBacktest(fund.code).read_sql()
-            df_dict[f'{fund.name}-{days}天'] = df.loc[df['before_days'] == days]
-            logger.debug(f"Loaded {fund.name}-{days} to df_dict.")
+            df_dict[f'{fund.name}-{cycle}天'] = df.loc[df['cycle'] == cycle]
+            logger.debug(f"Loaded {fund.name}-{cycle} to df_dict.")
 
     df_cnt = len(df_dict)
     rows = math.ceil(df_cnt/3)
