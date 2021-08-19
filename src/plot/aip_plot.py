@@ -158,56 +158,68 @@ def export_aip_violin_plot_by_filed(filed, show=False):
     '''
     导出指定领域基金的周定投-小提琴图
     '''
-    fund_list = DepositoryTable.get_holding_by_filed(filed)
-    df_dict = {}
+    try:
+        fund_list = DepositoryTable.get_holding_by_filed(filed)
+        df_dict = {}
 
-    for fund in fund_list:
-        for cycle in AutomaticInvestmentPlan.InvestmentCycles:
-            df = FundBacktest(fund.code).read_sql()
-            df_dict[f'{fund.name}-{cycle}天'] = df.loc[df['cycle'] == cycle]
-            logger.debug(f"Loaded {fund.name}-{cycle} to df_dict.")
+        for fund in fund_list:
+            for cycle in AutomaticInvestmentPlan.InvestmentCycles:
+                df = FundBacktest(fund.code).read_sql()
+                df_dict[f'{fund.name}-{cycle}天'] = df.loc[df['cycle'] == cycle]
+                logger.debug(f"Loaded {fund.name}-{cycle} to df_dict.")
 
-    df_cnt = len(df_dict)
-    rows = math.ceil(df_cnt/3)
-    cols = 3
-    
-    fig, axs = plt.subplots(nrows=rows, 
-                            ncols=cols, 
-                            figsize=(10, 5*rows),# Width, height
-                            ) 
-    plt.subplots_adjust(wspace=0.3, hspace=0.3)
-    
-    i = 0
-    for fund, fund_df in df_dict.items():
-        # 这里 *100 变为百分比
-        bodies = [fund_df.loc[fund_df['week'] == day]['profit_rate']*100 for day in range(1, 6)]
+        df_cnt = len(df_dict)
+        rows = math.ceil(df_cnt/3)
+        cols = 3
         
-        violin_plot = axs[math.floor(i/cols)][i%cols].violinplot(bodies,
-                                            showmeans=False, # 均值
-                                            showmedians=True, # 中位数
-                                            showextrema=True,  # 极值
-                                           ) 
-        axs[math.floor(i/cols)][i%cols].set_title(fund)
-        i += 1
+        fig, axs = plt.subplots(nrows=rows, 
+                                ncols=cols, 
+                                figsize=(10, 5*rows),# Width, height
+                                ) 
+        plt.subplots_adjust(wspace=0.3, hspace=0.3)
         
-    # adding horizontal grid lines
-    for r in range(rows):
-        for c in range(cols):
-            axs[r][c].yaxis.grid(True)
-            axs[r][c].set_xticks([i+1 for i in range(5)])
-            if c == 0:
-                axs[r][c].set_ylabel('Profit Rate / %')
+        i = 0
+        for fund, fund_df in df_dict.items():
+            # 这里 *100 变为百分比
+            bodies = [fund_df.loc[fund_df['week'] == day]['profit_rate']*100 for day in range(1, 6)]
             
+            violin_plot = axs[math.floor(i/cols)][i%cols].violinplot(bodies,
+                                                showmeans=False, # 均值
+                                                showmedians=True, # 中位数
+                                                showextrema=True,  # 极值
+                                               ) 
+            axs[math.floor(i/cols)][i%cols].set_title(fund)
+            i += 1
+            
+        # adding horizontal grid lines
+        for r in range(rows):
+            for c in range(cols):
+                axs[r][c].yaxis.grid(True)
+                axs[r][c].set_xticks([i+1 for i in range(5)])
+                if c == 0:
+                    axs[r][c].set_ylabel('Profit Rate / %')
+                
 
-    # add x-tick labels
-    labels = [f"week {day}" for day in range(1, 6)]
-    plt.setp(axs, xticks=[i+1 for i in range(5)],
-             xticklabels=labels)
-    
-    if show:
-        plt.show()
-    else:
-        plt.savefig(os.path.join(EXPORT_AIP_PLOT_PATH, f'{filed}.png'))
-        logger.info(f"Successfully exported {filed} aip violin plot.")
+        # add x-tick labels
+        labels = [f"week {day}" for day in range(1, 6)]
+        plt.setp(axs, xticks=[i+1 for i in range(5)],
+                 xticklabels=labels)
+        
+        if show:
+            plt.show()
+        else:
+            plt.savefig(os.path.join(EXPORT_AIP_PLOT_PATH, f'{filed}.png'))
+            logger.info(f"Successfully exported {filed} aip violin plot.")
+        return True
+
+    except Exception as error:
+        logger.error(f"Export aip violin plot by filed failed, error:{error}.")
+        return False
+
+
+
+
+
+
 
 

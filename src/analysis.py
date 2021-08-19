@@ -43,22 +43,47 @@ def transport_backtest_data(cpus=8):
 
     fund_list = DepositoryTable().get_all_holding()
     for fund in fund_list:
-        ret = pool.apply_async(_upload_backtest_data, args=(fund.code, ))
-        results.append((fund.code, ret))
+        res = pool.apply_async(_upload_backtest_data, args=(fund.code, ))
+        results.append((fund.code, res))
     pool.close()
     pool.join()
 
-    print(f"Transport backtest data:{len(fund_list)} successful.")
+    successes, fails = [], []
+    for code, res in results:
+        if res:
+            successes.append(code)
+        else:
+            fails.append(code)
+
+    print(f"Transport backtest data:{len(successes)} successful. fails:{fails}")
 
 
-def export_violin_plot():
-    for filed in Filed().get_fileds():
+def export_violin_plot(cpus=8):
+
+    results = []
+    job_cnt = min(multiprocessing.cpu_count(), int(cpus))
+    pool = multiprocessing.Pool(processes=job_cnt)
+
+    fileds = Filed().get_fileds()
+    for filed in fileds:
         if filed == Filed.MILITARY:
             continue
-        export_aip_violin_plot_by_filed(filed)
+        res = pool.apply_async(export_aip_violin_plot_by_filed, args=(filed, ))
+        results.append((filed, res))
+    pool.close()
+    pool.join()
+
+    successes, fails = [], []
+    for code, res in results:
+        if res:
+            successes.append(code)
+        else:
+            fails.append(code)
+
+    print(f"Export violin plot:{len(successes)} successful. fails:{fails}")
 
 if __name__ == "__main__":
 
-    transport_backtest_data()
+    export_violin_plot()
 
 
