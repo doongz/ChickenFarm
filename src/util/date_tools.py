@@ -21,7 +21,7 @@ def get_recent_trading_day(date):
     '''
     得到最近的交易日，往前找
     :param  date     string/datetime  '2021-08-15'
-    :return date     string           '2021-08-13'
+    :return date     datetime         datetime.datetime(2021, 8, 13, 0, 0)
     '''
     if isinstance(date, str):
         # 如果输入的是str, 转为datetime
@@ -30,23 +30,20 @@ def get_recent_trading_day(date):
     while not is_trade_day(date):
         date = date - timedelta(days=1)
 
-    return date.strftime("%Y-%m-%d")
+    return date.replace(hour=0, minute=0, second=0, microsecond=0)
 
 
 
 def get_between_data(begin_date, end_date):
     '''
     得到两个日期之间连续日期列表
-    :param  begin_date  string '2021-07-13'
-    :param  end_date    string '2021-08-13'
-    :return date_list   list   ['2021-07-13',' 2021-07-14'...]
+    :param  begin_date  datetime
+    :param  end_date    datetime
+    :return date_list   list   [datetime, datetime, ...]
     '''
     date_list = []
-    begin_date = datetime.strptime(begin_date, "%Y-%m-%d")
-    end_date = datetime.strptime(end_date, "%Y-%m-%d")
     while begin_date <= end_date:
-        date_str = begin_date.strftime("%Y-%m-%d")
-        date_list.append(date_str)
+        date_list.append(begin_date)
         begin_date += timedelta(days=1)
     return date_list
 
@@ -55,9 +52,10 @@ def get_before_date(days):
     '''
     得到指定天数前的那一天，近半年，近一年，近三年
     :param  days  int       180
-    :return data  datetime  
+    :return data  datetime  datetime.datetime(2021, 8, 13, 0, 0)
     '''
-    data = datetime.today() - timedelta(days=days)
+    today_date = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
+    data = today_date - timedelta(days=days)
     return data
 
 
@@ -66,14 +64,13 @@ def get_before_date_interval(days, size=30):
     得到指定天数前的日期区间，近半年，近一年，近三年
     :param  days  int   180
     :param  size  int   区间大小，30
-    :return date_list   tuple, ('2021-02-01', '2021-03-03')
+    :return       (datetime, datetime) 
     '''
     nearly_date = get_before_date(days)
     begin_date = nearly_date
     end_date = nearly_date + timedelta(days=size)
 
-    return (begin_date.strftime("%Y-%m-%d"), 
-            end_date.strftime("%Y-%m-%d"))
+    return (begin_date, end_date)
 
 
 

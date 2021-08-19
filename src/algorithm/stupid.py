@@ -45,6 +45,7 @@ class StupidAlgorithm(Algorithm):
                         f"收益率 {100*profit_rate}% ;")
         return res
 
+
 # TODO: 整合到上面
 def invest_month(code, start, end, amount=100, day_list=['05', '10', '15', '20', '25']):
 

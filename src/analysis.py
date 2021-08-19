@@ -7,7 +7,6 @@ from apollo.src.model_prof.fund_types import Filed
 from apollo.src.model_prof.fund_backtest import FundBacktest
 from apollo.src.module.aip_mod import StupidPlan
 from apollo.src.plot.aip_plot import export_aip_violin_plot_by_filed
-from apollo.src.util.tools import speed_up
 from apollo.src.util.log import get_logger
 
 
@@ -60,6 +59,6 @@ def export_violin_plot():
 
 if __name__ == "__main__":
 
-    export_violin_plot()
+    transport_backtest_data()
 
 

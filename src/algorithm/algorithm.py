@@ -55,19 +55,17 @@ class Algorithm(ABC):
     def __cut_buy_df(self):
         # 从所有的净值 df 截取出 start~end 间的 df
         # 如果没找到 start_index 或 end_index 返回空的 df
-        start = datetime.strptime(self.start, '%Y-%m-%d')
-        end = datetime.strptime(self.end, '%Y-%m-%d')
 
         buy_df = pd.DataFrame()
         try:
-            start_index = self._value_df.loc[self._value_df['date'] == start].index[0]
+            start_index = self._value_df.loc[self._value_df['date'] == self.start].index[0]
         except Exception as error:
-            logger.warning(f"Not found start:{start} in value_df, error:{error}.")
+            logger.warning(f"Not found start:{self.start} in value_df, error:{error}.")
             return buy_df
         try:
-            end_index = self._value_df.loc[self._value_df['date'] == end].index[0]
+            end_index = self._value_df.loc[self._value_df['date'] == self.end].index[0]
         except Exception as error:
-            logger.warning(f"Not found end:{end} in value_df, error:{error}.")
+            logger.warning(f"Not found end:{self.end} in value_df, error:{error}.")
             return buy_df
 
         buy_df = self._value_df.iloc[start_index : end_index] 
