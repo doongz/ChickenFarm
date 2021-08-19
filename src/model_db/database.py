@@ -2,7 +2,7 @@ import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from apollo.src.config.mysql import USER, PWD, ADDRESS, PORT, DB_FUND
+from chicken_farm.src.config.mysql import USER, PWD, ADDRESS, PORT, DB_FUND
 
 
 class Singleton(type):

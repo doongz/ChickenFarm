@@ -3,9 +3,9 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from apollo.src.model_db.database import Database
-from apollo.src.config.path import EXPORT_CHART_PATH
-from apollo.src.util.log import get_logger
+from chicken_farm.src.model_db.database import Database
+from chicken_farm.src.config.path import EXPORT_CHART_PATH
+from chicken_farm.src.util.log import get_logger
 
 
 logger = get_logger(__file__)

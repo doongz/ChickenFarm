@@ -2,7 +2,7 @@ from datetime import datetime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, DateTime, DECIMAL, VARCHAR, CHAR
 
-from apollo.src.model_db.database import Database
+from chicken_farm.src.model_db.database import Database
 
 Base = declarative_base()
 

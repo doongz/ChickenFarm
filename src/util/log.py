@@ -3,7 +3,7 @@ import inspect
 import logging
 from logging.config import fileConfig
 
-from apollo.src.config.path import LOG_PATH
+from chicken_farm.src.config.path import LOG_PATH
 
 
 logging.config.fileConfig(LOG_PATH)

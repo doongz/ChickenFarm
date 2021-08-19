@@ -1,11 +1,11 @@
 import json
 
-from apollo.src.model_db.database import Database
-from apollo.src.model_db.tbl_operation_record import OperationRecordTable
-from apollo.src.model_db.tbl_depository import DepositoryTable, get_fund_dic_from_dpt
-from apollo.src.model_prof.fund_types import OperateType
-from apollo.src.config.key import KEY
-from apollo.src.util.log import get_logger
+from chicken_farm.src.model_db.database import Database
+from chicken_farm.src.model_db.tbl_operation_record import OperationRecordTable
+from chicken_farm.src.model_db.tbl_depository import DepositoryTable, get_fund_dic_from_dpt
+from chicken_farm.src.model_prof.fund_types import OperateType
+from chicken_farm.src.config.key import KEY
+from chicken_farm.src.util.log import get_logger
 
 
 logger = get_logger(__file__)

@@ -3,12 +3,12 @@
 '''
 from decimal import Decimal
 
-from apollo.src.model_db.database import Database
-from apollo.src.model_db.tbl_depository import DepositoryTable, get_fund_dic_from_dpt
-from apollo.src.model_db.tbl_info import InfoTable
-from apollo.src.model_prof.fund_types import OperateType
-from apollo.src.util.tools import auth, record_operation
-from apollo.src.util.log import get_logger
+from chicken_farm.src.model_db.database import Database
+from chicken_farm.src.model_db.tbl_depository import DepositoryTable, get_fund_dic_from_dpt
+from chicken_farm.src.model_db.tbl_info import InfoTable
+from chicken_farm.src.model_prof.fund_types import OperateType
+from chicken_farm.src.util.tools import auth, record_operation
+from chicken_farm.src.util.log import get_logger
 
 
 logger = get_logger(__file__)

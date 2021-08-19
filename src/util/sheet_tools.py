@@ -1,9 +1,9 @@
 import os
 import pandas as pd
 
-from apollo.src.model_db.database import Database
-from apollo.src.config.path import POSITION_CSV_PATH, EXPORT_TABLE_PATH
-from apollo.src.util.log import get_logger
+from chicken_farm.src.model_db.database import Database
+from chicken_farm.src.config.path import POSITION_CSV_PATH, EXPORT_TABLE_PATH
+from chicken_farm.src.util.log import get_logger
 
 
 logger = get_logger(__file__)

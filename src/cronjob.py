@@ -1,5 +1,5 @@
-from apollo.src.module.transport_mod import transport, transport_speed
-from apollo.src.util.sheet_tools import read_buy_list
+from chicken_farm.src.module.transport_mod import transport, transport_speed
+from chicken_farm.src.util.sheet_tools import read_buy_list
 
 
 def run(is_speed=True):

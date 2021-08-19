@@ -3,11 +3,11 @@ import math
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from apollo.src.module.aip_mod import AutomaticInvestmentPlan
-from apollo.src.model_db.tbl_depository import DepositoryTable
-from apollo.src.model_prof.fund_backtest import FundBacktest
-from apollo.src.config.path import EXPORT_AIP_PLOT_PATH
-from apollo.src.util.log import get_logger
+from chicken_farm.src.module.aip_mod import AutomaticInvestmentPlan
+from chicken_farm.src.model_db.tbl_depository import DepositoryTable
+from chicken_farm.src.model_prof.fund_backtest import FundBacktest
+from chicken_farm.src.config.path import EXPORT_AIP_PLOT_PATH
+from chicken_farm.src.util.log import get_logger
 
 
 logger = get_logger(__file__)

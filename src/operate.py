@@ -1,12 +1,12 @@
-from apollo.src.module.operate_mod import add_fund, delete_fund, update_fund, show_fund
-from apollo.src.module.operate_mod import buy_fund, sell_fund, update_position
-from apollo.src.module.statistics_mod import update_total_for_field
-from apollo.src.model_prof.fund_types import Filed
-from apollo.src.plot.statistics_plot import export_position_bar_chart, export_profit_bar_chart
-from apollo.src.plot.statistics_plot import export_position_profit_bar_chart, export_profit_rate_bar_chart
-from apollo.src.plot.statistics_plot import export_position_pie_chart
-from apollo.src.util.sheet_tools import read_latest_position, export_tables
-from apollo.src.util.log import get_logger
+from chicken_farm.src.module.operate_mod import add_fund, delete_fund, update_fund, show_fund
+from chicken_farm.src.module.operate_mod import buy_fund, sell_fund, update_position
+from chicken_farm.src.module.statistics_mod import update_total_for_field
+from chicken_farm.src.model_prof.fund_types import Filed
+from chicken_farm.src.plot.statistics_plot import export_position_bar_chart, export_profit_bar_chart
+from chicken_farm.src.plot.statistics_plot import export_position_profit_bar_chart, export_profit_rate_bar_chart
+from chicken_farm.src.plot.statistics_plot import export_position_pie_chart
+from chicken_farm.src.util.sheet_tools import read_latest_position, export_tables
+from chicken_farm.src.util.log import get_logger
 
 logger = get_logger(__file__)
 

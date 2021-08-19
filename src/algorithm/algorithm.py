@@ -2,11 +2,11 @@ import pandas as pd
 from datetime import datetime
 from abc import ABC, abstractmethod
 
-from apollo.src.model_prof.fund_netvalue import FundNetValue
-from apollo.src.util.date_tools import is_trade_day
-from apollo.src.model_db.tbl_info import InfoTable
-from apollo.src.util.exceptions import NonTradingError
-from apollo.src.util.log import get_logger
+from chicken_farm.src.model_prof.fund_netvalue import FundNetValue
+from chicken_farm.src.util.date_tools import is_trade_day
+from chicken_farm.src.model_db.tbl_info import InfoTable
+from chicken_farm.src.util.exceptions import NonTradingError
+from chicken_farm.src.util.log import get_logger
 
 
 logger = get_logger(__file__)

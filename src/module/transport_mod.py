@@ -5,10 +5,10 @@
 import multiprocessing
 import xalpha as xa
 
-from apollo.src.model_db.database import Database
-from apollo.src.model_db.tbl_info import InfoTable
-from apollo.src.model_prof.fund_netvalue import FundNetValue
-from apollo.src.util.log import get_logger
+from chicken_farm.src.model_db.database import Database
+from chicken_farm.src.model_db.tbl_info import InfoTable
+from chicken_farm.src.model_prof.fund_netvalue import FundNetValue
+from chicken_farm.src.util.log import get_logger
 
 
 logger = get_logger(__file__)

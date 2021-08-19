@@ -2,13 +2,13 @@ import pandas as pd
 from datetime import datetime, timedelta
 from abc import ABC, abstractmethod
 
-from apollo.src.algorithm.stupid import StupidAlgorithm
-from apollo.src.model_prof.fund_netvalue import FundNetValue
-from apollo.src.model_prof.fund_backtest import FundBacktest
-from apollo.src.util.date_tools import get_between_data, get_before_date_interval
-from apollo.src.util.date_tools import get_recent_trading_day
-from apollo.src.util.exceptions import NonTradingError
-from apollo.src.util.log import get_logger
+from chicken_farm.src.algorithm.stupid import StupidAlgorithm
+from chicken_farm.src.model_prof.fund_netvalue import FundNetValue
+from chicken_farm.src.model_prof.fund_backtest import FundBacktest
+from chicken_farm.src.util.date_tools import get_between_data, get_before_date_interval
+from chicken_farm.src.util.date_tools import get_recent_trading_day
+from chicken_farm.src.util.exceptions import NonTradingError
+from chicken_farm.src.util.log import get_logger
 
 
 logger = get_logger(__file__)

@@ -1,5 +1,5 @@
-from apollo.src.module.statistics_mod import update_total_for_field
-from apollo.src.module.statistics_mod import record_history
+from chicken_farm.src.module.statistics_mod import update_total_for_field
+from chicken_farm.src.module.statistics_mod import record_history
 
 
 def run():

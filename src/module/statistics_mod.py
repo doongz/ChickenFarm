@@ -2,14 +2,14 @@
 更新每个领域的统计情况
 每周去统计各个领域和基金的投入、持仓、收益历史
 '''
-from apollo.src.model_db.database import Database
-from apollo.src.model_db.tbl_depository import DepositoryTable
-from apollo.src.model_db.tbl_history_buying import HistroyBuyingTable
-from apollo.src.model_db.tbl_history_position import HistroyPositionTable
-from apollo.src.model_db.tbl_history_profit import HistroyProfitTable
-from apollo.src.model_db.tbl_total_for_field import TotalForField
-from apollo.src.model_prof.fund_types import Filed
-from apollo.src.util.log import get_logger
+from chicken_farm.src.model_db.database import Database
+from chicken_farm.src.model_db.tbl_depository import DepositoryTable
+from chicken_farm.src.model_db.tbl_history_buying import HistroyBuyingTable
+from chicken_farm.src.model_db.tbl_history_position import HistroyPositionTable
+from chicken_farm.src.model_db.tbl_history_profit import HistroyProfitTable
+from chicken_farm.src.model_db.tbl_total_for_field import TotalForField
+from chicken_farm.src.model_prof.fund_types import Filed
+from chicken_farm.src.util.log import get_logger
 
 
 logger = get_logger(__file__)

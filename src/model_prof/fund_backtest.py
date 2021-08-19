@@ -2,7 +2,7 @@ import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy import DateTime, DECIMAL, INT, VARCHAR
 
-from apollo.src.config.mysql import USER, PWD, ADDRESS, PORT, DB_BACKTEST
+from chicken_farm.src.config.mysql import USER, PWD, ADDRESS, PORT, DB_BACKTEST
 
 
 class FundBacktest():

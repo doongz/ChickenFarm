@@ -2,12 +2,12 @@ import pandas as pd
 import multiprocessing
 from pandas.testing import assert_frame_equal
 
-from apollo.src.model_db.tbl_depository import DepositoryTable
-from apollo.src.model_prof.fund_types import Filed
-from apollo.src.model_prof.fund_backtest import FundBacktest
-from apollo.src.module.aip_mod import StupidPlan
-from apollo.src.plot.aip_plot import export_aip_violin_plot_by_filed
-from apollo.src.util.log import get_logger
+from chicken_farm.src.model_db.tbl_depository import DepositoryTable
+from chicken_farm.src.model_prof.fund_types import Filed
+from chicken_farm.src.model_prof.fund_backtest import FundBacktest
+from chicken_farm.src.module.aip_mod import StupidPlan
+from chicken_farm.src.plot.aip_plot import export_aip_violin_plot_by_filed
+from chicken_farm.src.util.log import get_logger
 
 
 logger = get_logger(__file__)
