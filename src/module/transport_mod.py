@@ -14,7 +14,7 @@ from chicken_farm.src.model_prof.fund_backtest import FundBacktest
 
 from chicken_farm.src.module.aip_mod import StupidPlan
 
-from chicken_farm.src.util.tools.xalpha_tools import get_fundinfo_from_xalpha
+from chicken_farm.src.util.xalpha_tools import get_fundinfo_from_xalpha
 from chicken_farm.src.util.sheet_tools import read_buy_list
 from chicken_farm.src.util.log import get_logger
 
@@ -22,7 +22,7 @@ from chicken_farm.src.util.log import get_logger
 logger = get_logger(__file__)
 
 
-def transport_netvalue(codes, cpus=8):
+def transport_netvalue(cpus=8):
 
     results = []
     job_cnt = min(multiprocessing.cpu_count(), int(cpus))
@@ -42,7 +42,8 @@ def transport_netvalue(codes, cpus=8):
         else:
             fails.append(code)
 
-    logger.info(f"Transport net value:{len(successes)} successful. fails:{fails}.")
+    logger.info(f"Transport net value:{successes} successful. fails:{fails}.")
+    return successes, fails
 
 
 def transport_backtest_data(cpus=8):
@@ -65,7 +66,8 @@ def transport_backtest_data(cpus=8):
         else:
             fails.append(code)
 
-    logger.info(f"Transport backtest data:{len(successes)} successful. fails:{fails}.")
+    logger.info(f"Transport backtest data:{successes} successful. fails:{fails}.")
+    return successes, fails
 
 
 def _upload_netvalue_and_info(code):

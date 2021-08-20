@@ -5,7 +5,7 @@ from chicken_farm.src.module.operate_mod import buy_fund, sell_fund, update_posi
 from chicken_farm.src.module.statistics_mod import update_total_for_field, record_history
 from chicken_farm.src.module.transport_mod import transport_netvalue, transport_backtest_data
 
-from chicken_farm.src.plot.aip_mod import export_violin_plot
+from chicken_farm.src.plot.aip_plot import export_violin_plot
 from chicken_farm.src.plot.statistics_plot import export_position_bar_chart, \
                                                   export_profit_bar_chart, \
                                                   export_position_profit_bar_chart, \
@@ -17,7 +17,7 @@ from chicken_farm.src.util.sheet_tools import read_buy_list, read_latest_positio
 
 class Employee:
 
-    def __init__(self, key):
+    def __init__(self, key=None):
         self.key = key
 
 
@@ -100,7 +100,14 @@ class Operator(Employee):
         # 展示基金
         show_fund(code='519674')
 
-    def record_history(self)
+
+class Statistician(Employee):
+
+    def transport_netvalue(self):
+        # 把基金的历史净值上传至 db_netvalue 数据库中
+        return transport_netvalue()
+
+    def record_history(self):
         # 统计并记录各个领域以及总的投入、持仓、收益历史
         update_total_for_field()
         record_history()
@@ -130,6 +137,9 @@ class Analyst(Employee):
 
 
 
-if __name__ == "__main__":
-    
-    run()
+
+
+
+
+
+
