@@ -24,7 +24,7 @@ def transport(codes):
     :params codes 基金代码 list
     """
     for code in codes:
-        upload_netvalue_and_info(code)
+        _upload_netvalue_and_info(code)
 
     logger.info(f"Transport {len(codes)} data successful.")
 
@@ -35,7 +35,7 @@ def transport_speed(codes, cpus=8):
     pool = multiprocessing.Pool(processes=job_cnt)
 
     for code in codes:
-        ret = pool.apply_async(upload_netvalue_and_info, args=(code, ))
+        ret = pool.apply_async(_upload_netvalue_and_info, args=(code, ))
         results.append((code, ret))
     pool.close()
     pool.join()
@@ -43,7 +43,7 @@ def transport_speed(codes, cpus=8):
     logger.info(f"Transport-Speed {len(codes)} data successful.")
 
 
-def upload_netvalue_and_info(code):
+def _upload_netvalue_and_info(code):
     '''
     把基金的历史净值上传至 db_netvalue 数据库中
     并更新 db_fund.tbl_info 中的信息
