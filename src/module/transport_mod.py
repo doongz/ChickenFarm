@@ -1,46 +1,71 @@
 """Transport
-将xalpha的数据搬运到自建数据库
-只有函数 get_fundinfo_from_xalpha() 读取xalpha数据，其他脚本一律读取数据库中数据
+1、将xalpha的数据传输到自建数据库
+2、将回测的数据传输到自建数据库
 """
+import pandas as pd
 import multiprocessing
-import xalpha as xa
 
 from chicken_farm.src.model_db.database import Database
 from chicken_farm.src.model_db.tbl_info import InfoTable
+from chicken_farm.src.model_db.tbl_depository import DepositoryTable
+
 from chicken_farm.src.model_prof.fund_netvalue import FundNetValue
+from chicken_farm.src.model_prof.fund_backtest import FundBacktest
+
+from chicken_farm.src.module.aip_mod import StupidPlan
+
+from chicken_farm.src.util.tools.xalpha_tools import get_fundinfo_from_xalpha
+from chicken_farm.src.util.sheet_tools import read_buy_list
 from chicken_farm.src.util.log import get_logger
 
 
 logger = get_logger(__file__)
 
 
-def get_fundinfo_from_xalpha(code):
-    fundinfo = xa.fundinfo(code)
-    return fundinfo
+def transport_netvalue(codes, cpus=8):
 
-
-def transport(codes):
-    """
-    :params codes 基金代码 list
-    """
-    for code in codes:
-        _upload_netvalue_and_info(code)
-
-    logger.info(f"Transport {len(codes)} data successful.")
-
-
-def transport_speed(codes, cpus=8):
     results = []
     job_cnt = min(multiprocessing.cpu_count(), int(cpus))
     pool = multiprocessing.Pool(processes=job_cnt)
 
-    for code in codes:
-        ret = pool.apply_async(_upload_netvalue_and_info, args=(code, ))
-        results.append((code, ret))
+    buy_list = read_buy_list()
+    for code in buy_list:
+        res = pool.apply_async(_upload_netvalue_and_info, args=(code, ))
+        results.append((code, res))
     pool.close()
     pool.join()
 
-    logger.info(f"Transport-Speed {len(codes)} data successful.")
+    successes, fails = [], []
+    for code, res in results:
+        if res:
+            successes.append(code)
+        else:
+            fails.append(code)
+
+    logger.info(f"Transport net value:{len(successes)} successful. fails:{fails}.")
+
+
+def transport_backtest_data(cpus=8):
+
+    results = []
+    job_cnt = min(multiprocessing.cpu_count(), int(cpus))
+    pool = multiprocessing.Pool(processes=job_cnt)
+
+    fund_list = DepositoryTable().get_all_holding()
+    for fund in fund_list:
+        res = pool.apply_async(_upload_backtest_data, args=(fund.code, ))
+        results.append((fund.code, res))
+    pool.close()
+    pool.join()
+
+    successes, fails = [], []
+    for code, res in results:
+        if res:
+            successes.append(code)
+        else:
+            fails.append(code)
+
+    logger.info(f"Transport backtest data:{len(successes)} successful. fails:{fails}.")
 
 
 def _upload_netvalue_and_info(code):
@@ -78,6 +103,30 @@ def _upload_netvalue_and_info(code):
     except Exception as error:
         logger.error(f"Upload netvalue and info occurre an error: {error}.")
         return False
+
+
+def _upload_backtest_data(code):
+    '''
+    向 db_backtest 数据库上传基金的，半年、一年、三年回测数据
+    有新的计划就向 aip_plans 中加
+    '''
+    aip_plans = [StupidPlan()]
+
+    try:
+        for plan in aip_plans:
+            backtest_df = pd.DataFrame()
+            for cycle in plan.InvestmentCycles:
+                df = plan.analysis_realtime(code=code, cycle=cycle)
+                backtest_df = pd.concat([backtest_df, df])
+
+            FundBacktest(code).to_sql(backtest_df)
+            logger.info(f"Upload backtest data({code}) success.")
+        return True
+
+    except Exception as error:
+        logger.error(f"Upload backtest data occur error:{error}.")
+        return False
+
 
 
 
