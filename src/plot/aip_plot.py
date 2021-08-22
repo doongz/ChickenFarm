@@ -2,6 +2,7 @@ import os
 import math
 import pandas as pd
 import matplotlib.pyplot as plt
+import multiprocessing
 
 from chicken_farm.src.module.aip_mod import AutomaticInvestmentPlan
 from chicken_farm.src.model_db.tbl_depository import DepositoryTable

@@ -1,6 +1,6 @@
 from chicken_farm.src.model_prof.fund_types import Filed
 
-from chicken_farm.src.module.operate_mod import add_fund, delete_fund, update_fund, show_fund
+from chicken_farm.src.module.operate_mod import add_fund, delete_fund, update_fund, fund_dpt
 from chicken_farm.src.module.operate_mod import buy_fund, sell_fund, update_position
 from chicken_farm.src.module.statistics_mod import update_total_for_field, record_history
 from chicken_farm.src.module.transport_mod import transport_netvalue, transport_backtest_data
@@ -61,7 +61,6 @@ class Operator(Employee):
                     )
         update_total_for_field()
 
-
     def buy(self, code, amount):
         # 加仓基金
         buy_fund(code=code, 
@@ -86,7 +85,7 @@ class Operator(Employee):
                         )
         update_total_for_field()
 
-    def update_position_list(self, code):
+    def update_position_list(self):
         # 读取 position.csv 中基金的最新持仓，并更新持仓
         latest_position = read_latest_position()
         for code, position in latest_position:
@@ -95,10 +94,11 @@ class Operator(Employee):
                             key=self.key
                             )
         update_total_for_field()
+        return latest_position
 
-    def show(self, code):
-        # 展示基金
-        show_fund(code='519674')
+    def get_dpt(self, code):
+        # 用于展示基金
+        return fund_dpt(code=code)
 
 
 class Statistician(Employee):
@@ -131,8 +131,8 @@ class Analyst(Employee):
         # 回测，并将回测数据上传
         transport_backtest_data()
 
-    def draw_violin_plot(self):
-        # 绘制各领域基金的小提琴图
+    def draw_backtest_plot(self):
+        # 绘制各领域基金回测的小提琴图
         export_violin_plot()
 
 

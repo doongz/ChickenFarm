@@ -26,7 +26,7 @@ def read_latest_position():
     return latest_position
 
 
-# 从数据库中导出csv文件
+# 从 db_fund 数据库中导出csv文件
 def export_tables():
     table_names = ['tbl_depository', 'tbl_total_for_field', 'tbl_history_buying', 
                    'tbl_history_position', 'tbl_history_profit']

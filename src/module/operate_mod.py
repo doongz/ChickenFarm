@@ -146,11 +146,11 @@ def update_position(code, amount, *args, **kwargs):
                 f"profit_rate({fund_dpt.profit_rate}).")
 
 
-def show_fund(code):
+def fund_dpt(code):
     '''
-    展示 tbl_depository 表中一条基金记录
+    获取 tbl_depository 表中一条基金记录
     '''
-    fund_dpt_dic = get_fund_dic_from_dpt(code)
-    for key, value in fund_dpt_dic.items():
-        logger.info(f"{key}: {value}")
+    fund_dpt = get_fund_dic_from_dpt(code)
+    return fund_dpt
+
 
