@@ -19,9 +19,10 @@ logger = get_logger(__file__)
 class ChromeDriver():
 
     def __init__(self):
-        self.driver = webdriver.Chrome()
+        pass
 
     def _login(self, url):
+        self.driver = webdriver.Chrome()
         self.driver.get(url)
         self._wait(by=By.ID, value='tbname')
 
@@ -44,10 +45,10 @@ class ChromeDriver():
         try:
             url = "https://trade.1234567.com.cn/MyAssets/hold?spm=S"
             self._login(url)
+            raise Exception('dfdf')
 
             positions = []
             self._wait(by=By.CLASS_NAME, value='table-hold') # 这里无效重新
-            time.sleep(1)
             tag_elements = self.driver.find_element(By.CLASS_NAME, 'table-hold').find_elements(By.TAG_NAME, 'tr')
             for tag in tag_elements:
                 positions.append(tag.text)

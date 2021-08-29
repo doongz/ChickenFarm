@@ -37,7 +37,6 @@ def get_trade_record():
                         }, ignore_index=True)
     
     df = df.iloc[::-1]
-    # print(df)
     return df
 
 
@@ -58,6 +57,8 @@ def get_position():
 
     return df
 
-
+if __name__ == "__main__":
+    df = get_position()
+    print(df)
 
 
