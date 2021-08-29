@@ -4,11 +4,12 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 from chicken_farm.src.model_db.database import Database
-from chicken_farm.src.config.path import EXPORT_CHART_PATH
+from chicken_farm.src.util.config import Config
 from chicken_farm.src.util.log import get_logger
 
 
 logger = get_logger(__file__)
+config = Config()
 
 
 plt.rcParams['font.sans-serif'] = ['Arial Unicode MS']
@@ -41,7 +42,7 @@ def export_position_bar_chart(show=False):
     if show:
         plt.show()
     else:
-        plt.savefig(os.path.join(EXPORT_CHART_PATH, 'position_bar_chart.png'))
+        plt.savefig(os.path.join(config.export_chart_path, 'position_bar_chart.png'))
         logger.info(f"Successfully exported position bar chart.")
 
 
@@ -65,7 +66,7 @@ def export_profit_bar_chart(show=False):
     if show:
         plt.show()
     else:
-        plt.savefig(os.path.join(EXPORT_CHART_PATH, 'profit_bar_chart.png'))
+        plt.savefig(os.path.join(config.export_chart_path, 'profit_bar_chart.png'))
         logger.info(f"Successfully exported profit bar chart.")
 
 
@@ -97,7 +98,7 @@ def export_position_profit_bar_chart(show=False):
     if show:
         plt.show()
     else:
-        plt.savefig(os.path.join(EXPORT_CHART_PATH, 'position&profit_bar_chart.png'))
+        plt.savefig(os.path.join(config.export_chart_path, 'position&profit_bar_chart.png'))
         logger.info(f"Successfully exported profit & bar chart.")
 
 
@@ -122,7 +123,7 @@ def export_profit_rate_bar_chart(show=False):
     if show:
         plt.show()
     else:
-        plt.savefig(os.path.join(EXPORT_CHART_PATH, 'profit_rate_bar_chart.png'))
+        plt.savefig(os.path.join(config.export_chart_path, 'profit_rate_bar_chart.png'))
         logger.info(f"Successfully exported profit rate chart.")
 
 
@@ -156,5 +157,5 @@ def export_position_pie_chart(show=False):
     if show:
         plt.show()
     else:
-        plt.savefig(os.path.join(EXPORT_CHART_PATH, 'position_pie_chart.png'))
+        plt.savefig(os.path.join(config.export_chart_path, 'position_pie_chart.png'))
         logger.info(f"Successfully exported position pie chart.")

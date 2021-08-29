@@ -8,7 +8,7 @@ from chicken_farm.src.module.aip_mod import AutomaticInvestmentPlan
 from chicken_farm.src.model_db.tbl_depository import DepositoryTable
 from chicken_farm.src.model_prof.fund_backtest import FundBacktest
 from chicken_farm.src.model_prof.fund_types import Filed
-from chicken_farm.src.config.path import EXPORT_AIP_PLOT_PATH
+from chicken_farm.src.util.config import Config
 from chicken_farm.src.util.log import get_logger
 
 
@@ -102,7 +102,7 @@ def export_aip_violin_plot_by_filed(filed, show=False):
         if show:
             plt.show()
         else:
-            plt.savefig(os.path.join(EXPORT_AIP_PLOT_PATH, f'{filed}.png'))
+            plt.savefig(os.path.join(Config().export_aip_plot_path, f'{filed}.png'))
             logger.info(f"Successfully exported {filed} aip violin plot.")
         return True
 

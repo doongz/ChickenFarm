@@ -2,14 +2,19 @@ import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy import DateTime, DECIMAL, INT, VARCHAR
 
-from chicken_farm.src.config.mysql import USER, PWD, ADDRESS, PORT, DB_BACKTEST
+from chicken_farm.src.util.config import Config
+
+
+config = Config()
 
 
 class FundBacktest():
 
     def __init__(self, code):
 
-        self.engine = create_engine(f"mysql+pymysql://{USER}:{PWD}@{ADDRESS}:{PORT}/{DB_BACKTEST}")
+        self.engine = create_engine(
+            f"mysql+pymysql://{config.db_username}:{config.db_password}@{config.db_address}:{config.db_port}/{config.db_backtest}"
+            )
         self.code = code
         self.tbl = f"tbl_{self.code}"
 

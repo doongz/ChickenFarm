@@ -3,10 +3,10 @@ import inspect
 import logging
 from logging.config import fileConfig
 
-from chicken_farm.src.config.path import LOG_PATH
+from chicken_farm.src.util.config import Config
 
 
-logging.config.fileConfig(LOG_PATH)
+logging.config.fileConfig(Config().log_path)
 
 
 def get_logger(filename):

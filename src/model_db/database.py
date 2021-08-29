@@ -2,7 +2,10 @@ import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from chicken_farm.src.config.mysql import USER, PWD, ADDRESS, PORT, DB_FUND
+from chicken_farm.src.util.config import Config
+
+
+config = Config()
 
 
 class Singleton(type):
@@ -16,7 +19,10 @@ class Singleton(type):
 
 class Database(metaclass=Singleton):
     def __init__(self):
-        self.engine = create_engine(f"mysql+pymysql://{USER}:{PWD}@{ADDRESS}:{PORT}/{DB_FUND}")
+        self.engine = create_engine(
+            f"mysql+pymysql://{config.db_username}:{config.db_password}@{config.db_address}:{config.db_port}/{config.db_fund}"
+            )
+
         # 创建DBSession类型:
         DBSession = sessionmaker(bind=self.engine)
         # 创建session对象:

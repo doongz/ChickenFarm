@@ -4,7 +4,7 @@ from chicken_farm.src.model_db.database import Database
 from chicken_farm.src.model_db.tbl_operation_record import OperationRecordTable
 from chicken_farm.src.model_db.tbl_depository import DepositoryTable, get_fund_dic_from_dpt
 from chicken_farm.src.model_prof.fund_types import OperateType
-from chicken_farm.src.config.key import KEY
+from chicken_farm.src.util.config import Config
 from chicken_farm.src.util.log import get_logger
 
 
@@ -19,7 +19,7 @@ def auth(func):
         if not key:
             logger.error("Your operation key is empty.")
             raise Exception('Your operation key is empty.')
-        if key != KEY:
+        if key != Config().operation_key:
             logger.error("Your operation key is wrong.")
             raise Exception('Your operation key is wrong.')
         logger.info("Authentication success.")
@@ -47,6 +47,9 @@ def record_operation(operate_type):
             opr.amount = kwargs.get("amount", None)
             opr.info_after_change = "Waiting for operation"
             opr.info_before_change = json.dumps(dpt_before_change)
+            operate_time = kwargs.get("operate_time", None)
+            if operate_time: 
+                opr.operate_time = operate_time
             Database().add(opr) # 如果下面的函数发生异常，这里将会插入一条垃圾数据
 
             func(*args, **kwargs)
