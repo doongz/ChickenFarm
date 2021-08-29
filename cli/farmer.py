@@ -6,13 +6,21 @@ import argparse
 import threading
 import getpass
 import time
+import pandas as pd
 from termcolor import colored
 from argparse import RawTextHelpFormatter
+
 
 from chicken_farm.src.employees import Jober
 from chicken_farm.src.employees import Operator
 from chicken_farm.src.employees import Statistician
 from chicken_farm.src.employees import Analyst
+
+pd.set_option('display.max_columns', None)
+pd.set_option('display.max_rows',None)
+pd.set_option('display.unicode.ambiguous_as_wide', True)
+pd.set_option('display.unicode.east_asian_width', True)
+pd.set_option('display.width', 180) # 设置打印宽度(**重要**)
 
 key = os.getenv('OPERATION_KEY', None)
 jober = Jober(key)
@@ -74,6 +82,13 @@ def sell(code, amount):
 
 
 @confirm
+def record_op_auto():
+    df = operator.record_op_auto()
+    print(colored(df, "green"))
+    print(colored(f"自动记录买入、卖出操作完成。", "green"))
+
+
+@confirm
 def position(code, amount):
     operator.update_position(code, amount)
     print(colored(f"{code} 更新持仓为 {amount} ¥。", "green"))
@@ -84,6 +99,12 @@ def position_list():
     latest_position = operator.update_position_list()
     for code, position in latest_position:
         print(colored(f"{code} 更新持仓为 {position} ¥。", "green"))
+
+@confirm
+def position_auto():
+    df = operator.update_position_auto()
+    print(colored(df, "green"))
+    print(colored(f"自动更新持仓数据完成。", "green"))
 
 
 def show(code):
@@ -123,6 +144,10 @@ def main():
     group.add_argument('-s', '--sell', 
                        action='store_true',  
                        help='卖出基金')
+    group.add_argument('-roa', '--record-op-auto',
+                       dest='record_op_auto', 
+                       action='store_true',  
+                       help='从天天基金获取数据，自动将买入、卖出添加至数据库中')
     group.add_argument('-p', '--position', 
                        action='store_true',  
                        help='更新持仓 单个基金')
@@ -130,6 +155,10 @@ def main():
                        dest='position_list', 
                        action='store_true',  
                        help='读取 position.csv 中基金的最新持仓，并更新持仓')
+    group.add_argument('-pa', '--position-auto', 
+                       dest='position_auto', 
+                       action='store_true',  
+                       help='从天天基金获取持仓数据，更新至数据库中')
     group.add_argument('-show', '--show', 
                        action='store_true',  
                        help='展示基金存储')
@@ -183,10 +212,14 @@ def main():
         buy(args.code, args.amount)
     elif args.sell:
         sell(args.code, args.amount)
+    elif args.record_op_auto:
+        record_op_auto()
     elif args.position:
         position(args.code, args.amount)
     elif args.position_list:
         position_list()
+    elif args.position_auto:
+        position_auto()
     elif args.show:
         show(args.code)
     elif args.record_history:

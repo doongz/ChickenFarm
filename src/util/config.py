@@ -69,7 +69,7 @@ class Config(object):
     @property
     def log_path(self):
         # 日志配置文件路径
-        return os.path.join(os.path.dirname(os.path.abspath(__file__)), "./log.conf")
+        return os.path.join(os.path.dirname(os.path.abspath(__file__)), "log.conf")
 
     @property
     def position_csv_path(self):
@@ -90,3 +90,13 @@ class Config(object):
     def export_aip_plot_path(self):
         # 导出的回测分析图的路径
         return self.json_data.get("EXPORT_AIP_PLOT_PATH")
+
+    @property
+    def tiantian_username(self):
+        # 天天基金账户
+        return self.json_data.get("TIANTIAN_USERNAME")
+
+    @property
+    def tiantian_password(self):
+        # 天天基金密码
+        return self.json_data.get("TIANTIAN_PASSWORD")

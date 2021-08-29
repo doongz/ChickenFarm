@@ -2,18 +2,7 @@
 
 一、初次使用需要添加环境变量
 echo "export PYTHONPATH=$PYTHONPATH:/Users/zhangdong/Desktop" >> ~/.bash_profile
-echo "export DB_USERNAME=" >> ~/.bash_profile
-echo "export DB_PASSWORD=" >> ~/.bash_profile
-echo "export DB_ADDRESS=" >> ~/.bash_profile
-echo "export DB_PORT=" >> ~/.bash_profile
-echo "export DB_FUND=" >> ~/.bash_profile
-echo "export DB_NETVALUE=" >> ~/.bash_profile
-echo "export DB_BACKTEST=" >> ~/.bash_profile
-echo "export OPERATION_KEY=" >> ~/.bash_profile
-echo "export POSITION_CSV_PATH=" >> ~/.bash_profile
-echo "export EXPORT_TABLE_PATH=" >> ~/.bash_profile
-echo "export EXPORT_CHART_PATH=" >> ~/.bash_profile
-echo "export EXPORT_AIP_PLOT_PATH=" >> ~/.bash_profile
+echo "export FARM_CONFIG_PATH=" >> ~/.bash_profile
 source ~/.bash_profile
 
 
@@ -25,6 +14,9 @@ source ~/.bash_profile
 三、每周末需要做
 1、更新净值数据库(一键)                         python cli/farmer.py -n                   
 2、将本周的交易记录下来                    
+  1) 自动记录本周交易操作                       python cli/farmer.py -roa
+  2) 自动记录最新持仓（得先把支付宝里卖的手动处理，填写csv后）  python cli/farmer.py -pa
+被选:
   1）处理加仓，一条一条基金执行                   python cli/farmer.py -b -c <code> -a <amount>
   2）处理卖出，一条一条基金执行                   python cli/farmer.py -s -c <code> -a <amount>
   3）更新持仓，现将基金的最新持仓维护至 position.csv 中，然后运行  python cli/farmer.py -pl              
@@ -36,9 +28,9 @@ source ~/.bash_profile
 
 
 TODO:
-1、近半年、近一年、近三年定投分析 已完成
-2、cli 部分操作加入yes判断
-3、适配天天基金 selenium
+1、人肉定投，发邮件
+2、适配天天基金 selenium
+3、掌握目标止盈等投资算法后，全部使用人肉定投
 4、readme
 
 

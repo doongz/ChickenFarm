@@ -1,9 +1,10 @@
-from chicken_farm.src.model_prof.fund_types import Filed
+from chicken_farm.src.model_prof.fund_types import Filed, OperateType 
 
 from chicken_farm.src.module.operate_mod import add_fund, delete_fund, update_fund, fund_dpt
 from chicken_farm.src.module.operate_mod import buy_fund, sell_fund, update_position
 from chicken_farm.src.module.statistics_mod import update_total_for_field, record_history
 from chicken_farm.src.module.transport_mod import transport_netvalue, transport_backtest_data
+from chicken_farm.src.module.chrome_mod import get_trade_record, get_position
 
 from chicken_farm.src.plot.aip_plot import export_violin_plot
 from chicken_farm.src.plot.statistics_plot import export_position_bar_chart, \
@@ -77,6 +78,25 @@ class Operator(Employee):
                   )
         update_total_for_field()
 
+    def record_op_auto(self):
+        # 从天天基金获取交易记录，自动将买入、卖出添加至数据库中
+        df = get_trade_record()
+        for index, row in df.iterrows():
+            if row['operate_type'] == OperateType.BUY:
+                buy_fund(code=row['code'], 
+                         amount=row['amount'],
+                         operate_time=row['operate_time'],
+                         key=self.key
+                         )
+            if row['operate_type'] == OperateType.SELL:
+                sell_fund(code=code, 
+                          amount=amount, 
+                          operate_time=row['operate_time'],
+                          key=self.key
+                          )
+        update_total_for_field()
+        return df
+
     def update_position(self, code, amount):
         # 更新基金的最新持仓
         update_position(code=code, 
@@ -95,6 +115,32 @@ class Operator(Employee):
                             )
         update_total_for_field()
         return latest_position
+
+    def update_position_auto(self):
+        # 从天天基金获取持仓数据，更新至数据库中
+        # todo: 等支付宝里面的都卖完了，这里简化
+        df = get_position()
+        from decimal import Decimal
+        code_list = df['code'].tolist()
+        latest_position = read_latest_position()
+        for code, position in latest_position:
+            if code in code_list:
+                p = df.loc[df['code'] == code]['position'].values[0] + Decimal(position).quantize(Decimal('0.00'))
+                df.at[df.loc[df['code'] == code].index, 'position'] = p
+            else:
+                df = df.append({'code': code,
+                                'position': Decimal(position).quantize(Decimal('0.00'))
+                                }, ignore_index=True)
+                
+        for index, row in df.iterrows():
+            update_position(code=row['code'], 
+                            amount=row['position'],
+                            key=self.key
+                            )
+        update_total_for_field()
+
+        return df
+
 
     def get_dpt(self, code):
         # 用于展示基金
@@ -135,7 +181,8 @@ class Analyst(Employee):
         # 绘制各领域基金回测的小提琴图
         export_violin_plot()
 
-
+if __name__ == "__main__":
+    Operator().buy_auto()
 
 
 
