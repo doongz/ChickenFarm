@@ -4,6 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 from chicken_farm.src.model_db.database import Database
+from chicken_farm.src.util.tools import DateTools
 from chicken_farm.src.util.config import Config
 from chicken_farm.src.util.log import get_logger
 
@@ -31,7 +32,7 @@ def export_position_bar_chart(show=False):
                       width=0.5,
                       color=COLORS)
 
-    ax.set_title('10 领域最新持仓')
+    ax.set_title(f"十领域最新持仓 {DateTools.today()}")
     ax.set_ylabel('数额')
     ax.yaxis.grid(True)
 
@@ -57,7 +58,7 @@ def export_profit_bar_chart(show=False):
                        width=data,
                        height=0.7,
                        color=COLORS)
-    ax.set_title('10 领域最新收益')
+    ax.set_title(f"十领域最新收益 {DateTools.today()}")
     ax.xaxis.grid(True)
 
     for a, b in zip(filed, data):
@@ -89,7 +90,7 @@ def export_position_profit_bar_chart(show=False):
         plt.text(a, b+50, b, ha='center', va='bottom', fontsize=7)
 
     ax.set_ylabel('数额')
-    ax.set_title('10 领域最新持仓 & 收益')
+    ax.set_title(f"十领域最新持仓 & 收益 {DateTools.today()}")
     ax.set_xticks(x)
     ax.set_xticklabels(df['filed_cn'])
     ax.legend(fontsize=10)
@@ -113,7 +114,7 @@ def export_profit_rate_bar_chart(show=False):
                        width=data,
                        height=0.7,
                        color=COLORS)
-    ax.set_title('10 领域最新收益率')
+    ax.set_title(f"十领域最新收益率 {DateTools.today()}")
     ax.xaxis.grid(True)
     ax.set_xlabel('收益率 %')
 
@@ -152,7 +153,7 @@ def export_position_pie_chart(show=False):
         ax.annotate(recipe[i]+' '+percent, xy=(x, y), xytext=(1.35*np.sign(x), 1.4*y),
                     horizontalalignment=horizontalalignment, **kw)
 
-    ax.set_title('10 领域持仓占比')
+    ax.set_title(f"十领域持仓占比 {DateTools.today()}")
 
     if show:
         plt.show()

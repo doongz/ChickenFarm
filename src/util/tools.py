@@ -117,6 +117,10 @@ class XAlphaTools:
 class DateTools:
 
     @staticmethod
+    def today():
+        return datetime.today().strftime('%Y-%m-%d')
+
+    @staticmethod
     def is_trade_day(date):
         '''
         判断指定日期是否为股票交易日
