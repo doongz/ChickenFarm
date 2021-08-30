@@ -2,9 +2,9 @@ import pandas as pd
 from datetime import datetime
 from abc import ABC, abstractmethod
 
-from chicken_farm.src.model_prof.fund_netvalue import FundNetValue
-from chicken_farm.src.util.date_tools import is_trade_day
 from chicken_farm.src.model_db.tbl_info import InfoTable
+from chicken_farm.src.model_prof.fund_netvalue import FundNetValue
+from chicken_farm.src.util.tools import DateTools
 from chicken_farm.src.util.exceptions import NonTradingError
 from chicken_farm.src.util.log import get_logger
 
@@ -42,13 +42,13 @@ class Algorithm(ABC):
 
     def __check_start(self, start):
         # 确保输入的 start 为交易日
-        if not is_trade_day(start):
+        if not DateTools.is_trade_day(start):
             raise NonTradingError(f"Start date:{start} is not trading day.")
         return start
         
     def __check_end(self, end):
         # 确保输入的 end 为交易日
-        if not is_trade_day(end):
+        if not DateTools.is_trade_day(end):
             raise NonTradingError(f"End date:{end} is not trading day.")
         return end
 

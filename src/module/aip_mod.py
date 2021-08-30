@@ -5,8 +5,7 @@ from abc import ABC, abstractmethod
 from chicken_farm.src.algorithm.stupid import StupidAlgorithm
 from chicken_farm.src.model_prof.fund_netvalue import FundNetValue
 from chicken_farm.src.model_prof.fund_backtest import FundBacktest
-from chicken_farm.src.util.date_tools import get_between_data, get_before_date_interval
-from chicken_farm.src.util.date_tools import get_recent_trading_day
+from chicken_farm.src.util.tools import DateTools
 from chicken_farm.src.util.exceptions import NonTradingError
 from chicken_farm.src.util.log import get_logger
 
@@ -39,7 +38,7 @@ class AutomaticInvestmentPlan(ABC):
 
         stupid = self.create_algo(code)
         
-        for start in get_between_data(start_interval[0], start_interval[1]):
+        for start in DateTools.get_between_data(start_interval[0], start_interval[1]):
             try:
                 stupid.prepare_data(start, end) 
             except NonTradingError as error:
@@ -70,7 +69,7 @@ class AutomaticInvestmentPlan(ABC):
         fund_value = FundNetValue(code)
 
         # 处理起始区间，如果起始点在发行日之前，就调整为发行日那天
-        start_interval = get_before_date_interval(cycle, size)
+        start_interval = DateTools.get_before_date_interval(cycle, size)
         start = start_interval[0]
         if start < fund_value.release_date:
             start_interval = (fund_value.release_date,
@@ -80,7 +79,7 @@ class AutomaticInvestmentPlan(ABC):
                            f"start_interval修复为{start_interval}.")
 
         # 处理结束的那天，如果结束的那天在数据库里还没上传，就调整为数据库中最后的日子
-        end = get_recent_trading_day(datetime.today())
+        end = DateTools.get_recent_trading_day(datetime.today())
         if end > fund_value.last_date:
             end = fund_value.last_date
             logger.debug(f"基金:{code}, 结束日在数据库中不存在, 修复为{end}.")

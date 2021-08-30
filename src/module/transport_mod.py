@@ -14,8 +14,8 @@ from chicken_farm.src.model_prof.fund_backtest import FundBacktest
 
 from chicken_farm.src.module.aip_mod import StupidPlan
 
-from chicken_farm.src.util.xalpha_tools import get_fundinfo_from_xalpha
-from chicken_farm.src.util.sheet_tools import read_buy_list
+from chicken_farm.src.util.tools import XAlphaTools
+from chicken_farm.src.util.tools import SheetTools
 from chicken_farm.src.util.log import get_logger
 
 
@@ -28,7 +28,7 @@ def transport_netvalue(cpus=8):
     job_cnt = min(multiprocessing.cpu_count(), int(cpus))
     pool = multiprocessing.Pool(processes=job_cnt)
 
-    buy_list = read_buy_list()
+    buy_list = SheetTools.read_buy_list()
     for code in buy_list:
         res = pool.apply_async(_upload_netvalue_and_info, args=(code, ))
         results.append((code, res))
@@ -76,7 +76,7 @@ def _upload_netvalue_and_info(code):
     并更新 db_fund.tbl_info 中的信息
     '''
     try:
-        fundinfo = get_fundinfo_from_xalpha(code)
+        fundinfo = XAlphaTools.get_fundinfo_from_xalpha(code)
 
         fund_val = FundNetValue(code)
         fund_val.to_sql(fundinfo.price)

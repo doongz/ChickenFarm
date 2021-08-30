@@ -1,5 +1,4 @@
 __pycache__/
 .ipynb_checkpoints
 .DS_Store
-dev.ipynb
-dev.py
+*dev*

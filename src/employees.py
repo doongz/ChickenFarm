@@ -12,8 +12,7 @@ from chicken_farm.src.plot.statistics_plot import export_position_bar_chart, \
                                                   export_position_profit_bar_chart, \
                                                   export_profit_rate_bar_chart, \
                                                   export_position_pie_chart
-
-from chicken_farm.src.util.sheet_tools import read_buy_list, read_latest_position, export_tables
+from chicken_farm.src.util.tools import SheetTools
 
 
 class Employee:
@@ -107,7 +106,7 @@ class Operator(Employee):
 
     def update_position_list(self):
         # 读取 position.csv 中基金的最新持仓，并更新持仓
-        latest_position = read_latest_position()
+        latest_position = SheetTools.read_latest_position()
         for code, position in latest_position:
             update_position(code=code, 
                             amount=position,
@@ -122,7 +121,7 @@ class Operator(Employee):
         df = get_position()
         from decimal import Decimal
         code_list = df['code'].tolist()
-        latest_position = read_latest_position()
+        latest_position = SheetTools.read_latest_position()
         for code, position in latest_position:
             if code in code_list:
                 p = df.loc[df['code'] == code]['position'].values[0] + Decimal(position).quantize(Decimal('0.00'))
@@ -160,7 +159,7 @@ class Statistician(Employee):
 
     def export_tables(self):
         # 导出基金最新数据总表、每个领域合计表、历史购买表、历史仓位表、历史收益表
-        export_tables()
+        SheetTools.export_tables()
 
     def draw_charts(self):
         # 绘制图表
