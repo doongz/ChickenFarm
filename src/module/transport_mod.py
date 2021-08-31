@@ -5,9 +5,9 @@
 import pandas as pd
 import multiprocessing
 
-from chicken_farm.src.model_db.database import Database
-from chicken_farm.src.model_db.tbl_info import InfoTable
-from chicken_farm.src.model_db.tbl_depository import DepositoryTable
+from chicken_farm.src.db.database import Database
+from chicken_farm.src.db.tbl_info import InfoTable
+from chicken_farm.src.db.tbl_depository import DepositoryTable
 
 from chicken_farm.src.model_prof.fund_netvalue import FundNetValue
 from chicken_farm.src.model_prof.fund_backtest import FundBacktest

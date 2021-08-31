@@ -2,16 +2,16 @@ from datetime import datetime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, DateTime, DECIMAL, VARCHAR, BIGINT
 
-from chicken_farm.src.model_db.database import Database
+from chicken_farm.src.db.database import Database
 from chicken_farm.src.model_prof.fund_types import Filed
 
 
 Base = declarative_base()
 
 
-class HistroyBuyingTable(Base):
+class HistroyProfitTable(Base):
 
-    __tablename__ = 'tbl_history_buying'
+    __tablename__ = 'tbl_history_profit'
 
     id = Column(BIGINT, primary_key=True, autoincrement=True)
     date = Column(DateTime, default=datetime.now())
@@ -29,4 +29,3 @@ class HistroyBuyingTable(Base):
     MILITARY = Column(DECIMAL(10, 2), name=Filed.MILITARY)
 
     comment = Column(VARCHAR(255))
-

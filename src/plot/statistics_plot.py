@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from chicken_farm.src.model_db.database import Database
+from chicken_farm.src.db.database import Database
 from chicken_farm.src.util.tools import DateTools
 from chicken_farm.src.util.config import Config
 from chicken_farm.src.util.log import get_logger

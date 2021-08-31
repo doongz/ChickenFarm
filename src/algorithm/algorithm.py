@@ -2,7 +2,7 @@ import pandas as pd
 from datetime import datetime
 from abc import ABC, abstractmethod
 
-from chicken_farm.src.model_db.tbl_info import InfoTable
+from chicken_farm.src.database.tbl_info import InfoTable
 from chicken_farm.src.model_prof.fund_netvalue import FundNetValue
 from chicken_farm.src.util.tools import DateTools
 from chicken_farm.src.util.exceptions import NonTradingError

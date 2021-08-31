@@ -6,9 +6,9 @@ from chinese_calendar import is_workday
 from datetime import datetime, timedelta
 
 
-from chicken_farm.src.model_db.database import Database
-from chicken_farm.src.model_db.tbl_operation_record import OperationRecordTable
-from chicken_farm.src.model_db.tbl_depository import get_fund_dic_from_dpt
+from chicken_farm.src.db.database import Database
+from chicken_farm.src.db.tbl_operation_record import OperationRecordTable
+from chicken_farm.src.db.tbl_depository import get_fund_dic_from_dpt
 from chicken_farm.src.model_prof.fund_types import OperateType
 from chicken_farm.src.util.config import Config
 from chicken_farm.src.util.log import get_logger

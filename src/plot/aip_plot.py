@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import multiprocessing
 
 from chicken_farm.src.module.aip_mod import AutomaticInvestmentPlan
-from chicken_farm.src.model_db.tbl_depository import DepositoryTable
+from chicken_farm.src.db.tbl_depository import DepositoryTable
 from chicken_farm.src.model_prof.fund_backtest import FundBacktest
 from chicken_farm.src.model_prof.fund_types import Filed
 from chicken_farm.src.util.tools import DateTools
