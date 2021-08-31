@@ -2,6 +2,9 @@ from datetime import datetime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, DateTime, DECIMAL, VARCHAR, CHAR, BIGINT
 
+from chicken_farm.src.model_db.database import Database
+
+
 Base = declarative_base()
 
 
@@ -19,3 +22,7 @@ class OperationRecordTable(Base):
     info_before_change = Column(VARCHAR(2048), nullable=False)
     operate_time = Column(DateTime, default=datetime.now(), nullable=False)
     comment = Column(VARCHAR(255))
+
+    @staticmethod
+    def get_by_operate_id(operate_id):
+        return Database().query(OperationRecordTable).filter_by(operate_id=operate_id).first()
