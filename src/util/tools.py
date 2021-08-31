@@ -58,7 +58,7 @@ def record_operation(operate_type):
             operate_id = opr.code + opr.operate_time.strftime('%Y%m%d%H%M%S')
             if OperationRecordTable.get_by_operate_id(operate_id):
                 logger.error(f"This operation has been recorded. operate_id:{operate_id}, "
-                              "{opr.name}({opr.code}) opr.operate_type opr.amount.")
+                             f"{opr.name}({opr.code}) {opr.operate_type} {opr.amount}.")
                 raise Exception(f"operate_id:{operate_id} has been recorded.")
             opr.operate_id = operate_id
             Database().add(opr) # 如果下面的函数发生异常，这里将会插入一条垃圾数据
@@ -70,7 +70,6 @@ def record_operation(operate_type):
                 opr.name = dpt_after_change.get('name')
                 opr.code = dpt_after_change.get('code')
             opr.info_after_change = json.dumps(dpt_after_change)
-            opr.operate_id = 
             Database().update()
             logger.info(f"Record {opr.name}({opr.code}) operation:{opr.operate_type} "
                         f"amount:{opr.amount} to tbl_operation_record.")
