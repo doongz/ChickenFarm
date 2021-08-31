@@ -65,6 +65,7 @@ def record_operation(operate_type):
                 opr.name = dpt_after_change.get('name')
                 opr.code = dpt_after_change.get('code')
             opr.info_after_change = json.dumps(dpt_after_change)
+            opr.operate_id = opr.code + opr.operate_time.strftime('%Y%m%d%H%M%S')
             Database().update()
             logger.info(f"Record {opr.name}({opr.code}) operation:{opr.operate_type} "
                         f"amount:{opr.amount} to tbl_operation_record.")

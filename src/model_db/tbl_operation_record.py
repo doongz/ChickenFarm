@@ -10,6 +10,7 @@ class OperationRecordTable(Base):
     __tablename__ = 'tbl_operation_record'
 
     id = Column(BIGINT, primary_key=True, autoincrement=True)
+    operate_id = Column(VARCHAR(20), nullable=False)
     name = Column(VARCHAR(255), nullable=False)
     code = Column(CHAR(6), nullable=False)
     operate_type = Column(VARCHAR(32), nullable=False)
