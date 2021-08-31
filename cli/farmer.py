@@ -11,7 +11,6 @@ from termcolor import colored
 from argparse import RawTextHelpFormatter
 
 
-from chicken_farm.src.employees import Jober
 from chicken_farm.src.employees import Operator
 from chicken_farm.src.employees import Statistician
 from chicken_farm.src.employees import Analyst
@@ -23,7 +22,6 @@ pd.set_option('display.unicode.east_asian_width', True)
 pd.set_option('display.width', 180) # 设置打印宽度(**重要**)
 
 key = os.getenv('OPERATION_KEY', None)
-jober = Jober(key)
 operator = Operator(key)
 statistician = Statistician(key)
 analyst = Analyst(key)

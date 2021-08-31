@@ -159,28 +159,6 @@ class Analyst(Employee):
         export_violin_plot()
 
 
-class Jober(Operator, Statistician, Analyst):
-
-    def weekly_job(self):
-        """
-        todo: 未验证，如果其中一步失败了怎么办: 备忘录模式
-        1、把基金的历史净值上传至 db_netvalue 数据库中
-        2、更新本周的操作记录，需要适配支付宝和天天基金
-        3、更新本周所有基金的持仓，需要适配支付宝和天天基金
-        4、统计并记录本周各个领域的投入、持仓、收益
-        5、导出个人数据统计表
-        6、导出个人数据统计图
-        7、更新回测分析数据
-        8、导出回测分析图表
-        """
-        super().transport_netvalue()
-        super().record_op_auto()
-        super().update_position_auto()
-        super().record_history()
-        super().export_tables() 
-        super().draw_charts()
-        super().transport_backtest_data()
-        super().draw_backtest_plot()
 
 
 
