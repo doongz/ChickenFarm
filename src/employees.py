@@ -1,4 +1,4 @@
-from chicken_farm.src.model_prof.fund_types import Filed, OperateType 
+from chicken_farm.src.db.types import Filed, OperateType 
 
 from chicken_farm.src.module.operate_mod import add_fund, delete_fund, update_fund, fund_dpt
 from chicken_farm.src.module.operate_mod import buy_fund, sell_fund, update_position

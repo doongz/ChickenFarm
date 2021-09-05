@@ -2,8 +2,8 @@ from datetime import datetime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, DateTime, DECIMAL, VARCHAR, BIGINT
 
-from chicken_farm.src.db.database import Database
-from chicken_farm.src.model_prof.fund_types import Filed
+from chicken_farm.src.db.db_fund import Database
+from chicken_farm.src.db.types import Filed
 
 
 Base = declarative_base()

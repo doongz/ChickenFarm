@@ -5,11 +5,11 @@
 import pandas as pd
 import multiprocessing
 
-from chicken_farm.src.db.database import Database
+from chicken_farm.src.db.db_fund import Database
 from chicken_farm.src.db.tbl_depository import DepositoryTable
 
-from chicken_farm.src.model_prof.fund_netvalue import FundNetValue
-from chicken_farm.src.model_prof.fund_backtest import FundBacktest
+from chicken_farm.src.db.db_netvalue import FundNetValue
+from chicken_farm.src.db.db_backtest import FundBacktest
 
 from chicken_farm.src.module.aip_mod import StupidPlan
 

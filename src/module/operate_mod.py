@@ -3,9 +3,9 @@
 '''
 from decimal import Decimal
 
-from chicken_farm.src.db.database import Database
+from chicken_farm.src.db.db_fund import Database
 from chicken_farm.src.db.tbl_depository import DepositoryTable, get_fund_dic_from_dpt
-from chicken_farm.src.model_prof.fund_types import OperateType
+from chicken_farm.src.db.types import OperateType
 from chicken_farm.src.util.tools import XAlphaTools
 from chicken_farm.src.util.tools import auth, record_operation
 from chicken_farm.src.util.exceptions import FundNotFoundError

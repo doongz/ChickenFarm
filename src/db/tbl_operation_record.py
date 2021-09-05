@@ -2,7 +2,7 @@ from datetime import datetime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, DateTime, DECIMAL, VARCHAR, CHAR, BIGINT
 
-from chicken_farm.src.db.database import Database
+from chicken_farm.src.db.db_fund import Database
 
 
 Base = declarative_base()

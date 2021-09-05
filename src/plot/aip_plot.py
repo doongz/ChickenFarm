@@ -6,8 +6,8 @@ import multiprocessing
 
 from chicken_farm.src.module.aip_mod import AutomaticInvestmentPlan
 from chicken_farm.src.db.tbl_depository import DepositoryTable
-from chicken_farm.src.model_prof.fund_backtest import FundBacktest
-from chicken_farm.src.model_prof.fund_types import Filed
+from chicken_farm.src.db.db_backtest import FundBacktest
+from chicken_farm.src.db.types import Filed
 from chicken_farm.src.util.tools import DateTools
 from chicken_farm.src.util.config import Config
 from chicken_farm.src.util.log import get_logger

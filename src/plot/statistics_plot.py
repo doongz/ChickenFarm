@@ -4,8 +4,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from pandas.plotting import register_matplotlib_converters
 
-from chicken_farm.src.model_prof.fund_types import Filed
-from chicken_farm.src.db.database import Database
+from chicken_farm.src.db.types import Filed
+from chicken_farm.src.db.db_fund import Database
 from chicken_farm.src.util.tools import DateTools
 from chicken_farm.src.util.config import Config
 from chicken_farm.src.util.log import get_logger

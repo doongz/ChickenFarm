@@ -2,7 +2,7 @@ import pandas as pd
 from datetime import datetime
 from decimal import Decimal
 
-from chicken_farm.src.model_prof.fund_types import OperateType 
+from chicken_farm.src.db.types import OperateType 
 from chicken_farm.src.util.chrome import ChromeDriver
 from chicken_farm.src.util.log import get_logger
 
