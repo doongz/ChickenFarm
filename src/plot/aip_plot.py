@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import multiprocessing
 
 from chicken_farm.src.module.aip_mod import AutomaticInvestmentPlan
+from chicken_farm.src.db.db_fund import Database
 from chicken_farm.src.db.tbl_depository import DepositoryTable
 from chicken_farm.src.db.db_backtest import FundBacktest
 from chicken_farm.src.db.types import Filed
@@ -19,13 +20,26 @@ logger = get_logger(__file__)
 plt.rcParams['font.sans-serif'] = ['Arial Unicode MS'] # 显示中文
 plt.rcParams['figure.dpi'] = 300  # 显示分辨率
 plt.rcParams['savefig.dpi'] = 300  # 保存图片分辨率
- 
 
-def export_violin_plot(cpus=8):
+def export_violin_plot():
     '''
     导出所有领域的周定投-小提琴图
     '''
+    fileds = Filed().get_fileds()
 
+    successes, fails = [], []
+    for filed in fileds:
+        if filed == Filed.MILITARY:
+            continue
+        export_aip_violin_plot_by_filed(filed)
+
+    logger.info(f"Export violin plot successful.")
+
+def export_violin_plot_speed(cpus=8):
+    '''
+    多进程导出所有领域的周定投-小提琴图
+    todo: 单次执行时正常，famer 中多个任务执行时有异常
+    '''
     results = []
     job_cnt = min(multiprocessing.cpu_count(), int(cpus))
     pool = multiprocessing.Pool(processes=job_cnt)
@@ -53,7 +67,6 @@ def export_aip_violin_plot_by_filed(filed, show=False):
     '''
     导出指定领域的周定投-小提琴图
     '''
-    return False
     try:
         fund_list = DepositoryTable.get_holding_by_filed(filed)
         df_dict = {}
@@ -80,7 +93,7 @@ def export_aip_violin_plot_by_filed(filed, show=False):
         for fund, fund_df in df_dict.items():
             # 这里 *100 变为百分比
             bodies = [fund_df.loc[fund_df['week'] == day]['profit_rate']*100 for day in range(1, 6)]
-            
+            # todo: 如果该领域下只有一个基金，这里会有异常
             violin_plot = axs[math.floor(i/cols)][i%cols].violinplot(bodies,
                                                 showmeans=False, # 均值
                                                 showmedians=True, # 中位数
@@ -113,8 +126,6 @@ def export_aip_violin_plot_by_filed(filed, show=False):
     except Exception as error:
         logger.error(f"Export aip violin plot by filed failed, error:{error}.")
         return False
-
-
 
 
 def show_diff_box_plot(df_dict, figsize=(20, 7), notch=True, vert=True):

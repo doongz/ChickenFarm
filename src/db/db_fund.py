@@ -17,7 +17,8 @@ class Singleton(type):
         return cls._instances[cls]
 
 
-class Database(metaclass=Singleton):
+class Database():
+
     def __init__(self):
         self.engine = create_engine(
             f"mysql+pymysql://{config.db_username}:{config.db_password}@{config.db_address}:{config.db_port}/{config.db_fund}"
@@ -27,6 +28,9 @@ class Database(metaclass=Singleton):
         DBSession = sessionmaker(bind=self.engine)
         # 创建session对象:
         self.session = DBSession()
+
+    def dispose(self):
+        self.engine.dispose()
 
     def add(self, obj):
         # work

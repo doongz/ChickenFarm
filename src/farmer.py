@@ -91,13 +91,19 @@ class Farmer:
         self._slave = slave
 
     def base_job(self):
-        # self.slave.record_op_auto()
-        # self.slave.update_position_auto()
-        # self.slave.record_history()
-        # self.slave.export_tables() 
-        # self.slave.draw_charts()
-        # self.slave.transport_netvalue()
-        # self.slave.backtest()
+        """
+        todo: 对数据库的连接前5个任务一直在主进程，transport_netvalue 进入分进程，
+              backtest 进入分进程，draw_backtest_plot又进入分进程
+              这种情况下数据库的连接会有问题
+        https://www.cnblogs.com/flowell/p/multiprocessing_flask_sqlalchemy.html
+        """
+        self.slave.record_op_auto()
+        self.slave.update_position_auto()
+        self.slave.record_history()
+        self.slave.export_tables() 
+        self.slave.draw_charts()
+        self.slave.transport_netvalue()
+        self.slave.backtest()
         self.slave.draw_backtest_plot()
 
     def backtest_job(self):
