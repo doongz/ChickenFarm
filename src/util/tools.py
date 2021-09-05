@@ -90,14 +90,14 @@ class SheetTools:
     @staticmethod
     def read_buy_list():
         # 从 position.csv 中读取已购买基金的代码列表
-        df = pd.read_csv(config.position_csv_path, dtype={"code": str})
+        df = pd.read_csv(Config().position_csv_path, dtype={"code": str})
         return df['code'].tolist()
 
     @staticmethod
     def read_latest_position():
         # 从 position.csv 中读取已购买基金的最新持仓
         latest_position = []
-        df = pd.read_csv(config.position_csv_path, dtype={"code": str})
+        df = pd.read_csv(Config().position_csv_path, dtype={"code": str})
 
         for index, row in df.iterrows():
             latest_position.append((row['code'], row['position']))
@@ -112,7 +112,7 @@ class SheetTools:
 
         for tbl in table_names:
             df = Database().to_df(tbl)
-            tbl_path = os.path.join(config.export_table_path, tbl+'.csv')
+            tbl_path = os.path.join(Config().export_table_path, tbl+'.csv')
             df.to_csv(tbl_path)
 
             logger.info(f"Export table:{tbl} to {tbl_path} success.")
@@ -157,7 +157,7 @@ class DateTools:
             # 如果输入的是str, 转为datetime
             date = datetime.strptime(date, '%Y-%m-%d')
 
-        while not is_trade_day(date):
+        while not DateTools.is_trade_day(date):
             date = date - timedelta(days=1)
 
         return date.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -195,7 +195,7 @@ class DateTools:
         :param  size  int   区间大小，30
         :return       (datetime, datetime) 
         '''
-        nearly_date = get_before_date(days)
+        nearly_date = DateTools.get_before_date(days)
         begin_date = nearly_date
         end_date = nearly_date + timedelta(days=size)
 

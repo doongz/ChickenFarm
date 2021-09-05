@@ -1,3 +1,5 @@
+from termcolor import colored
+
 from chicken_farm.src.employees import Operator
 from chicken_farm.src.employees import Statistician
 from chicken_farm.src.employees import Analyst
@@ -72,7 +74,7 @@ class Job():
         logger.info(f"Job parts: {[p.__name__ for p in self.parts]}")
         for f in self.parts:
             f()
-            logger.info(f"Run {f.__name__} success.")
+            print(colored(f"Run {f.__name__} success.", "green"))
 
 
 class Farmer:

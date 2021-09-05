@@ -45,7 +45,7 @@ def get_position():
     positions = ChromeDriver().query_position()
 
     df = pd.DataFrame(columns=['name', 'code', 'position'])
-    for p in positions[1:]:
+    for p in positions:
         if len(p) == 0: continue
         if '010718' in p: continue  # 010718这个基金不纳入持仓统计
         p = p.replace(' ', '\n').split('\n')

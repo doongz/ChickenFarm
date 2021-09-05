@@ -44,19 +44,30 @@ class ChromeDriver():
         获取仓位数据
         '''
         try:
-            url = "https://trade.1234567.com.cn/MyAssets/hold?spm=S"
+            url = "https://trade.1234567.com.cn/MyAssets/hold"
             self._login(url)
-            raise Exception('dfdf')
+            self._wait(by=By.CLASS_NAME, value='table-hold')
+            
+            timeout = 5
+            while True:
+                positions = []
+                tag_elements = self.driver.find_element(By.CLASS_NAME, 'table-hold').find_elements(By.TAG_NAME, 'tr')
+                for tag in tag_elements:
+                    positions.append(tag.text)
 
-            positions = []
-            self._wait(by=By.CLASS_NAME, value='table-hold') # 这里无效重新
-            tag_elements = self.driver.find_element(By.CLASS_NAME, 'table-hold').find_elements(By.TAG_NAME, 'tr')
-            for tag in tag_elements:
-                positions.append(tag.text)
+                if "数据加载中" not in "".join(positions):
+                    break
+                elif timeout < 0:
+                    raise Exception(f"Query position timeout.")
+                else:
+                    logger.warning(f"数据加载中..., 正在重试。")
+                    time.sleep(1)
+                    timeout -= 1
 
-        finally: 
+        finally:
             self.driver.quit()
-
+        
+        positions = positions[1:]
         logger.info(f"Query positions:{len(positions)} success.")
         return positions
 

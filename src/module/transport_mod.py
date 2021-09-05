@@ -25,23 +25,27 @@ def transport_netvalue(cpus=8):
 
     results = []
     job_cnt = min(multiprocessing.cpu_count(), int(cpus))
-    pool = multiprocessing.Pool(processes=job_cnt)
+    pool_1 = multiprocessing.Pool(processes=job_cnt)
+    pool_2 = multiprocessing.Pool(processes=job_cnt)
 
-    buy_list = SheetTools.read_buy_list()
+    buy_list = DepositoryTable.get_all_holding_code()
     for code in buy_list:
-        res = pool.apply_async(_upload_netvalue, args=(code, ))
-        results.append((code, res))
-    pool.close()
-    pool.join()
+        res_1 = pool_1.apply_async(_upload_netvalue, args=(code, ))
+        res_2 = pool_2.apply_async(_update_info, args=(code, ))
+        results.append((code, res_1, res_2))
+
+    pool_1.close()
+    pool_2.close()
+    pool_1.join()
+    pool_2.join()
 
     successes, fails = [], []
-    for code, res in results:
-        if res:
+    for code, res_1, res_2 in results:
+        if res_1 and res_2:
             successes.append(code)
         else:
             fails.append(code)
 
-    _update_info()
     logger.info(f"Transport net value:{successes} successful. fails:{fails}.")
     return successes, fails
 
@@ -89,20 +93,18 @@ def _upload_netvalue(code):
         return False
 
 
-def _update_info():
+def _update_info(code):
     """
-    更新 tbl_depository 中所有基金的 buy_rate sell_rate_info url
+    更新 tbl_depository 中基金的 buy_rate sell_rate_info url
     """
-    for fund_dpt in DepositoryTable.get_all():
-        fundinfo = XAlphaTools.get_fundinfo_from_xalpha(fund_dpt.code)
-        fund_dpt.buy_rate = fundinfo.rate / 100
-        fund_dpt.sell_rate_info = str(fundinfo.feeinfo)
-        fund_dpt.url = fundinfo._url
-        Database().update()
-        logger.debug(f"Update {info.name} info to the tbl_depository.")
+    fundinfo = XAlphaTools.get_fundinfo_from_xalpha(code)
+    fund_dpt = DepositoryTable.get_by_code(code)
 
-    logger.info(f"Update all fund info to the tbl_depository success.")
-
+    fund_dpt.buy_rate = fundinfo.rate / 100
+    fund_dpt.sell_rate_info = str(fundinfo.feeinfo)
+    fund_dpt.url = fundinfo._url
+    Database().update()
+    logger.info(f"Update info({code}) to the tbl_depository success.")
 
 
 def _upload_backtest_data(code):

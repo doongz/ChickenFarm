@@ -50,6 +50,12 @@ class DepositoryTable(Base):
         return Database().query(DepositoryTable).filter_by(status=Status.HOLD).all()
 
     @staticmethod
+    def get_all_holding_code():
+        all_holding = DepositoryTable.get_all_holding()
+        all_holding_code = [dpt.code for dpt in all_holding]
+        return all_holding_code
+
+    @staticmethod
     def get_all():
         return Database().query(DepositoryTable).all()
 
