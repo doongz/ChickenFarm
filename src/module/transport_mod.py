@@ -41,7 +41,7 @@ def transport_netvalue(cpus=8):
 
     successes, fails = [], []
     for code, res_1, res_2 in results:
-        if res_1 and res_2:
+        if res_1.get() and res_2.get():
             successes.append(code)
         else:
             fails.append(code)
@@ -65,7 +65,7 @@ def transport_backtest_data(cpus=8):
 
     successes, fails = [], []
     for code, res in results:
-        if res:
+        if res.get():
             successes.append(code)
         else:
             fails.append(code)

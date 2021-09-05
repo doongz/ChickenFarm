@@ -41,7 +41,7 @@ def export_violin_plot(cpus=8):
 
     successes, fails = [], []
     for code, res in results:
-        if res:
+        if res.get():
             successes.append(code)
         else:
             fails.append(code)
@@ -53,6 +53,7 @@ def export_aip_violin_plot_by_filed(filed, show=False):
     '''
     导出指定领域的周定投-小提琴图
     '''
+    return False
     try:
         fund_list = DepositoryTable.get_holding_by_filed(filed)
         df_dict = {}
