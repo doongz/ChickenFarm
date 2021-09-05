@@ -6,7 +6,6 @@ import pandas as pd
 import multiprocessing
 
 from chicken_farm.src.db.database import Database
-from chicken_farm.src.db.tbl_info import InfoTable
 from chicken_farm.src.db.tbl_depository import DepositoryTable
 
 from chicken_farm.src.model_prof.fund_netvalue import FundNetValue
@@ -30,7 +29,7 @@ def transport_netvalue(cpus=8):
 
     buy_list = SheetTools.read_buy_list()
     for code in buy_list:
-        res = pool.apply_async(_upload_netvalue_and_info, args=(code, ))
+        res = pool.apply_async(_upload_netvalue, args=(code, ))
         results.append((code, res))
     pool.close()
     pool.join()
@@ -42,6 +41,7 @@ def transport_netvalue(cpus=8):
         else:
             fails.append(code)
 
+    _update_info()
     logger.info(f"Transport net value:{successes} successful. fails:{fails}.")
     return successes, fails
 
@@ -70,7 +70,7 @@ def transport_backtest_data(cpus=8):
     return successes, fails
 
 
-def _upload_netvalue_and_info(code):
+def _upload_netvalue(code):
     '''
     把基金的历史净值上传至 db_netvalue 数据库中
     并更新 db_fund.tbl_info 中的信息
@@ -81,30 +81,28 @@ def _upload_netvalue_and_info(code):
         fund_val = FundNetValue(code)
         fund_val.to_sql(fundinfo.price)
 
-        info = InfoTable.get_by_code(code)
-        if not info:
-            info = InfoTable()
-            info.name = fundinfo.name
-            info.code = fundinfo.code
-            info.rate = fundinfo.rate / 100
-            info.feeinfo = str(fundinfo.feeinfo)
-            info.url = fundinfo._url
-            Database().add(info)
-            logger.info(f"Add the data({info.name}) to the table({fund_val.tbl}, {info.__tablename__}).")
-            return True
-
-        info.name = fundinfo.name
-        info.code = fundinfo.code
-        info.rate = fundinfo.rate / 100
-        info.feeinfo = str(fundinfo.feeinfo)
-        info.url = fundinfo._url
-        Database().update()
-        logger.info(f"Update the data({info.name}) to the table({fund_val.tbl}, {info.__tablename__}).")
+        logger.info(f"Upload netvalue({code}) to the {fund_val.tbl} success.")
         return True
 
     except Exception as error:
-        logger.error(f"Upload netvalue and info occurre an error: {error}.")
+        logger.error(f"Upload netvalue occurre an error: {error}.")
         return False
+
+
+def _update_info():
+    """
+    更新 tbl_depository 中所有基金的 buy_rate sell_rate_info url
+    """
+    for fund_dpt in DepositoryTable.get_all():
+        fundinfo = XAlphaTools.get_fundinfo_from_xalpha(fund_dpt.code)
+        fund_dpt.buy_rate = fundinfo.rate / 100
+        fund_dpt.sell_rate_info = str(fundinfo.feeinfo)
+        fund_dpt.url = fundinfo._url
+        Database().update()
+        logger.debug(f"Update {info.name} info to the tbl_depository.")
+
+    logger.info(f"Update all fund info to the tbl_depository success.")
+
 
 
 def _upload_backtest_data(code):

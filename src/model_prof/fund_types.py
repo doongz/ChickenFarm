@@ -29,6 +29,7 @@ class Status:
 
 class OperateType:
 
+    ADD = 'add'
     BUY = 'buy'
     SELL = 'sell'
     UPDATE = 'update'

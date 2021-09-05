@@ -15,9 +15,9 @@ class DepositoryTable(Base):
     name = Column(VARCHAR(255), unique=True, nullable=False)
     code = Column(CHAR(6), primary_key=True)
     filed = Column(VARCHAR(255))
-    buying = Column(DECIMAL(10, 2), nullable=False)
+    buying = Column(DECIMAL(10, 2), default=0)
     selling = Column(DECIMAL(10, 2), default=0)
-    position = Column(DECIMAL(10, 2), nullable=False)
+    position = Column(DECIMAL(10, 2), default=0)
     profit = Column(DECIMAL(10, 2), default=0)
     profit_rate = Column(DECIMAL(5, 4), default=0)
     priority = Column(INT, default=0)
@@ -25,6 +25,9 @@ class DepositoryTable(Base):
     update_time = Column(DateTime, onupdate=datetime.now(), default=datetime.now())
     create_time = Column(DateTime, default=datetime.now())
     comment = Column(VARCHAR(255))
+    buy_rate = Column(DECIMAL(5, 4))
+    sell_rate_info = Column(VARCHAR(255))
+    url = Column(VARCHAR(255))
 
     @staticmethod
     def get_by_code(code):

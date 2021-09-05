@@ -90,9 +90,6 @@ class Farmer:
 
     def base_job(self):
         self.slave.record_op_auto()
-
-    def full_job(self):
-        self.slave.record_op_auto()
         self.slave.update_position_auto()
         self.slave.record_history()
         self.slave.export_tables() 
@@ -101,23 +98,27 @@ class Farmer:
         self.slave.backtest()
         self.slave.draw_backtest_plot()
 
+    def backtest_job(self):
+        self.slave.backtest()
+        self.slave.draw_backtest_plot()
+
 
 if __name__ == "__main__":
 
     farmer = Farmer()
-    slave = Slave(Config.operation_key)
+    slave = Slave(Config().operation_key)
     farmer.slave = slave
 
     print("Base job: ")
     farmer.base_job()
     slave.job.run()
 
-    print("Full job: ")
-    farmer.full_job()
-    slave.job.run()
+#     print("Backtest job: ")
+#     farmer.backtest_job()
+#     slave.job.run()
 
-    # Remember, the Builder pattern can be used without a Director class.
-    print("Custom product: ")
-    slave.record_op_auto()
-    slave.update_position_auto()
-    slave.job.run()
+#     # Remember, the Builder pattern can be used without a Director class.
+#     print("Custom product: ")
+#     slave.record_op_auto()
+#     slave.update_position_auto()
+#     slave.job.run()

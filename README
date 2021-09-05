@@ -12,7 +12,7 @@ source ~/.bash_profile
 
 
 三、每周末需要做
-1、更新净值数据库(一键)                         python cli/farmer.py -n                   
+1、更新净值数据库(一键)                         python cli/farm.py -n                   
 2、将本周的交易记录下来   
   0) 先把支付宝里卖的手动处理，填写csv后                
   1) 自动记录本周交易操作                       python cli/farmer.py -roa

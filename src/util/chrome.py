@@ -26,6 +26,7 @@ class ChromeDriver():
         self.driver.get(url)
         self._wait(by=By.ID, value='tbname')
 
+        time.sleep(0.5)
         self.driver.find_element_by_id('tbname').send_keys(config.tiantian_username)
         time.sleep(0.5)
         self.driver.find_element_by_id('tbpwd').send_keys(config.tiantian_password)

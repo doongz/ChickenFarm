@@ -2,7 +2,7 @@ import pandas as pd
 from datetime import datetime
 from abc import ABC, abstractmethod
 
-from chicken_farm.src.db.tbl_info import InfoTable
+from chicken_farm.src.db.tbl_depository import DepositoryTable
 from chicken_farm.src.model_prof.fund_netvalue import FundNetValue
 from chicken_farm.src.util.tools import DateTools
 from chicken_farm.src.util.exceptions import NonTradingError
@@ -23,7 +23,7 @@ class Algorithm(ABC):
         """
 
         self.code = code
-        self.name = InfoTable.get_by_code(code).name
+        self.name = DepositoryTable.get_by_code(code).name
 
         self._value_df = FundNetValue(code).read_sql()
         self._amount = 1000

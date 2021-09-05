@@ -2,6 +2,7 @@ import os
 import json
 import decimal
 import pandas as pd
+import xalpha as xa
 from chinese_calendar import is_workday
 from datetime import datetime, timedelta
 
@@ -11,6 +12,7 @@ from chicken_farm.src.db.tbl_operation_record import OperationRecordTable
 from chicken_farm.src.db.tbl_depository import get_fund_dic_from_dpt
 from chicken_farm.src.model_prof.fund_types import OperateType
 from chicken_farm.src.util.config import Config
+from chicken_farm.src.util.exceptions import OpHasBeenRecordedError
 from chicken_farm.src.util.log import get_logger
 
 
@@ -22,6 +24,7 @@ def auth(func):
     def wrapper(*args, **kwargs):
 
         key = kwargs.get("key", None)
+
         if not key:
             logger.error("Your operation key is empty.")
             raise Exception('Your operation key is empty.')
@@ -48,7 +51,7 @@ def record_operation(operate_type):
 
             opr = OperationRecordTable()
             opr.name = dpt_before_change.get('name', 'xxxxxx')
-            opr.code = dpt_before_change.get('code', 'xxxxxx')
+            opr.code = code
             opr.operate_type = operate_type
             opr.amount = kwargs.get("amount", None)
             opr.info_after_change = "Waiting for operation"
@@ -57,13 +60,17 @@ def record_operation(operate_type):
 
             operate_id = opr.code + opr.operate_time.strftime('%Y%m%d%H%M%S')
             if OperationRecordTable.get_by_operate_id(operate_id):
-                logger.error(f"This operation has been recorded. operate_id:{operate_id}, "
-                             f"{opr.name}({opr.code}) {opr.operate_type} {opr.amount}.")
-                raise Exception(f"operate_id:{operate_id} has been recorded.")
+                raise OpHasBeenRecordedError(f"This operation has been recorded. "
+                                             f"operate_id:{operate_id}, {opr.name}({opr.code}) "
+                                             f"{opr.operate_type} {opr.amount}.")
             opr.operate_id = operate_id
             Database().add(opr) # 如果下面的函数发生异常，这里将会插入一条垃圾数据
 
-            func(*args, **kwargs)
+            try:
+                func(*args, **kwargs)
+            except Exception as error:
+                Database().delete(opr)
+                raise error
 
             dpt_after_change = get_fund_dic_from_dpt(code)
             if operate_type != OperateType.DELETE:

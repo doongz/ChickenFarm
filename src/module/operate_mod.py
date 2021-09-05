@@ -5,9 +5,10 @@ from decimal import Decimal
 
 from chicken_farm.src.db.database import Database
 from chicken_farm.src.db.tbl_depository import DepositoryTable, get_fund_dic_from_dpt
-from chicken_farm.src.db.tbl_info import InfoTable
 from chicken_farm.src.model_prof.fund_types import OperateType
+from chicken_farm.src.util.tools import XAlphaTools
 from chicken_farm.src.util.tools import auth, record_operation
+from chicken_farm.src.util.exceptions import FundNotFoundError
 from chicken_farm.src.util.log import get_logger
 
 
@@ -15,32 +16,30 @@ logger = get_logger(__file__)
 
 
 @auth
-@record_operation(OperateType.BUY)
-def add_fund(code, amount, filed=None, comment=None, *args, **kwargs):
+@record_operation(OperateType.ADD)
+def add_fund(code, filed=None, comment=None, *args, **kwargs):
     '''
     向 tbl_depository 添加第一次购买的基金
     '''
-    fund_info = InfoTable.get_by_code(code)
-    if not fund_info:
-        logger.error(f"Please upload {code} netvalue and info, firstly.")
-        raise Exception(f"Not found {code} in tbl_info.")
-
+    fundinfo = XAlphaTools.get_fundinfo_from_xalpha(code)
     fund_dpt = DepositoryTable.get_by_code(code)
+
     if fund_dpt:
         logger.error(f"{fund_dpt.code}({fund_dpt.name}) has been in tbl_depository.")
         raise Exception(f"{fund_dpt.code}({fund_dpt.name}) has been in tbl_depository.")
 
     fund_dpt = DepositoryTable()
-    fund_dpt.name = fund_info.name
+    fund_dpt.name = fundinfo.name
     fund_dpt.code = code
     fund_dpt.filed = filed
-    fund_dpt.buying = amount
-    fund_dpt.position = amount
     fund_dpt.comment = comment
+    fund_dpt.buy_rate = fundinfo.rate / 100
+    fund_dpt.sell_rate_info = str(fundinfo.feeinfo)
+    fund_dpt.url = fundinfo._url
 
     Database().add(fund_dpt)
     logger.info(f"Add {fund_dpt.name}({fund_dpt.code}) to tbl_depository successfully, "
-                f"filed:{fund_dpt.filed}, buying:{fund_dpt.buying}, comment:{fund_dpt.comment}.")
+                f"filed:{fund_dpt.filed}, comment:{fund_dpt.comment}.")
 
 
 @auth
@@ -73,8 +72,7 @@ def delete_fund(code, *args, **kwargs):
     '''
     fund_dpt = DepositoryTable.get_by_code(code)
     if not fund_dpt:
-        logger.error(f"Not found {code} in tbl_depository.")
-        raise Exception(f"Not found {code} in tbl_depository.")
+        raise FundNotFoundError(f"Not found {code} in tbl_depository.")
 
     Database().delete(fund_dpt)
     logger.info(f"Delete {fund_dpt.name}({fund_dpt.code}) from tbl_depository.")
@@ -90,8 +88,7 @@ def buy_fund(code, amount, *args, **kwargs):
     
     fund_dpt = DepositoryTable.get_by_code(code)
     if not fund_dpt:
-        logger.error(f"Not found {code} in tbl_depository.")
-        raise Exception(f"Not found {code} in tbl_depository.")
+        raise FundNotFoundError(f"Not found {code} in tbl_depository.")
 
     fund_dpt.buying += amount
     fund_dpt.position += amount
