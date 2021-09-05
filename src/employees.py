@@ -11,7 +11,10 @@ from chicken_farm.src.plot.statistics_plot import export_position_bar_chart, \
                                                   export_profit_bar_chart, \
                                                   export_position_profit_bar_chart, \
                                                   export_profit_rate_bar_chart, \
-                                                  export_position_pie_chart
+                                                  export_position_pie_chart, \
+                                                  export_history_position_line_chart, \
+                                                  export_history_profit_line_chart, \
+                                                  export_history_buying_line_chart
 
 from chicken_farm.src.util.tools import SheetTools
 from chicken_farm.src.util.exceptions import FundNotFoundError, OpHasBeenRecordedError
@@ -165,6 +168,9 @@ class Statistician(Employee):
         export_position_profit_bar_chart()
         export_profit_rate_bar_chart()
         export_position_pie_chart()
+        export_history_position_line_chart()
+        export_history_profit_line_chart()
+        export_history_buying_line_chart()
 
 
 class Analyst(Employee):

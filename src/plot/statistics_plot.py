@@ -2,7 +2,9 @@ import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from pandas.plotting import register_matplotlib_converters
 
+from chicken_farm.src.model_prof.fund_types import Filed
 from chicken_farm.src.db.database import Database
 from chicken_farm.src.util.tools import DateTools
 from chicken_farm.src.util.config import Config
@@ -11,6 +13,7 @@ from chicken_farm.src.util.log import get_logger
 
 logger = get_logger(__file__)
 config = Config()
+register_matplotlib_converters()
 
 
 plt.rcParams['font.sans-serif'] = ['Arial Unicode MS']
@@ -160,3 +163,81 @@ def export_position_pie_chart(show=False):
     else:
         plt.savefig(os.path.join(config.export_chart_path, 'position_pie_chart.png'))
         logger.info(f"Successfully exported position pie chart.")
+
+
+def export_history_position_line_chart(show=False):
+    df = Database().to_df('tbl_history_position')
+    fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(10, 10))
+    fileds = Filed().get_fileds()
+    x = df['date'].tolist()
+
+    for i, filed in enumerate(fileds):
+        y = df[filed].tolist()
+        ax.plot(x, y, label=filed, color=COLORS[i], linestyle='-', marker='.', linewidth=1.5)
+
+        # 在最后一个数据点加标注
+        for _x, _y in zip(x[-1:], y[-1:]):
+            ax.text(_x, _y, _y, ha='center', va='bottom')
+
+    ax.set_title(f"十领域持仓历史 {DateTools.today()}")
+    ax.yaxis.grid(True, linestyle='--')
+    ax.set_ylabel('数额 ¥')
+    ax.legend(loc='upper left') # 图例
+
+    if show:
+        plt.show()
+    else:
+        plt.savefig(os.path.join(config.export_chart_path, 'history_position_line_chart.png'))
+        logger.info(f"Successfully exported history position line chart.")
+
+
+def export_history_profit_line_chart(show=False):
+    df = Database().to_df('tbl_history_profit')
+    fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(10, 10))
+    fileds = Filed().get_fileds()
+    x = df['date'].tolist()
+
+    for i, filed in enumerate(fileds):
+        y = df[filed].tolist()
+        ax.plot(x, y, label=filed, color=COLORS[i], linestyle='-', marker='.', linewidth=1.5)
+
+        # 在最后一个数据点加标注
+        for _x, _y in zip(x[-1:], y[-1:]):
+            ax.text(_x, _y, _y, ha='center', va='bottom')
+
+    ax.set_title(f"十领域收益历史 {DateTools.today()}")
+    ax.yaxis.grid(True, linestyle='--')
+    ax.set_ylabel('数额 ¥')
+    ax.legend(loc='upper left') # 图例
+
+    if show:
+        plt.show()
+    else:
+        plt.savefig(os.path.join(config.export_chart_path, 'history_profit_line_chart.png'))
+        logger.info(f"Successfully exported history profit line chart.")
+
+
+def export_history_buying_line_chart(show=False):
+    df = Database().to_df('tbl_history_buying')
+    fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(10, 10))
+    fileds = Filed().get_fileds()
+    x = df['date'].tolist()
+
+    for i, filed in enumerate(fileds):
+        y = df[filed].tolist()
+        ax.plot(x, y, label=filed, color=COLORS[i], linestyle='-', marker='.', linewidth=1.5)
+
+        # 在最后一个数据点加标注
+        for _x, _y in zip(x[-1:], y[-1:]):
+            ax.text(_x, _y, _y, ha='center', va='bottom')
+
+    ax.set_title(f"十领域购买历史 {DateTools.today()}")
+    ax.yaxis.grid(True, linestyle='--')
+    ax.set_ylabel('数额 ¥')
+    ax.legend(loc='upper left') # 图例
+
+    if show:
+        plt.show()
+    else:
+        plt.savefig(os.path.join(config.export_chart_path, 'history_buying_line_chart.png'))
+        logger.info(f"Successfully exported history buying line chart.")
