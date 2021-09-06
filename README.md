@@ -2,22 +2,23 @@
   <br>
   <a href="https://github.com/WalleDong/ChickenFarm"><img src="https://github.com/WalleDong/ChickenFarm/raw/main/docs/images/logo.png" alt="Chicken Farm"></a>
 </h1>
-<h4 align="center">养鸡，我们是专业的</h4>
+<h4 align="center">一家小小的养鸡场</h4>
 
 <p align="center">
-    <a href="https://github.com/ArmynC/ArminC-AutoExec/commits/master">
-    <img src="https://img.shields.io/github/last-commit/ArmynC/ArminC-AutoExec.svg?style=flat-square&logo=github&logoColor=white"
-         alt="GitHub last commit">
-    <a href="https://github.com/ArmynC/ArminC-AutoExec/issues">
-    <img src="https://img.shields.io/github/issues-raw/ArmynC/ArminC-AutoExec.svg?style=flat-square&logo=github&logoColor=white"
-         alt="GitHub issues">
-    <a href="https://github.com/ArmynC/ArminC-AutoExec/pulls">
-    <img src="https://img.shields.io/github/issues-pr-raw/ArmynC/ArminC-AutoExec.svg?style=flat-square&logo=github&logoColor=white"
-         alt="GitHub pull requests">
-    <a href="https://twitter.com/intent/tweet?text=Try this CS:GO AutoExec:&url=https%3A%2F%2Fgithub.com%2FArmynC%2FArminC-AutoExec">
-    <img src="https://img.shields.io/twitter/url/https/github.com/ArmynC/ArminC-AutoExec.svg?style=flat-square&logo=twitter"
-         alt="GitHub tweet">
-</p>
+    <a>
+      <img alt="env" src="https://img.shields.io/badge/macOS-passing-green?logo=apple" />
+    </a>
+    <a>
+      <img alt="Python" src="https://img.shields.io/badge/python-3.7-blue?logo=python&logoColor=white" />
+    </a>
+    <a href="https://github.com/WalleDong/ChickenFarm/graphs/commit-activity">
+      <img alt="commit-activity" src="https://img.shields.io/github/last-commit/WalleDong/ChickenFarm.svg?logo=github&logoColor=white" />
+    </a>
+    <a href="https://github.com/WalleDong/ChickenFarm/issues">
+      <img alt="Issues" src="https://img.shields.io/github/issues/WalleDong/ChickenFarm?style=flat&color=%23FFA24E&label=Issues&logo=github" />
+    </a>
+  </p>
+
 
 <p align="center">
   <a href="#about">About</a> •
@@ -42,7 +43,6 @@
 echo "export PYTHONPATH=$PYTHONPATH:/Users/zhangdong/Desktop" >> ~/.bash_profile
 echo "export FARM_CONFIG_PATH=" >> ~/.bash_profile
 source ~/.bash_profile
-
 
 二、新买一个基金需要将基金的历史数据上传至数据库中
 1、将基金代码写入 position.csv 中
