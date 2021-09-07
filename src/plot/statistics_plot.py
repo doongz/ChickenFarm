@@ -35,7 +35,7 @@ def export_position_bar_chart(show=False):
                       width=0.5,
                       color=COLORS)
 
-    ax.set_title(f"十领域最新持仓 {DateTools.today()}")
+    ax.set_title(f"各领域最新持仓 {DateTools.today()}")
     ax.set_ylabel('数额')
     ax.yaxis.grid(True)
 
@@ -61,7 +61,7 @@ def export_profit_bar_chart(show=False):
                        width=data,
                        height=0.7,
                        color=COLORS)
-    ax.set_title(f"十领域最新收益 {DateTools.today()}")
+    ax.set_title(f"各领域最新收益 {DateTools.today()}")
     ax.xaxis.grid(True)
 
     for a, b in zip(filed, data):
@@ -78,7 +78,7 @@ def export_position_profit_bar_chart(show=False):
     # 导出当前每个领域持仓和收益的柱状图
     df = Database().to_df('tbl_total_for_field')
 
-    x = np.arange(10)
+    x = np.arange(df.shape[0])
     total_width, n = 0.8, 2    # 有多少个类型，只需更改n即可
     width = total_width / n
     x = x - (total_width - width) / 2
@@ -93,7 +93,7 @@ def export_position_profit_bar_chart(show=False):
         plt.text(a, b+50, b, ha='center', va='bottom', fontsize=7)
 
     ax.set_ylabel('数额')
-    ax.set_title(f"十领域最新持仓 & 收益 {DateTools.today()}")
+    ax.set_title(f"各领域最新持仓 & 收益 {DateTools.today()}")
     ax.set_xticks(x)
     ax.set_xticklabels(df['filed_cn'])
     ax.legend(fontsize=10)
@@ -117,7 +117,7 @@ def export_profit_rate_bar_chart(show=False):
                        width=data,
                        height=0.7,
                        color=COLORS)
-    ax.set_title(f"十领域最新收益率 {DateTools.today()}")
+    ax.set_title(f"各领域最新收益率 {DateTools.today()}")
     ax.xaxis.grid(True)
     ax.set_xlabel('收益率 %')
 
@@ -156,7 +156,7 @@ def export_position_pie_chart(show=False):
         ax.annotate(recipe[i]+' '+percent, xy=(x, y), xytext=(1.35*np.sign(x), 1.4*y),
                     horizontalalignment=horizontalalignment, **kw)
 
-    ax.set_title(f"十领域持仓占比 {DateTools.today()}")
+    ax.set_title(f"各领域持仓占比 {DateTools.today()}")
 
     if show:
         plt.show()
@@ -179,7 +179,7 @@ def export_history_position_line_chart(show=False):
         for _x, _y in zip(x[-1:], y[-1:]):
             ax.text(_x, _y, _y, ha='center', va='bottom')
 
-    ax.set_title(f"十领域持仓历史 {DateTools.today()}")
+    ax.set_title(f"各领域持仓历史 {DateTools.today()}")
     ax.yaxis.grid(True, linestyle='--')
     ax.set_ylabel('数额 ¥')
     ax.legend(loc='upper left') # 图例
@@ -205,7 +205,7 @@ def export_history_profit_line_chart(show=False):
         for _x, _y in zip(x[-1:], y[-1:]):
             ax.text(_x, _y, _y, ha='center', va='bottom')
 
-    ax.set_title(f"十领域收益历史 {DateTools.today()}")
+    ax.set_title(f"各领域收益历史 {DateTools.today()}")
     ax.yaxis.grid(True, linestyle='--')
     ax.set_ylabel('数额 ¥')
     ax.legend(loc='upper left') # 图例
@@ -231,7 +231,7 @@ def export_history_buying_line_chart(show=False):
         for _x, _y in zip(x[-1:], y[-1:]):
             ax.text(_x, _y, _y, ha='center', va='bottom')
 
-    ax.set_title(f"十领域购买历史 {DateTools.today()}")
+    ax.set_title(f"各领域购买历史 {DateTools.today()}")
     ax.yaxis.grid(True, linestyle='--')
     ax.set_ylabel('数额 ¥')
     ax.legend(loc='upper left') # 图例

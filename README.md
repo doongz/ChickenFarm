@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-  <a href="https://github.com/WalleDong/ChickenFarm"><img src="https://github.com/WalleDong/ChickenFarm/raw/main/docs/images/logo.png" alt="Chicken Farm"></a>
+  <a href="https://github.com/WalleDong/ChickenFarm"><img src="./docs/images/logo.png" alt="Chicken Farm"></a>
 </h1>
 <h4 align="center">一家小小的养鸡场 </h4>
 
@@ -30,8 +30,6 @@
   <a href="#Community">Community</a> •
   <a href="#License">License</a>
 </p>
-
-
   在养鸡场里面，农场主指挥着工人们记录各项操作记录、统计农场里的各项数据、利用各种算法进行回测分析
 
 
@@ -80,6 +78,14 @@ source ~/.bash_profile
 6、更新回测分析数据(一键)                        python cli/farmer.py -bt
 7、导出回测分析图表(一键)                        python cli/farmer.py -draw
 
+### 个人数据统计图
+
+![personal_data_statistics](./docs/images/personal_data_statistics.png)
+
+### 定投分析图
+
+![aip_backtest](./docs/images/aip_backtest.png)
+
 
 # Todo
 
@@ -94,7 +100,7 @@ Please read the [contribution guidelines](https://github.com/WalleDong/ChickenFa
 
 # Community
 
-[![Chat](https://img.shields.io/badge/Chat%20on-Wechat-green?logo=wechat&style=social)](https://github.com/WalleDong/ChickenFarm/)
+[![Chat](https://img.shields.io/badge/Chat%20on-Wechat-green?logo=wechat&style=social)](./docs/images/wechat.JPG)
 
 # License
 
