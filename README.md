@@ -18,6 +18,9 @@
     <a href="https://github.com/WalleDong/ChickenFarm/issues">
       <img alt="Issues" src="https://img.shields.io/github/issues/WalleDong/ChickenFarm?style=flat&color=%23FFA24E&label=Issues&logo=github" />
     </a>
+    <a href="https://github.com/WalleDong/ChickenFarm/pulls">
+      <img alt="GitHub pull requests" src="https://img.shields.io/github/issues-pr/WalleDong/ChickenFarm?color=0088ff&logo=github" />
+    </a>
   </p>
 
 
