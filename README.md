@@ -100,4 +100,4 @@ Please read the [contribution guidelines](https://github.com/WalleDong/ChickenFa
 
 [![License](https://img.shields.io/github/license/WalleDong/ChickenFarm?color=blue&label=license)](https://github.com/WalleDong/ChickenFarm/blob/main/LICENSE)
 
-Copyright @ [Walle Dong](https://github.com/WalleDong)
+Copyright © 2021 [Walle Dong](https://github.com/WalleDong). All rights reserved.
