@@ -29,8 +29,6 @@ def export_violin_plot():
 
     successes, fails = [], []
     for filed in fileds:
-        if filed == Filed.MILITARY:
-            continue
         export_aip_violin_plot_by_filed(filed)
 
     logger.info(f"Export violin plot successful.")
@@ -46,8 +44,6 @@ def export_violin_plot_speed(cpus=8):
 
     fileds = Filed().get_fileds()
     for filed in fileds:
-        if filed == Filed.MILITARY:
-            continue
         res = pool.apply_async(export_aip_violin_plot_by_filed, args=(filed, ))
         results.append((filed, res))
     pool.close()

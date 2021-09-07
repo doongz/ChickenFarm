@@ -26,6 +26,5 @@ class HistroyProfitTable(Base):
     US = Column(DECIMAL(10, 2), name=Filed.US)
     BLUE = Column(DECIMAL(10, 2), name=Filed.BLUE)
     FINANCE = Column(DECIMAL(10, 2), name=Filed.FINANCE)
-    MILITARY = Column(DECIMAL(10, 2), name=Filed.MILITARY)
 
     comment = Column(VARCHAR(255))

@@ -83,7 +83,6 @@ def _record_history_buying():
     ht_buy.US = fileds_buying[Filed.US]
     ht_buy.BLUE = fileds_buying[Filed.BLUE]
     ht_buy.FINANCE = fileds_buying[Filed.FINANCE]
-    ht_buy.MILITARY = fileds_buying[Filed.MILITARY]
 
     Database().add(ht_buy)
     logger.info(f"Record history buying to tbl_history_buying successfully.")
@@ -110,7 +109,6 @@ def _record_history_position():
     ht_buy.US = fileds_position[Filed.US]
     ht_buy.BLUE = fileds_position[Filed.BLUE]
     ht_buy.FINANCE = fileds_position[Filed.FINANCE]
-    ht_buy.MILITARY = fileds_position[Filed.MILITARY]
 
     Database().add(ht_buy)
     logger.info(f"Record history position to tbl_history_position successfully.")
@@ -137,7 +135,6 @@ def _record_history_profit():
     ht_buy.US = fileds_profit[Filed.US]
     ht_buy.BLUE = fileds_profit[Filed.BLUE]
     ht_buy.FINANCE = fileds_profit[Filed.FINANCE]
-    ht_buy.MILITARY = fileds_profit[Filed.MILITARY]
 
     Database().add(ht_buy)
     logger.info(f"Record history profit to tbl_history_profit successfully.")

@@ -9,7 +9,6 @@ class Filed:
     US = "US_stocks"
     BLUE = "blue_chip"
     FINANCE = "finance_estate"
-    MILITARY = "military_industry"
 
 
     def get_fileds(self):
