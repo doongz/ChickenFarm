@@ -92,7 +92,13 @@ source ~/.bash_profile
 3、掌握目标止盈等投资算法后，全部使用人肉定投
 4、readme
 
+# Contribute
+
+Contributions are always welcome!
+Please read the [contribution guidelines](contribute.md) first.
 
 # License
+
+[![License](https://img.shields.io/github/license/WalleDong/ChickenFarm?color=blue&label=License)](https://github.com/WalleDong/ChickenFarm/blob/main/LICENSE)
 
 Copyright @ [Walle Dong](https://github.com/WalleDong)
