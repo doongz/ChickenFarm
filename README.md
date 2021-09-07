@@ -30,13 +30,14 @@
   <a href="#Community">Community</a> •
   <a href="#License">License</a>
 </p>
-  在养鸡场里面，农场主指挥着工人们记录各项操作记录、统计农场里的各项数据、利用各种算法进行回测分析
+​		非专业养鸡场:baby_chick::hatched_chick::hatching_chick:，统计购买和卖出操作，分析持仓和收益，爬取基金净值，使用各种定投算法回测分析，生成投资策略。所有功能一键式全自动完成。
 
 
 # Features
-
-- 个人数据统计
-- 回测分析
+- 全自动数据采集（天天基金购买记录、最新持仓采集）
+- 爬取最新基金净值
+- 个人数据分析
+- 定投回测分析
 
 
 # Installation
@@ -80,17 +81,17 @@ source ~/.bash_profile
 
 ### 个人数据统计图
 
-![personal_data_statistics](./docs/images/personal_data_statistics.png)
+![personal_data_statistics](./docs/images/personal_data_statistics.jpg)
 
 ### 定投分析图
 
-![aip_backtest](./docs/images/aip_backtest.png)
+![aip_backtest](./docs/images/aip_backtest.jpg)
 
 
 # Todo
 
-- [ ] 实现目标止盈等投资算法
-- [ ] 发送投资策略
+- [ ] 支持目标止盈、移动止盈等多种投资算法
+- [ ] 自动生成投资策略
 
 
 # Contribute
