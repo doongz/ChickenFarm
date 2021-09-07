@@ -2,11 +2,7 @@
   <br>
   <a href="https://github.com/WalleDong/ChickenFarm"><img src="https://github.com/WalleDong/ChickenFarm/raw/main/docs/images/logo.png" alt="Chicken Farm"></a>
 </h1>
-<h4 align="center">一家小小的养鸡场
-    <a >
-      <img alt="Chat" src="https://img.shields.io/badge/Chat%20on-Wechat-green?logo=wechat&style=social" />
-    </a>
-</h4>
+<h4 align="center">一家小小的养鸡场 </h4>
 
 
 <p align="center">
@@ -29,8 +25,9 @@
   <a href="#Features">Features</a> •
   <a href="#Installation">Installation</a> •
   <a href="#Usage">Usage</a> •
-  <a href="#TODO">TODO</a> •
+  <a href="#Todo">Todo</a> •
   <a href="#Contribute">Contribute</a> •
+  <a href="#Community">Community</a> •
   <a href="#License">License</a>
 </p>
 
@@ -40,9 +37,9 @@
 
 # Features
 
-- [x] 个人数据统计
-- [x] 回测分析
-- [ ] 详细设计
+- 个人数据统计
+- 回测分析
+
 
 # Installation
 
@@ -84,17 +81,23 @@ source ~/.bash_profile
 7、导出回测分析图表(一键)                        python cli/farmer.py -draw
 
 
-# TODO
-3、掌握目标止盈等投资算法后，全部使用人肉定投
-4、readme
+# Todo
+
+- [ ] 实现目标止盈等投资算法
+- [ ] 发送投资策略
+
 
 # Contribute
 
 Contributions are always welcome!
 Please read the [contribution guidelines](https://github.com/WalleDong/ChickenFarm/blob/main/docs/contribution.md).:relaxed:
 
+# Community
+
+[![Chat](https://img.shields.io/badge/Chat%20on-Wechat-green?logo=wechat&style=social)](https://github.com/WalleDong/ChickenFarm/)
+
 # License
 
-[![License](https://img.shields.io/github/license/WalleDong/ChickenFarm?color=blue&label=License)](https://github.com/WalleDong/ChickenFarm/blob/main/LICENSE)
+[![License](https://img.shields.io/github/license/WalleDong/ChickenFarm?color=blue&label=license)](https://github.com/WalleDong/ChickenFarm/blob/main/LICENSE)
 
 Copyright @ [Walle Dong](https://github.com/WalleDong)
