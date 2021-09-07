@@ -30,25 +30,37 @@
   <a href="#Community">Community</a> •
   <a href="#License">License</a>
 </p>
-​		非专业养鸡场:baby_chick::hatched_chick::hatching_chick:，统计购买和卖出操作，分析持仓和收益，爬取基金净值，使用各种定投算法回测分析，生成投资策略。所有功能一键式全自动完成。
+
+非专业养鸡场:baby_chick::hatched_chick::hatching_chick:，统计购买和卖出操作，分析持仓和收益，爬取基金净值，使用各种定投算法回测分析，生成投资策略。所有功能一键式全自动完成。祝大家 :chart_with_upwards_trend::chart_with_upwards_trend::chart_with_upwards_trend:
 
 
 # Features
 - 全自动数据采集（天天基金购买记录、最新持仓采集）
 - 爬取最新基金净值
-- 个人数据分析
-- 定投回测分析
+- [个人数据分析](#个人数据统计图)
+- [定投回测分析](#定投分析图)
 
 
 # Installation
 
-零、请自备数据库
+### 0、申请 Mysql 数据库
+推荐 [阿里云](https://cn.aliyun.com/product/rds/mysql)，一年19.9，阿里云打:moneybag:
 
-一、初次使用需要添加环境变量
-echo "export PYTHONPATH=$PYTHONPATH:/Users/zhangdong/Desktop" >> ~/.bash_profile
-echo "export FARM_CONFIG_PATH=" >> ~/.bash_profile
+### 1、填写配置表
+将 [配置表(farmConfig.json)](./farmConfig.json) 移动到项目目录外，按照注释填写配置表。**该表涉及账号密码，请勿提交此表！！！**
+
+### 2、配置环境变量
+```shell
+echo "export PYTHONPATH=$PYTHONPATH:<项目所在的父目录>" >> ~/.bash_profile
+echo "export FARM_CONFIG_PATH=<配置表(farmConfig.json)路径>" >> ~/.bash_profile
+echo "export OPERATION_KEY=<操作key, 与配置表中保持一致>" >> ~/.bash_profile
 source ~/.bash_profile
+```
 
+### 3、安装依赖包
+```shell
+python -m pip install requirements.txt
+```
 # Usage
 
 二、新买一个基金需要将基金的历史数据上传至数据库中
