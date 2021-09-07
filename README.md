@@ -26,16 +26,12 @@
 
 
 <p align="center">
-  <a href="#about">About</a> •
-  <a href="#installation">Installation</a> •
-  <a href="#updating">Updating</a> •
-  <a href="#features">Features</a> •
-  <a href="#binds">Binds</a> •
-  <a href="#wiki">Wiki</a> •
-  <a href="#contributing">Contributing</a> •
-  <a href="#credits">Credits</a> •
-  <a href="#support">Support</a> •
-  <a href="#license">License</a>
+  <a href="#Features">Features</a> •
+  <a href="#Installation">Installation</a> •
+  <a href="#Usage">Usage</a> •
+  <a href="#TODO">TODO</a> •
+  <a href="#Contribute">Contribute</a> •
+  <a href="#License">License</a>
 </p>
 
 
@@ -57,7 +53,7 @@ echo "export PYTHONPATH=$PYTHONPATH:/Users/zhangdong/Desktop" >> ~/.bash_profile
 echo "export FARM_CONFIG_PATH=" >> ~/.bash_profile
 source ~/.bash_profile
 
-# CLI
+# Usage
 
 二、新买一个基金需要将基金的历史数据上传至数据库中
 1、将基金代码写入 position.csv 中
@@ -95,7 +91,7 @@ source ~/.bash_profile
 # Contribute
 
 Contributions are always welcome!
-Please read the [contribution guidelines](contribute.md) first.
+Please read the [contribution guidelines](https://github.com/WalleDong/ChickenFarm/blob/main/docs/contribution.md).:relaxed:
 
 # License
 
