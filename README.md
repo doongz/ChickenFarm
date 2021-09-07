@@ -2,14 +2,19 @@
   <br>
   <a href="https://github.com/WalleDong/ChickenFarm"><img src="https://github.com/WalleDong/ChickenFarm/raw/main/docs/images/logo.png" alt="Chicken Farm"></a>
 </h1>
-<h4 align="center">一家小小的养鸡场</h4>
+<h4 align="center">一家小小的养鸡场
+    <a >
+      <img alt="Chat" src="https://img.shields.io/badge/Chat%20on-Wechat-green?logo=wechat&style=social" />
+    </a>
+</h4>
+
 
 <p align="center">
     <a>
       <img alt="env" src="https://img.shields.io/badge/macOS-passing-green?logo=apple" />
     </a>
     <a>
-      <img alt="Python" src="https://img.shields.io/badge/python-3.7-blue?logo=python&logoColor=white" />
+      <img alt="Python" src="https://img.shields.io/badge/Python-3.7-blue?logo=python&logoColor=white" />
     </a>
     <a href="https://github.com/WalleDong/ChickenFarm/graphs/commit-activity">
       <img alt="commit-activity" src="https://img.shields.io/github/last-commit/WalleDong/ChickenFarm.svg?logo=github&logoColor=white" />
@@ -33,9 +38,17 @@
   <a href="#license">License</a>
 </p>
 
----
+
+  在养鸡场里面，农场主指挥着工人们记录各项操作记录、统计农场里的各项数据、利用各种算法进行回测分析
 
 
+# Features
+
+- [x] 个人数据统计
+- [x] 回测分析
+- [ ] 详细设计
+
+# Installation
 
 零、请自备数据库
 
@@ -43,6 +56,8 @@
 echo "export PYTHONPATH=$PYTHONPATH:/Users/zhangdong/Desktop" >> ~/.bash_profile
 echo "export FARM_CONFIG_PATH=" >> ~/.bash_profile
 source ~/.bash_profile
+
+# CLI
 
 二、新买一个基金需要将基金的历史数据上传至数据库中
 1、将基金代码写入 position.csv 中
@@ -73,9 +88,11 @@ source ~/.bash_profile
 7、导出回测分析图表(一键)                        python cli/farmer.py -draw
 
 
-TODO:
+# TODO
 3、掌握目标止盈等投资算法后，全部使用人肉定投
 4、readme
 
 
+# License
 
+Copyright @ [Walle Dong](https://github.com/WalleDong)
