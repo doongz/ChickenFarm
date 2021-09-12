@@ -292,3 +292,26 @@ class Farmer:
         """
         self.slave.backtest()
         self.slave.draw_backtest_plot()
+
+
+if __name__ == "__main__":
+
+    farmer = Farmer()
+    slave = Slave("AK06@w33D")
+    farmer.slave = slave
+
+    print("Base job: ")
+    farmer.backtest_job()
+    slave.job.run()
+
+
+#     print("Backtest job: ")
+#     farmer.backtest_job()
+#     slave.job.run()
+
+#     # Remember, the Builder pattern can be used without a Director class.
+#     print("Custom product: ")
+#     slave.record_op_auto()
+#     slave.update_position_auto()
+#     slave.job.run()
+

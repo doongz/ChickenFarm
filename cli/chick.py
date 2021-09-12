@@ -10,10 +10,7 @@ import pandas as pd
 from termcolor import colored
 from argparse import RawTextHelpFormatter
 
-
-from chicken_farm.src.employees import Operator
-from chicken_farm.src.employees import Statistician
-from chicken_farm.src.employees import Analyst
+from chicken_farm.src.farm import Operator, Statistician, Analyst, Farmer, Slave
 
 pd.set_option('display.max_columns', None)
 pd.set_option('display.max_rows',None)
@@ -25,6 +22,9 @@ key = os.getenv('OPERATION_KEY', None)
 operator = Operator(key)
 statistician = Statistician(key)
 analyst = Analyst(key)
+farmer = Farmer()
+slave = Slave(key)
+farmer.slave = slave
 
 # def progbar(curr, total, full_progbar):
 #     frac = float(curr) / float(total)
@@ -182,10 +182,10 @@ def main():
                        help='绘制各领域基金回测的小提琴图')
 
 
-    parser.add_argument('-c', '--code',
+    parser.add_argument('-code',
                         dest='code',
                         help="基金代码")
-    parser.add_argument('-a', '--amount',
+    parser.add_argument('-amount',
                         dest='amount',
                         help="数额")
 

@@ -66,20 +66,30 @@ python -m pip install requirements.txt
 ```
 # Usage
 
-二、新买一个基金需要将基金的历史数据上传至数据库中
-1、将基金代码写入 position.csv 中
-2、执行                    python cronjob.py 
+### CLI
+
+| command                                    | help                 |
+| :----------------------------------------- | :------------------- |
+| chick --netvalue                           | 更新基金历史净值数据 |
+| chick --buy -code <code> -amount <amount>  | 买入基金             |
+| chick --sell -code <code> -amount <amount> | 卖出基金             |
 
 
-三、每周末需要做
 
-1、手动处理支付宝里卖的
-2、填写支付宝里的持仓，填写csv
-3、一键更新
+### 每周任务
+
+0. 新买一个基金，需添加
+1. 将支付宝的基金最新净值填入 position.csv 中
+2. 执行基础任务
+3. 执行回测分析
+
+
+
 
 
 1、更新净值数据库(一键)                         python cli/farm.py -n                   
 2、将本周的交易记录下来   
+
   0) 先把支付宝里卖的手动处理，填写csv后                
   1) 自动记录本周交易操作                       python cli/farmer.py -roa
   2) 自动记录最新持仓                           python cli/farmer.py -pa
