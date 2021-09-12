@@ -1,6 +1,6 @@
 from termcolor import colored
 
-from chicken_farm.src.module.operate_mod import add_fund, delete_fund, update_fund, fund_dpt
+from chicken_farm.src.module.operate_mod import add_fund, delete_fund, update_fund, get_dpt
 from chicken_farm.src.module.operate_mod import buy_fund, sell_fund, update_position
 from chicken_farm.src.module.statistics_mod import update_total_for_field, record_history
 from chicken_farm.src.module.transport_mod import transport_netvalue, transport_backtest_data
@@ -24,18 +24,19 @@ class SlaveBase:
 
 class Operator(SlaveBase):
 
-    def add(self, code, filed):
+    def add(self, code):
         # 新买入基金
-        add_fund(code=code, 
-                 filed=filed,
+        add_fund(code=code,
                  key=self.key)
         update_total_for_field()
+        print(colored(f"添加基金: {code}", "green"))
 
     def delete(self, code):
         # 删除基金
         delete_fund(code=code, 
                     key=self.key)
         update_total_for_field()
+        print(colored(f"删除基金: {code}", "green"))
 
     def buy(self, code, amount):
         # 加仓基金
@@ -43,6 +44,7 @@ class Operator(SlaveBase):
                  amount=amount, 
                  key=self.key)
         update_total_for_field()
+        print(colored(f"{code} 买入 {amount} ¥。", "green"))
 
     def sell(self, code, amount):
         # 卖出基金
@@ -50,8 +52,24 @@ class Operator(SlaveBase):
                   amount=amount, 
                   key=self.key)
         update_total_for_field()
+        print(colored(f"{code} 卖出 {amount} ¥。", "green"))
 
-    def record_op_auto(self):
+    def update_position(self, code, amount):
+        # 更新基金的最新持仓
+        update_position(code=code, 
+                        amount=amount, 
+                        key=self.key
+                        )
+        update_total_for_field()
+        print(colored(f"{code} 更新持仓为 {amount} ¥。", "green"))
+
+    def show(self, code):
+        # 展示基金数据
+        fund_dpt = get_dpt(code=code)
+        for key, value in fund_dpt.items():
+            print(colored(f"{key}: {value}", "green"))
+
+    def record_op(self):
         # 从天天基金获取交易记录，自动将买入、卖出添加至数据库中
         df = get_trade_record()
         for index, row in df.iterrows():
@@ -81,26 +99,10 @@ class Operator(SlaveBase):
                           key=self.key
                           )
         update_total_for_field()
-        return df
 
-    def update_position(self, code, amount):
-        # 更新基金的最新持仓
-        update_position(code=code, 
-                        amount=amount, 
-                        key=self.key
-                        )
-        update_total_for_field()
+        print(colored(df, "green"))
+        print(colored(f"自动记录买入、卖出操作完成。", "green"))
 
-    def update_position_list(self):
-        # 读取 position.csv 中基金的最新持仓，并更新持仓
-        latest_position = SheetTools.read_latest_position()
-        for code, position in latest_position:
-            update_position(code=code, 
-                            amount=position,
-                            key=self.key
-                            )
-        update_total_for_field()
-        return latest_position
 
     def update_position_auto(self):
         # 从天天基金获取持仓数据，更新至数据库中
@@ -125,28 +127,23 @@ class Operator(SlaveBase):
                             )
         update_total_for_field()
 
-        return df
+        print(colored(df, "green"))
+        print(colored(f"自动更新持仓数据完成。", "green"))
 
-
-    def get_dpt(self, code):
-        # 用于展示基金
-        return fund_dpt(code=code)
 
 
 class Statistician(SlaveBase):
-
-    def transport_netvalue(self):
-        # 把基金的历史净值上传至 db_netvalue 数据库中
-        return transport_netvalue()
 
     def record_history(self):
         # 统计并记录各个领域以及总的投入、持仓、收益历史
         update_total_for_field()
         record_history()
+        print(colored(f"统计并记录各个领域以及总的投入、持仓、收益历史完成。", "green"))
 
     def export_tables(self):
         # 导出基金最新数据总表、每个领域合计表、历史购买表、历史仓位表、历史收益表
         SheetTools.export_tables()
+        print(colored(f"导出基金最新数据总表、每个领域合计表、历史购买表、历史仓位表、历史收益表完成。", "green"))
 
     def draw_charts(self):
         # 绘制图表
@@ -158,17 +155,28 @@ class Statistician(SlaveBase):
         st_plot.export_history_position_line_chart()
         st_plot.export_history_profit_line_chart()
         st_plot.export_history_buying_line_chart()
+        print(colored(f"绘制图表完成。", "green"))
 
 
 class Analyst(SlaveBase):
 
+    def transport_netvalue(self):
+        # 把基金的历史净值上传至 db_netvalue 数据库中
+        successes, fails = transport_netvalue()
+
+        print(colored(f"上传基金历史净值成功 {len(successes)} 条。", "green"))
+        if len(fails) != 0:
+            print(colored(f"上传基金历史净值失败 {len(fails)} 条。", "red"))
+
     def backtest(self):
         # 回测，并将回测数据上传
         transport_backtest_data()
+        print(colored(f"回测完成，并将回测数据上传。", "green"))
 
     def draw_backtest_plot(self):
         # 绘制各领域基金回测的小提琴图
         aip_plot.export_violin_plot()
+        print(colored(f"绘制各领域基金回测的小提琴图完成。", "green"))
 
 
 class Slave(Operator, Statistician, Analyst):
@@ -187,10 +195,10 @@ class Slave(Operator, Statistician, Analyst):
         return job
 
     """
-    直接使用
+    不可进行编排任务，直接使用
     """
-    def add(self, code, amount, filed):
-        super().add(code, amount, filed)
+    def add(self, code):
+        super().add(code)
 
     def delete(self, code):
         super().delete(code)
@@ -204,14 +212,14 @@ class Slave(Operator, Statistician, Analyst):
     def update_position(self, code, amount):
         super().update_position(code, amount)
 
-    def get_dpt(self, code):
-        super().get_dpt(code)
+    def show(self, code):
+        super().show(code)
 
     """
-    需要 slave.job.run() 启动
+    可进行编排任务，需要 slave.job.run() 启动
     """
-    def record_op_auto(self):
-        self._job.add(super().record_op_auto)
+    def record_op(self):
+        self._job.add(super().record_op)
 
     def update_position_auto(self):
         self._job.add(super().update_position_auto)
@@ -265,8 +273,8 @@ class Farmer:
 
     def base_job(self):
         """
-        1、更新本周的操作记录，需要适配支付宝和天天基金
-        2、更新本周所有基金的持仓，需要适配支付宝和天天基金
+        1、更新本周的操作记录，
+        2、更新本周所有基金的持仓
         3、统计并记录本周各个领域的投入、持仓、收益
         4、导出个人数据统计表
         5、导出个人数据统计图
@@ -277,13 +285,12 @@ class Farmer:
               这种情况下数据库的连接会有问题
         https://www.cnblogs.com/flowell/p/multiprocessing_flask_sqlalchemy.html
         """
-        self.slave.record_op_auto()
+        self.slave.record_op()
         self.slave.update_position_auto()
         self.slave.record_history()
         self.slave.export_tables() 
         self.slave.draw_charts()
         self.slave.transport_netvalue()
-
 
     def backtest_job(self):
         """
@@ -293,25 +300,4 @@ class Farmer:
         self.slave.backtest()
         self.slave.draw_backtest_plot()
 
-
-if __name__ == "__main__":
-
-    farmer = Farmer()
-    slave = Slave("AK06@w33D")
-    farmer.slave = slave
-
-    print("Base job: ")
-    farmer.backtest_job()
-    slave.job.run()
-
-
-#     print("Backtest job: ")
-#     farmer.backtest_job()
-#     slave.job.run()
-
-#     # Remember, the Builder pattern can be used without a Director class.
-#     print("Custom product: ")
-#     slave.record_op_auto()
-#     slave.update_position_auto()
-#     slave.job.run()
 

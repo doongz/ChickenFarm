@@ -43,7 +43,6 @@
 - [个人数据分析](#个人数据统计图)
 - [定投回测分析](#定投分析图)
 
-
 # Installation
 
 ### 0、申请 Mysql 数据库
@@ -66,49 +65,81 @@ python -m pip install requirements.txt
 ```
 # Usage
 
-### CLI
+## 每周工作
 
-| command                                    | help                 |
-| :----------------------------------------- | :------------------- |
-| chick --netvalue                           | 更新基金历史净值数据 |
-| chick --buy -code <code> -amount <amount>  | 买入基金             |
-| chick --sell -code <code> -amount <amount> | 卖出基金             |
-
-
-
-### 每周任务
-
-0. 新买一个基金，需添加
+0. 新买一个基金时，需添加
+```shell
+chick -add -c <code>
+```
 1. 将支付宝的基金最新净值填入 position.csv 中
+```shell
+vim ~/Desktop/position.csv
+```
 2. 执行基础任务
-3. 执行回测分析
+```shell
+chick -job base_job
+```
+3. 执行回测分析任务
+```shell
+chick -job backtest_job
+```
 
+## CLI
 
+#### 1、操作记录
 
+| command                               | help                                           |
+| :------------------------------------ | :--------------------------------------------- |
+| chick -add -c `code`                  | 添加基金                                       |
+| chick -delete -c `code`               | 删除基金                                       |
+| chick -buy -c `code` -a `amount`      | 买入基金                                       |
+| chick -sell -c `code` -a `amount`     | 卖出基金                                       |
+| chick -position -c `code` -a `amount` | 更新单个基金的持仓                             |
+| chick -show -c `code`                 | 展示基金数据                                   |
+| chick -record-op                      | 从天天基金获取数据，将本周的操作更新至数据库中 |
+| chick -position-auto                  | 从天天基金获取持仓数据，更新至数据库中         |
 
+#### 2、个人数据分析
 
-1、更新净值数据库(一键)                         python cli/farm.py -n                   
-2、将本周的交易记录下来   
+| command               | help                                                         |
+| --------------------- | ------------------------------------------------------------ |
+| chick -record-history | 统计并记录各个领域以及总的投入、持仓、收益历史               |
+| chick -tables         | 导出基金最新数据总表、每个领域合计表、历史购买表、历史仓位表、历史收益表 |
+| chick -charts         | 绘制个人数据图表                                             |
 
-  0) 先把支付宝里卖的手动处理，填写csv后                
-  1) 自动记录本周交易操作                       python cli/farmer.py -roa
-  2) 自动记录最新持仓                           python cli/farmer.py -pa
-被选:
+#### 3、回测分析
 
-    1）处理加仓，一条一条基金执行                   python cli/farmer.py -b -c <code> -a <amount>
-    2）处理卖出，一条一条基金执行                   python cli/farmer.py -s -c <code> -a <amount>
-    3）更新持仓，现将基金的最新持仓维护至 position.csv 中，然后运行  python cli/farmer.py -pl              
-3、统计并记录本周各个领域的投入、持仓、收益(一键)    python cli/farmer.py -record
-4、导出个人数据统计表(一键)                       python cli/farmer.py -tables
-5、导出个人数据统计图(一键)                       python cli/farmer.py -charts                 
-6、更新回测分析数据(一键)                        python cli/farmer.py -bt
-7、导出回测分析图表(一键)                        python cli/farmer.py -draw
+| command              | help                         |
+| -------------------- | ---------------------------- |
+| chick -netvalue      | 更新基金历史净值数据         |
+| chick -backtest      | 回测，并将回测数据上传       |
+| chick -backtest-plot | 绘制各领域基金回测的小提琴图 |
 
-### 个人数据统计图
+#### 4、执行任务
+
+```shell
+chick -job base_job
+```
+
+1、更新本周的操作记录，
+2、更新本周所有基金的持仓
+3、统计并记录本周各个领域的投入、持仓、收益
+4、导出个人数据统计表
+5、导出个人数据统计图
+6、把基金的历史净值上传至 db_netvalue 数据库中
+
+```shell
+chick -job backtest_job
+```
+
+1、更新回测分析数据
+2、导出回测分析图表
+
+## 个人数据统计图
 
 ![personal_data_statistics](./docs/images/personal_data_statistics.jpg)
 
-### 定投分析图
+## 定投分析图
 
 ![aip_backtest](./docs/images/aip_backtest.jpg)
 

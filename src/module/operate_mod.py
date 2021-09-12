@@ -143,7 +143,7 @@ def update_position(code, amount, *args, **kwargs):
                 f"profit_rate({fund_dpt.profit_rate}).")
 
 
-def fund_dpt(code):
+def get_dpt(code):
     '''
     获取 tbl_depository 表中一条基金记录
     '''
