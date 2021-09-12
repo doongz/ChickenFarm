@@ -20,8 +20,21 @@ from chicken_farm.src.util.log import get_logger
 
 logger = get_logger(__file__)
 
+def transport_netvalue():
+    buy_list = DepositoryTable.get_all_holding_code()
+    successes, fails = [], []
+    for code in buy_list:
+        res_1 = _upload_netvalue(code)
+        res_2 = _update_info(code)
+        if res_1 and res_2:
+            successes.append(code)
+        else:
+            fails.append(code)
+    logger.info(f"Transport net value:{successes} successful. fails:{fails}.")
+    return successes, fails
 
-def transport_netvalue(cpus=8):
+
+def transport_netvalue_speed(cpus=8):
 
     results = []
     job_cnt = min(multiprocessing.cpu_count(), int(cpus))
@@ -97,15 +110,19 @@ def _update_info(code):
     """
     更新 tbl_depository 中基金的 buy_rate sell_rate_info url
     """
-    fundinfo = XAlphaTools.get_fundinfo_from_xalpha(code)
-    fund_dpt = DepositoryTable.get_by_code(code)
+    try:
+        fundinfo = XAlphaTools.get_fundinfo_from_xalpha(code)
+        fund_dpt = DepositoryTable.get_by_code(code)
 
-    fund_dpt.buy_rate = fundinfo.rate / 100
-    fund_dpt.sell_rate_info = str(fundinfo.feeinfo)
-    fund_dpt.url = fundinfo._url
-    Database().update()
-    logger.info(f"Update info({code}) to the tbl_depository success.")
-
+        fund_dpt.buy_rate = fundinfo.rate / 100
+        fund_dpt.sell_rate_info = str(fundinfo.feeinfo)
+        fund_dpt.url = fundinfo._url
+        Database().update()
+        logger.info(f"Update info({code}) to the tbl_depository success.")
+        return True
+    except Exception as error:
+        logger.error(f"Upload info occurre an error: {error}.")
+        return False
 
 def _upload_backtest_data(code):
     '''

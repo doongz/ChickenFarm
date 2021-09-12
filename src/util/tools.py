@@ -31,7 +31,7 @@ def auth(func):
         if key != Config().operation_key:
             logger.error("Your operation key is wrong.")
             raise Exception('Your operation key is wrong.')
-        logger.info("Authentication success.")
+        logger.debug("Authentication success.")
 
         func(*args, **kwargs)
 

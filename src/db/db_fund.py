@@ -17,7 +17,7 @@ class Singleton(type):
         return cls._instances[cls]
 
 
-class Database():
+class Database(metaclass=Singleton):
 
     def __init__(self):
         self.engine = create_engine(

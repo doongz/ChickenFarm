@@ -34,7 +34,7 @@
   <a href="#License">License</a>
 </p>
 
-非专业养鸡场:baby_chick::hatched_chick::hatching_chick:，统计购买和卖出操作，分析持仓和收益，爬取基金净值，使用各种定投算法回测分析，生成投资策略。所有功能一键式全自动完成。祝大家 :chart_with_upwards_trend::chart_with_upwards_trend::chart_with_upwards_trend:
+非专业养鸡场:baby_chick::hatched_chick::hatching_chick:，统计购买和卖出操作，分析持仓和收益，爬取基金净值，使用各种定投算法回测分析，生成投资策略。所有功能一键式全自动完成 :chart_with_upwards_trend::chart_with_upwards_trend::chart_with_upwards_trend:
 
 
 # Features
