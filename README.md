@@ -34,7 +34,7 @@
   <a href="#License">License</a>
 </p>
 
-非专业养鸡场:baby_chick::hatched_chick::hatching_chick:，统计购买和卖出操作，分析持仓和收益，爬取基金净值，使用各种定投算法回测分析，生成投资策略。所有功能一键式全自动完成 :chart_with_upwards_trend::chart_with_upwards_trend::chart_with_upwards_trend:
+非专业养鸡场:hatching_chick::hatched_chick::baby_chick:，统计购买和卖出操作，分析持仓和收益，爬取基金净值，使用各种定投算法回测分析，生成投资策略。所有功能一键式全自动完成 :chart_with_upwards_trend::chart_with_upwards_trend::chart_with_upwards_trend:
 
 
 # Features
@@ -121,19 +121,19 @@ chick -job backtest_job
 chick -job base_job
 ```
 
-1、更新本周的操作记录，
-2、更新本周所有基金的持仓
-3、统计并记录本周各个领域的投入、持仓、收益
-4、导出个人数据统计表
-5、导出个人数据统计图
-6、把基金的历史净值上传至 db_netvalue 数据库中
+1. 更新本周的操作记录，
+2. 更新本周所有基金的持仓
+3. 统计并记录本周各个领域的投入、持仓、收益
+4. 导出个人数据统计表
+5. 导出个人数据统计图
+6. 把基金的历史净值上传至 db_netvalue 数据库中
 
 ```shell
 chick -job backtest_job
 ```
 
-1、更新回测分析数据
-2、导出回测分析图表
+1. 更新回测分析数据
+2. 导出回测分析图表
 
 ## 个人数据统计图
 
