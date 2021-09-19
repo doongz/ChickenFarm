@@ -1,14 +1,13 @@
 class Filed:
     
-    ENERGY = "new_energy"
+    FACTURE = "manufacturing"
+    RESOURCE = "resource"
     SEMI = "semiconductor"
-    METALS = "Non_ferrous_metals"
     MEDICAL = "medical_institutions"
-    SPIRIT = "white_spirit"
+    CONSUME = "consumption"
+    FINANCE = "finance_estate"
     HK = "Hongkong_stocks"
     US = "US_stocks"
-    BLUE = "blue_chip"
-    FINANCE = "finance_estate"
 
 
     def get_fileds(self):

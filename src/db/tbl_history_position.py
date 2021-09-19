@@ -17,14 +17,13 @@ class HistroyPositionTable(Base):
     date = Column(DateTime, default=datetime.now())
     total = Column(DECIMAL(10, 2))
 
-    ENERGY = Column(DECIMAL(10, 2), name=Filed.ENERGY)
+    FACTURE = Column(DECIMAL(10, 2), name=Filed.FACTURE)
+    RESOURCE = Column(DECIMAL(10, 2), name=Filed.RESOURCE)
     SEMI = Column(DECIMAL(10, 2), name=Filed.SEMI)
-    METALS = Column(DECIMAL(10, 2), name=Filed.METALS)
     MEDICAL = Column(DECIMAL(10, 2), name=Filed.MEDICAL)
-    SPIRIT = Column(DECIMAL(10, 2), name=Filed.SPIRIT)
+    CONSUME = Column(DECIMAL(10, 2), name=Filed.CONSUME)
+    FINANCE = Column(DECIMAL(10, 2), name=Filed.FINANCE)
     HK = Column(DECIMAL(10, 2), name=Filed.HK)
     US = Column(DECIMAL(10, 2), name=Filed.US)
-    BLUE = Column(DECIMAL(10, 2), name=Filed.BLUE)
-    FINANCE = Column(DECIMAL(10, 2), name=Filed.FINANCE)
 
     comment = Column(VARCHAR(255))

@@ -72,19 +72,18 @@ def _record_history_buying():
         tot_field = TotalForField.get_by_filed(filed)
         fileds_buying[filed] = tot_field.buying
 
-    ht_buy = HistroyBuyingTable()
-    ht_buy.total = sum(fileds_buying.values())
-    ht_buy.ENERGY = fileds_buying[Filed.ENERGY]
-    ht_buy.SEMI = fileds_buying[Filed.SEMI]
-    ht_buy.METALS = fileds_buying[Filed.METALS]
-    ht_buy.MEDICAL = fileds_buying[Filed.MEDICAL]
-    ht_buy.SPIRIT = fileds_buying[Filed.SPIRIT]
-    ht_buy.HK = fileds_buying[Filed.HK]
-    ht_buy.US = fileds_buying[Filed.US]
-    ht_buy.BLUE = fileds_buying[Filed.BLUE]
-    ht_buy.FINANCE = fileds_buying[Filed.FINANCE]
+    history = HistroyBuyingTable()
+    history.total = sum(fileds_buying.values())
+    history.FACTURE = fileds_buying[Filed.FACTURE]
+    history.RESOURCE = fileds_buying[Filed.RESOURCE]
+    history.SEMI = fileds_buying[Filed.SEMI]
+    history.MEDICAL = fileds_buying[Filed.MEDICAL]
+    history.CONSUME = fileds_buying[Filed.CONSUME]
+    history.FINANCE = fileds_buying[Filed.FINANCE]
+    history.HK = fileds_buying[Filed.HK]
+    history.US = fileds_buying[Filed.US]
 
-    Database().add(ht_buy)
+    Database().add(history)
     logger.info(f"Record history buying to tbl_history_buying successfully.")
 
 
@@ -98,19 +97,18 @@ def _record_history_position():
         tot_field = TotalForField.get_by_filed(filed)
         fileds_position[filed] = tot_field.position
 
-    ht_buy = HistroyPositionTable()
-    ht_buy.total = sum(fileds_position.values())
-    ht_buy.ENERGY = fileds_position[Filed.ENERGY]
-    ht_buy.SEMI = fileds_position[Filed.SEMI]
-    ht_buy.METALS = fileds_position[Filed.METALS]
-    ht_buy.MEDICAL = fileds_position[Filed.MEDICAL]
-    ht_buy.SPIRIT = fileds_position[Filed.SPIRIT]
-    ht_buy.HK = fileds_position[Filed.HK]
-    ht_buy.US = fileds_position[Filed.US]
-    ht_buy.BLUE = fileds_position[Filed.BLUE]
-    ht_buy.FINANCE = fileds_position[Filed.FINANCE]
+    history = HistroyPositionTable()
+    history.total = sum(fileds_position.values())
+    history.FACTURE = fileds_position[Filed.FACTURE]
+    history.RESOURCE = fileds_position[Filed.RESOURCE]
+    history.SEMI = fileds_position[Filed.SEMI]
+    history.MEDICAL = fileds_position[Filed.MEDICAL]
+    history.CONSUME = fileds_position[Filed.CONSUME]
+    history.FINANCE = fileds_position[Filed.FINANCE]
+    history.HK = fileds_position[Filed.HK]
+    history.US = fileds_position[Filed.US]
 
-    Database().add(ht_buy)
+    Database().add(history)
     logger.info(f"Record history position to tbl_history_position successfully.")
 
 
@@ -124,17 +122,16 @@ def _record_history_profit():
         tot_field = TotalForField.get_by_filed(filed)
         fileds_profit[filed] = tot_field.profit
 
-    ht_buy = HistroyProfitTable()
-    ht_buy.total = sum(fileds_profit.values())
-    ht_buy.ENERGY = fileds_profit[Filed.ENERGY]
-    ht_buy.SEMI = fileds_profit[Filed.SEMI]
-    ht_buy.METALS = fileds_profit[Filed.METALS]
-    ht_buy.MEDICAL = fileds_profit[Filed.MEDICAL]
-    ht_buy.SPIRIT = fileds_profit[Filed.SPIRIT]
-    ht_buy.HK = fileds_profit[Filed.HK]
-    ht_buy.US = fileds_profit[Filed.US]
-    ht_buy.BLUE = fileds_profit[Filed.BLUE]
-    ht_buy.FINANCE = fileds_profit[Filed.FINANCE]
+    history = HistroyProfitTable()
+    history.total = sum(fileds_profit.values())
+    history.FACTURE = fileds_profit[Filed.FACTURE]
+    history.RESOURCE = fileds_profit[Filed.RESOURCE]
+    history.SEMI = fileds_profit[Filed.SEMI]
+    history.MEDICAL = fileds_profit[Filed.MEDICAL]
+    history.CONSUME = fileds_profit[Filed.CONSUME]
+    history.FINANCE = fileds_profit[Filed.FINANCE]
+    history.HK = fileds_profit[Filed.HK]
+    history.US = fileds_profit[Filed.US]
 
-    Database().add(ht_buy)
+    Database().add(history)
     logger.info(f"Record history profit to tbl_history_profit successfully.")

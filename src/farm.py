@@ -299,5 +299,3 @@ class Farmer:
         """
         self.slave.backtest()
         self.slave.draw_backtest_plot()
-
-
