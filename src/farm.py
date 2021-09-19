@@ -93,8 +93,8 @@ class Operator(SlaveBase):
                              )
 
             if row['operate_type'] == OperateType.SELL:
-                sell_fund(code=code, 
-                          amount=amount, 
+                sell_fund(code=row['code'], 
+                          amount=row['amount'], 
                           operate_time=row['operate_time'],
                           key=self.key
                           )
