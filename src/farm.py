@@ -1,19 +1,26 @@
+import pandas as pd
 from termcolor import colored
 
-from ChickenFarm.src.module.operate_mod import add_fund, delete_fund, get_dpt
+from ChickenFarm.src.module.operate_mod import add_fund, delete_fund
 from ChickenFarm.src.module.operate_mod import buy_fund, sell_fund, update_position
 from ChickenFarm.src.module.statistics_mod import update_total_for_field, record_history
 from ChickenFarm.src.module.transport_mod import transport_netvalue, transport_backtest_data
 from ChickenFarm.src.module.chrome_mod import get_trade_record, get_position
+from ChickenFarm.src.db.tbl_depository import get_fund_dic_from_dpt, get_filed_pd_from_dpt, get_all_pd_from_dpt
+from ChickenFarm.src.db.types import OperateType 
 import ChickenFarm.src.plot.aip_plot as aip_plot
 import ChickenFarm.src.plot.statistics_plot as st_plot
-from ChickenFarm.src.db.types import OperateType 
 from ChickenFarm.src.util.tools import SheetTools
 from ChickenFarm.src.util.exceptions import FundNotFoundError, OpHasBeenRecordedError
 from ChickenFarm.src.util.log import get_logger
 
 
 logger = get_logger(__file__)
+pd.set_option('display.max_columns', None)
+pd.set_option('display.max_rows',None)
+pd.set_option('display.unicode.ambiguous_as_wide', True)
+pd.set_option('display.unicode.east_asian_width', True)
+pd.set_option('display.width', 180) # 设置打印宽度(**重要**)
 
 
 class SlaveBase:
@@ -24,12 +31,14 @@ class SlaveBase:
 
 class Operator(SlaveBase):
 
-    def add(self, code):
+    def add(self, code, filed):
         # 新买入基金
         add_fund(code=code,
-                 key=self.key)
+                 filed=filed,
+                 key=self.key,
+                 )
         update_total_for_field()
-        print(colored(f"添加基金: {code}", "green"))
+        print(colored(f"添加基金: {code}, 所属领域: {filed}", "green"))
 
     def delete(self, code):
         # 删除基金
@@ -63,11 +72,25 @@ class Operator(SlaveBase):
         update_total_for_field()
         print(colored(f"{code} 更新持仓为 {amount} ¥。", "green"))
 
-    def show(self, code):
+    def show(self, code=None, filed=None):
         # 展示基金数据
-        fund_dpt = get_dpt(code=code)
-        for key, value in fund_dpt.items():
-            print(colored(f"{key}: {value}", "green"))
+        if code != None:
+            fund_dict = get_fund_dic_from_dpt(code)
+            for key, value in fund_dict.items():
+                print(colored(f"{key}: {value}", "green"))
+            return
+
+        if filed != None:
+            filed_pd = get_filed_pd_from_dpt(filed)
+            print(colored(f"展示 {filed} 领域的基金", "green"))
+            print(filed_pd)
+            return
+
+        funds_dp = get_all_pd_from_dpt()
+        print(colored(f"展示所有持仓的基金", "green"))
+        print(funds_dp)
+        return
+
 
     def record_op(self):
         # 从天天基金获取交易记录，自动将买入、卖出添加至数据库中
@@ -197,8 +220,8 @@ class Slave(Operator, Statistician, Analyst):
     """
     不可进行编排任务，直接使用
     """
-    def add(self, code):
-        super().add(code)
+    def add(self, code, filed):
+        super().add(code, filed)
 
     def delete(self, code):
         super().delete(code)
@@ -212,8 +235,8 @@ class Slave(Operator, Statistician, Analyst):
     def update_position(self, code, amount):
         super().update_position(code, amount)
 
-    def show(self, code):
-        super().show(code)
+    def show(self, code, filed):
+        super().show(code, filed)
 
     """
     可进行编排任务，需要 slave.job.run() 启动

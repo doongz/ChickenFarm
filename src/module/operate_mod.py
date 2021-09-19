@@ -4,7 +4,8 @@
 from decimal import Decimal
 
 from ChickenFarm.src.db.db_fund import Database
-from ChickenFarm.src.db.tbl_depository import DepositoryTable, get_fund_dic_from_dpt
+from ChickenFarm.src.db.tbl_depository import DepositoryTable, \
+    get_fund_dic_from_dpt, get_filed_pd_from_dpt
 from ChickenFarm.src.db.types import OperateType
 from ChickenFarm.src.util.tools import XAlphaTools
 from ChickenFarm.src.util.tools import auth, record_operation
@@ -17,7 +18,7 @@ logger = get_logger(__file__)
 
 @auth
 @record_operation(OperateType.ADD)
-def add_fund(code, filed=None, comment=None, *args, **kwargs):
+def add_fund(code, *args, **kwargs):
     '''
     向 tbl_depository 添加第一次购买的基金
     '''
@@ -31,8 +32,8 @@ def add_fund(code, filed=None, comment=None, *args, **kwargs):
     fund_dpt = DepositoryTable()
     fund_dpt.name = fundinfo.name
     fund_dpt.code = code
-    fund_dpt.filed = filed
-    fund_dpt.comment = comment
+    fund_dpt.filed = kwargs.get("filed", None)
+    fund_dpt.comment = kwargs.get("comment", None)
     fund_dpt.buy_rate = fundinfo.rate / 100
     fund_dpt.sell_rate_info = str(fundinfo.feeinfo)
     fund_dpt.url = fundinfo._url
@@ -141,13 +142,3 @@ def update_position(code, amount, *args, **kwargs):
     logger.info(f"Update position {fund_dpt.name}({fund_dpt.code}), amount({amount}), "
                 f"position({fund_dpt.position}), profit({fund_dpt.profit}), "
                 f"profit_rate({fund_dpt.profit_rate}).")
-
-
-def get_dpt(code):
-    '''
-    获取 tbl_depository 表中一条基金记录
-    '''
-    fund_dpt = get_fund_dic_from_dpt(code)
-    return fund_dpt
-
-

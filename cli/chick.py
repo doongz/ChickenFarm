@@ -6,6 +6,8 @@ from termcolor import colored
 from argparse import RawTextHelpFormatter
 
 from ChickenFarm.src.farm import Farmer, Slave
+from ChickenFarm.src.db.types import Filed
+
 
 pd.set_option('display.max_columns', None)
 pd.set_option('display.max_rows',None)
@@ -22,7 +24,9 @@ farmer.slave = slave
 def confirm(func):
 
     def wrapper(*args, **kwargs):
-        answer = input("Are you sure you want to perform this operation [Y/N]?\n: ").lower()
+        answer = input("Are you sure you want to " + 
+                       colored(f"{func.__name__} {args}", "blue") + 
+                       " [Y/N]?\n: ").lower()
         if answer != 'y':
             print(colored("Aborted", "red"))
             sys.exit(0)
@@ -33,7 +37,15 @@ def confirm(func):
 
 @confirm
 def add(code):
-    slave.add(code)
+
+    fileds = Filed().get_fileds()
+    options = "Choose filed:\n" + "0 - None\n"
+    for i, filed in enumerate(fileds):
+        options += f"{i+1} - {filed}\n"
+    choose = int(input(options + ": "))
+    filed = None if choose == 0 else fileds[choose-1]
+
+    slave.add(code, filed)
     
 
 @confirm
@@ -56,8 +68,16 @@ def position(code, amount):
     slave.update_position(code, amount)
     
 
-def show(code):
-    slave.show(code)
+def show(code=None):
+
+    fileds = Filed().get_fileds()
+    options = "Choose filed:\n" + "0 - All\n"
+    for i, filed in enumerate(fileds):
+        options += f"{i+1} - {filed}\n"
+    choose = int(input(options + ": "))
+    filed = None if choose == 0 else fileds[choose-1]
+
+    slave.show(code, filed)
 
 
 @confirm
@@ -196,15 +216,15 @@ def main():
         if not args.amount:
             print(colored(f"请输入数额 -a", "red"))
             return -1
-    if args.add or args.delete or args.show:
+    if args.add or args.delete:
         if not args.code:
             print(colored(f"请输入基金代码 -c", "red"))
             return -1
 
     if args.add:
-        add()
+        add(args.code)
     elif args.delete:
-        delete()
+        delete(args.code)
     elif args.buy:
         buy(args.code, args.amount)
     elif args.sell:

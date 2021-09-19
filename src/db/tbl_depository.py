@@ -1,3 +1,4 @@
+import pandas as pd
 from datetime import datetime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, DateTime, DECIMAL, VARCHAR, CHAR, INT
@@ -71,7 +72,9 @@ class DepositoryTable(Base):
 
 
 def get_fund_dic_from_dpt(code):
-    # 获取的结果，仅可作为展示
+    '''
+    获取 tbl_depository 表中指定基金的dict，仅可作为展示
+    '''
     fund_dpt = DepositoryTable.get_by_code(code)
     if not fund_dpt: return {}
 
@@ -82,7 +85,42 @@ def get_fund_dic_from_dpt(code):
     return fund_dpt_dic
 
 
+def get_filed_pd_from_dpt(filed):
+    '''
+    获取 tbl_depository 表中指定领域的df，仅可作为展示
+    '''
+    funds = DepositoryTable.get_holding_by_filed(filed)
+    df = pd.DataFrame(columns=['name', 'code', 'buying', 'selling', 
+                               'position', 'profit', 'profit_rate', 'priority',])
+    for f in funds:
+        df = df.append({'name': f.name,
+                        'code': f.code,
+                        'buying': f.buying,
+                        'selling': f.selling,
+                        'position': f.position,
+                        'profit': f.profit,
+                        'profit_rate': f.profit_rate,
+                        'priority': f.priority
+                        }, ignore_index=True)
+    return df.sort_values(by='priority').reset_index(drop=True)
 
 
-
-
+def get_all_pd_from_dpt():
+    '''
+    获取 tbl_depository 表中所有基金的df，仅可作为展示
+    '''
+    funds = DepositoryTable.get_all_holding()
+    df = pd.DataFrame(columns=['name', 'code', "filed", 'buying', 'selling', 
+                               'position', 'profit', 'profit_rate', 'priority',])
+    for f in funds:
+        df = df.append({'name': f.name,
+                        'code': f.code,
+                        'filed': f.filed,
+                        'buying': f.buying,
+                        'selling': f.selling,
+                        'position': f.position,
+                        'profit': f.profit,
+                        'profit_rate': f.profit_rate,
+                        'priority': f.priority
+                        }, ignore_index=True)
+    return df.sort_values(by='filed').reset_index(drop=True)
