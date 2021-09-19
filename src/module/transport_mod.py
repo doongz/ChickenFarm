@@ -7,12 +7,9 @@ import multiprocessing
 
 from ChickenFarm.src.db.db_fund import Database
 from ChickenFarm.src.db.tbl_depository import DepositoryTable
-
 from ChickenFarm.src.db.db_netvalue import FundNetValue
 from ChickenFarm.src.db.db_backtest import FundBacktest
-
 from ChickenFarm.src.module.aip_mod import StupidPlan
-
 from ChickenFarm.src.util.tools import XAlphaTools
 from ChickenFarm.src.util.log import get_logger
 

@@ -4,7 +4,7 @@ from termcolor import colored
 from ChickenFarm.src.module.operate_mod import add_fund, delete_fund
 from ChickenFarm.src.module.operate_mod import buy_fund, sell_fund, update_position
 from ChickenFarm.src.module.statistics_mod import update_total_for_field, record_history
-from ChickenFarm.src.module.transport_mod import transport_netvalue, transport_backtest_data
+from ChickenFarm.src.module.transport_mod import transport_netvalue, transport_netvalue_speed, transport_backtest_data
 from ChickenFarm.src.module.chrome_mod import get_trade_record, get_position
 from ChickenFarm.src.db.tbl_depository import get_fund_dic_from_dpt, get_filed_pd_from_dpt, get_all_pd_from_dpt
 from ChickenFarm.src.db.types import OperateType 
@@ -190,6 +190,14 @@ class Analyst(SlaveBase):
         print(colored(f"上传基金历史净值成功 {len(successes)} 条。", "green"))
         if len(fails) != 0:
             print(colored(f"上传基金历史净值失败 {len(fails)} 条。", "red"))
+    
+    def transport_netvalue_speed(self):
+        # 加速上传
+        successes, fails = transport_netvalue_speed()
+
+        print(colored(f"上传基金历史净值成功 {len(successes)} 条。", "green"))
+        if len(fails) != 0:
+            print(colored(f"上传基金历史净值失败 {len(fails)} 条。", "red"))
 
     def backtest(self):
         # 回测，并将回测数据上传
@@ -237,6 +245,9 @@ class Slave(Operator, Statistician, Analyst):
 
     def show(self, code, filed):
         super().show(code, filed)
+    
+    def transport_netvalue_speed(self):
+        super().transport_netvalue_speed()
 
     """
     可进行编排任务，需要 slave.job.run() 启动

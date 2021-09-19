@@ -109,8 +109,7 @@ def charts():
 
 @confirm
 def netvalue():
-    slave.transport_netvalue()
-    slave.job.run()
+    slave.transport_netvalue_speed()
 
 
 @confirm
