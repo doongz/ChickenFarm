@@ -10,7 +10,7 @@
       <img alt="env" src="https://img.shields.io/badge/macOS-passing-green?logo=apple" />
     </a>
     <a>
-      <img alt="Python" src="https://img.shields.io/badge/Python-3.7-blue?logo=python&logoColor=white" />
+      <img alt="Python" src="https://img.shields.io/badge/Python-3.8-blue?logo=python&logoColor=white" />
     </a>
     <a href="https://github.com/WalleDong/ChickenFarm/graphs/commit-activity">
       <img alt="commit-activity" src="https://img.shields.io/github/last-commit/WalleDong/ChickenFarm.svg?logo=github&logoColor=white" />
@@ -69,7 +69,7 @@ python3 -m pip install -r requirements.txt
 
 0. 新买一个基金时，需添加
 ```shell
-chick -add -c <code>
+python3 cli/chick.py -add -c <code>
 ```
 1. 将支付宝的基金最新净值填入 position.csv 中
 ```shell
@@ -77,48 +77,52 @@ vim ~/Desktop/position.csv
 ```
 2. 执行基础任务
 ```shell
-chick -job base_job
+python3 cli/chick.py -job base_job
 ```
 3. 执行回测分析任务
 ```shell
-chick -job backtest_job
+python3 cli/chick.py -job backtest_job
 ```
 
 ## CLI
 
+```shell
+python3 cli/chick.py
+```
+
 #### 1、操作记录
 
-| command                               | help                                           |
-| :------------------------------------ | :--------------------------------------------- |
-| chick -add -c `code`                  | 添加基金                                       |
-| chick -delete -c `code`               | 删除基金                                       |
-| chick -buy -c `code` -a `amount`      | 买入基金                                       |
-| chick -sell -c `code` -a `amount`     | 卖出基金                                       |
-| chick -position -c `code` -a `amount` | 更新单个基金的持仓                             |
-| chick -show -c `code`                 | 展示基金数据                                   |
-| chick -record-op                      | 从天天基金获取数据，将本周的操作更新至数据库中 |
-| chick -position-auto                  | 从天天基金获取持仓数据，更新至数据库中         |
+| command                         | help                                           |
+| :------------------------------ | :--------------------------------------------- |
+| -add -c `code`                  | 添加基金                                       |
+| -delete -c `code`               | 删除基金                                       |
+| -buy -c `code` -a `amount`      | 买入基金                                       |
+| -sell -c `code` -a `amount`     | 卖出基金                                       |
+| -position -c `code` -a `amount` | 更新单个基金的持仓                             |
+| -show -c `code`                 | 展示基金数据                                   |
+| -record-op                      | 从天天基金获取数据，将本周的操作更新至数据库中 |
+| -position-auto                  | 从天天基金获取持仓数据，更新至数据库中         |
 
 #### 2、个人数据分析
 
-| command               | help                                                         |
-| --------------------- | ------------------------------------------------------------ |
-| chick -record-history | 统计并记录各个领域以及总的投入、持仓、收益历史               |
-| chick -tables         | 导出基金最新数据总表、每个领域合计表、历史购买表、历史仓位表、历史收益表 |
-| chick -charts         | 绘制个人数据图表                                             |
+| command         | help                                                         |
+| --------------- | ------------------------------------------------------------ |
+| -record-history | 统计并记录各个领域以及总的投入、持仓、收益历史               |
+| -tables         | 导出基金最新数据总表、每个领域合计表、历史购买表、历史仓位表、历史收益表 |
+| -charts         | 绘制个人数据图表                                             |
 
 #### 3、回测分析
 
-| command              | help                         |
-| -------------------- | ---------------------------- |
-| chick -netvalue      | 更新基金历史净值数据         |
-| chick -backtest      | 回测，并将回测数据上传       |
-| chick -backtest-plot | 绘制各领域基金回测的小提琴图 |
+| command        | help                         |
+| -------------- | ---------------------------- |
+| -netvalue      | 更新基金历史净值数据         |
+| -backtest      | 回测，并将回测数据上传       |
+| -backtest-plot | 绘制各领域基金回测的小提琴图 |
 
 #### 4、执行任务
 
 ```shell
-chick -job base_job
+python3 cli/chick.py -job base_job
 ```
 
 1. 更新本周的操作记录，
@@ -129,7 +133,7 @@ chick -job base_job
 6. 把基金的历史净值上传至 db_netvalue 数据库中
 
 ```shell
-chick -job backtest_job
+python3 cli/chick.py -job backtest_job
 ```
 
 1. 更新回测分析数据

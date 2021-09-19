@@ -1,11 +1,6 @@
 import os
 import sys
-import logging
-import requests
 import argparse
-import threading
-import getpass
-import time
 import pandas as pd
 from termcolor import colored
 from argparse import RawTextHelpFormatter
