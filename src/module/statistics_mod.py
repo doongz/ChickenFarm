@@ -2,14 +2,14 @@
 更新每个领域的统计情况
 每周去统计各个领域和基金的投入、持仓、收益历史
 '''
-from chicken_farm.src.db.db_fund import Database
-from chicken_farm.src.db.tbl_depository import DepositoryTable
-from chicken_farm.src.db.tbl_history_buying import HistroyBuyingTable
-from chicken_farm.src.db.tbl_history_position import HistroyPositionTable
-from chicken_farm.src.db.tbl_history_profit import HistroyProfitTable
-from chicken_farm.src.db.tbl_total_for_field import TotalForField
-from chicken_farm.src.db.types import Filed
-from chicken_farm.src.util.log import get_logger
+from ChickenFarm.src.db.db_fund import Database
+from ChickenFarm.src.db.tbl_depository import DepositoryTable
+from ChickenFarm.src.db.tbl_history_buying import HistroyBuyingTable
+from ChickenFarm.src.db.tbl_history_position import HistroyPositionTable
+from ChickenFarm.src.db.tbl_history_profit import HistroyProfitTable
+from ChickenFarm.src.db.tbl_total_for_field import TotalForField
+from ChickenFarm.src.db.types import Filed
+from ChickenFarm.src.util.log import get_logger
 
 
 logger = get_logger(__file__)

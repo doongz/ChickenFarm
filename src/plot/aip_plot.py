@@ -1,17 +1,15 @@
 import os
 import math
-import pandas as pd
 import matplotlib.pyplot as plt
 import multiprocessing
 
-from chicken_farm.src.module.aip_mod import AutomaticInvestmentPlan
-from chicken_farm.src.db.db_fund import Database
-from chicken_farm.src.db.tbl_depository import DepositoryTable
-from chicken_farm.src.db.db_backtest import FundBacktest
-from chicken_farm.src.db.types import Filed
-from chicken_farm.src.util.tools import DateTools
-from chicken_farm.src.util.config import Config
-from chicken_farm.src.util.log import get_logger
+from ChickenFarm.src.module.aip_mod import AutomaticInvestmentPlan
+from ChickenFarm.src.db.tbl_depository import DepositoryTable
+from ChickenFarm.src.db.db_backtest import FundBacktest
+from ChickenFarm.src.db.types import Filed
+from ChickenFarm.src.util.tools import DateTools
+from ChickenFarm.src.util.config import Config
+from ChickenFarm.src.util.log import get_logger
 
 
 logger = get_logger(__file__)

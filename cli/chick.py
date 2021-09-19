@@ -10,7 +10,7 @@ import pandas as pd
 from termcolor import colored
 from argparse import RawTextHelpFormatter
 
-from chicken_farm.src.farm import Farmer, Slave
+from ChickenFarm.src.farm import Farmer, Slave
 
 pd.set_option('display.max_columns', None)
 pd.set_option('display.max_rows',None)

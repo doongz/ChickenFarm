@@ -2,7 +2,7 @@ import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy import DateTime, DECIMAL, INT, VARCHAR
 
-from chicken_farm.src.util.config import Config
+from ChickenFarm.src.util.config import Config
 
 
 config = Config()
@@ -14,7 +14,7 @@ class FundBacktest():
 
         self.engine = create_engine(
             f"mysql+pymysql://{config.db_username}:{config.db_password}@{config.db_address}:{config.db_port}/{config.db_backtest}"
-            )
+        )
         self.code = code
         self.tbl = f"tbl_{self.code}"
 
@@ -28,8 +28,8 @@ class FundBacktest():
 
     def to_sql(self, df):
 
-        df.to_sql(name=self.tbl, 
-                  con=self.engine, 
+        df.to_sql(name=self.tbl,
+                  con=self.engine,
                   if_exists="replace",
                   index=False,
                   dtype=self.columns)
@@ -41,4 +41,3 @@ class FundBacktest():
     def query_sql(self, sql):
         sql = f"select * from {self.tbl};"
         return pd.read_sql_query(sql, self.engine)
-

@@ -1,9 +1,9 @@
 '''
 是一种愚蠢的算法，每周固定投入资金
 '''
-from chicken_farm.src.algorithm.algorithm import Algorithm
+from ChickenFarm.src.algorithm.algorithm import Algorithm
 
-from chicken_farm.src.util.log import get_logger
+from ChickenFarm.src.util.log import get_logger
 
 
 logger = get_logger(__file__)

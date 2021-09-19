@@ -1,16 +1,16 @@
 from termcolor import colored
 
-from chicken_farm.src.module.operate_mod import add_fund, delete_fund, update_fund, get_dpt
-from chicken_farm.src.module.operate_mod import buy_fund, sell_fund, update_position
-from chicken_farm.src.module.statistics_mod import update_total_for_field, record_history
-from chicken_farm.src.module.transport_mod import transport_netvalue, transport_backtest_data
-from chicken_farm.src.module.chrome_mod import get_trade_record, get_position
-import chicken_farm.src.plot.aip_plot as aip_plot
-import chicken_farm.src.plot.statistics_plot as st_plot
-from chicken_farm.src.db.types import OperateType 
-from chicken_farm.src.util.tools import SheetTools
-from chicken_farm.src.util.exceptions import FundNotFoundError, OpHasBeenRecordedError
-from chicken_farm.src.util.log import get_logger
+from ChickenFarm.src.module.operate_mod import add_fund, delete_fund, get_dpt
+from ChickenFarm.src.module.operate_mod import buy_fund, sell_fund, update_position
+from ChickenFarm.src.module.statistics_mod import update_total_for_field, record_history
+from ChickenFarm.src.module.transport_mod import transport_netvalue, transport_backtest_data
+from ChickenFarm.src.module.chrome_mod import get_trade_record, get_position
+import ChickenFarm.src.plot.aip_plot as aip_plot
+import ChickenFarm.src.plot.statistics_plot as st_plot
+from ChickenFarm.src.db.types import OperateType 
+from ChickenFarm.src.util.tools import SheetTools
+from ChickenFarm.src.util.exceptions import FundNotFoundError, OpHasBeenRecordedError
+from ChickenFarm.src.util.log import get_logger
 
 
 logger = get_logger(__file__)

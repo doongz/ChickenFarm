@@ -2,7 +2,7 @@ import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from chicken_farm.src.util.config import Config
+from ChickenFarm.src.util.config import Config
 
 
 config = Config()

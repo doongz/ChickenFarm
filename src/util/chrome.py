@@ -1,5 +1,4 @@
 import time
-import pandas as pd
 from retry import retry
 
 from selenium import webdriver
@@ -8,8 +7,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.common.exceptions import NoSuchElementException, TimeoutException, StaleElementReferenceException
 
-from chicken_farm.src.util.config import Config 
-from chicken_farm.src.util.log import get_logger
+from ChickenFarm.src.util.config import Config 
+from ChickenFarm.src.util.log import get_logger
 
 
 config = Config()

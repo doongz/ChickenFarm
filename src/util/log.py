@@ -1,9 +1,7 @@
-import os
-import inspect
 import logging
 from logging.config import fileConfig
 
-from chicken_farm.src.util.config import Config
+from ChickenFarm.src.util.config import Config
 
 
 logging.config.fileConfig(Config().log_path)

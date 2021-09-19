@@ -1,5 +1,5 @@
 class Filed:
-    
+
     FACTURE = "manufacturing"
     RESOURCE = "resource"
     SEMI = "semiconductor"
@@ -8,7 +8,6 @@ class Filed:
     FINANCE = "finance_estate"
     HK = "Hongkong_stocks"
     US = "US_stocks"
-
 
     def get_fileds(self):
         fileds = []

@@ -1,14 +1,13 @@
 import os
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
 from pandas.plotting import register_matplotlib_converters
 
-from chicken_farm.src.db.types import Filed
-from chicken_farm.src.db.db_fund import Database
-from chicken_farm.src.util.tools import DateTools
-from chicken_farm.src.util.config import Config
-from chicken_farm.src.util.log import get_logger
+from ChickenFarm.src.db.types import Filed
+from ChickenFarm.src.db.db_fund import Database
+from ChickenFarm.src.util.tools import DateTools
+from ChickenFarm.src.util.config import Config
+from ChickenFarm.src.util.log import get_logger
 
 
 logger = get_logger(__file__)

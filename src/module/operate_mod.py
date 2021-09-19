@@ -3,13 +3,13 @@
 '''
 from decimal import Decimal
 
-from chicken_farm.src.db.db_fund import Database
-from chicken_farm.src.db.tbl_depository import DepositoryTable, get_fund_dic_from_dpt
-from chicken_farm.src.db.types import OperateType
-from chicken_farm.src.util.tools import XAlphaTools
-from chicken_farm.src.util.tools import auth, record_operation
-from chicken_farm.src.util.exceptions import FundNotFoundError
-from chicken_farm.src.util.log import get_logger
+from ChickenFarm.src.db.db_fund import Database
+from ChickenFarm.src.db.tbl_depository import DepositoryTable, get_fund_dic_from_dpt
+from ChickenFarm.src.db.types import OperateType
+from ChickenFarm.src.util.tools import XAlphaTools
+from ChickenFarm.src.util.tools import auth, record_operation
+from ChickenFarm.src.util.exceptions import FundNotFoundError
+from ChickenFarm.src.util.log import get_logger
 
 
 logger = get_logger(__file__)

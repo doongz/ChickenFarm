@@ -2,9 +2,9 @@ import pandas as pd
 from datetime import datetime
 from decimal import Decimal
 
-from chicken_farm.src.db.types import OperateType 
-from chicken_farm.src.util.chrome import ChromeDriver
-from chicken_farm.src.util.log import get_logger
+from ChickenFarm.src.db.types import OperateType 
+from ChickenFarm.src.util.chrome import ChromeDriver
+from ChickenFarm.src.util.log import get_logger
 
 
 logger = get_logger(__file__)

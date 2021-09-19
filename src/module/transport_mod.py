@@ -5,17 +5,16 @@
 import pandas as pd
 import multiprocessing
 
-from chicken_farm.src.db.db_fund import Database
-from chicken_farm.src.db.tbl_depository import DepositoryTable
+from ChickenFarm.src.db.db_fund import Database
+from ChickenFarm.src.db.tbl_depository import DepositoryTable
 
-from chicken_farm.src.db.db_netvalue import FundNetValue
-from chicken_farm.src.db.db_backtest import FundBacktest
+from ChickenFarm.src.db.db_netvalue import FundNetValue
+from ChickenFarm.src.db.db_backtest import FundBacktest
 
-from chicken_farm.src.module.aip_mod import StupidPlan
+from ChickenFarm.src.module.aip_mod import StupidPlan
 
-from chicken_farm.src.util.tools import XAlphaTools
-from chicken_farm.src.util.tools import SheetTools
-from chicken_farm.src.util.log import get_logger
+from ChickenFarm.src.util.tools import XAlphaTools
+from ChickenFarm.src.util.log import get_logger
 
 
 logger = get_logger(__file__)
