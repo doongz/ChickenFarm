@@ -79,17 +79,23 @@ class Config(object):
     @property
     def export_table_path(self):
         # 导出的个人数据统计表的路径
-        return self.json_data.get("EXPORT_TABLE_PATH")
+        path = self.json_data.get("EXPORT_TABLE_PATH")
+        os.makedirs(path, exist_ok=True)
+        return path
 
     @property
     def export_chart_path(self):
         # 导出的个人数据图的路径
-        return self.json_data.get("EXPORT_CHART_PATH")
+        path = self.json_data.get("EXPORT_CHART_PATH")
+        os.makedirs(path, exist_ok=True)
+        return path
 
     @property
     def export_aip_plot_path(self):
         # 导出的回测分析图的路径
-        return self.json_data.get("EXPORT_AIP_PLOT_PATH")
+        path = self.json_data.get("EXPORT_AIP_PLOT_PATH")
+        os.makedirs(path, exist_ok=True)
+        return path
 
     @property
     def tiantian_username(self):

@@ -119,8 +119,8 @@ def backtest():
 
 
 @confirm
-def backtest_plot():
-    slave.draw_backtest_plot()
+def backtest_plots():
+    slave.draw_backtest_plots()
     slave.job.run()
 
 
@@ -185,8 +185,8 @@ def main():
     group.add_argument('-backtest',
                        action='store_true',  
                        help='回测，并将回测数据上传')
-    group.add_argument('-backtest-plot',
-                       dest='backtest_plot', 
+    group.add_argument('-backtest-plots',
+                       dest='backtest_plots', 
                        action='store_true',  
                        help='绘制各领域基金回测的小提琴图')
 
@@ -248,8 +248,8 @@ def main():
         netvalue()
     elif args.backtest:
         backtest()
-    elif args.backtest_plot:
-        backtest_plot()
+    elif args.backtest_plots:
+        backtest_plots()
 
     return 0
 
