@@ -19,7 +19,7 @@ plt.rcParams['font.sans-serif'] = ['Arial Unicode MS']
 plt.rcParams['savefig.dpi'] = 500  # 保存图片分辨率
 FIGSIZE = (10, 5)
 COLORS = ['limegreen', 'dodgerblue', 'mediumorchid','lightskyblue',
-          'silver', 'royalblue', 'gold', 'coral', 'orange', 'slategray']
+          'silver', 'gold', 'coral', 'orange', 'royalblue', 'slategray']
 
 
 def export_position_bar_chart(show=False):
@@ -106,7 +106,7 @@ def export_position_profit_bar_chart(show=False):
 
 
 def export_profit_rate_bar_chart(show=False):
-    # 导出各领域最新收益收益率的柱状图
+    # 导出各领域最新收益率的柱状图
     df = Database().to_df('tbl_total_for_field')
     filed = df['filed_cn']
     data = [round(i*100, 2) for i in df['profit_rate'].tolist()]
@@ -179,6 +179,8 @@ def export_history_position_line_chart(show=False):
             ax.text(_x, _y, _y, ha='center', va='bottom')
 
     ax.set_title(f"各领域持仓历史 {DateTools.today()}")
+    ax.set_xticks(x)
+    ax.set_xticklabels(list(map(lambda t: t.strftime('%Y-%m-%d'), x)))
     ax.yaxis.grid(True, linestyle='--')
     ax.set_ylabel('数额 ¥')
     ax.legend(loc='upper left') # 图例
@@ -205,6 +207,8 @@ def export_history_profit_line_chart(show=False):
             ax.text(_x, _y, _y, ha='center', va='bottom')
 
     ax.set_title(f"各领域收益历史 {DateTools.today()}")
+    ax.set_xticks(x)
+    ax.set_xticklabels(list(map(lambda t: t.strftime('%Y-%m-%d'), x)))
     ax.yaxis.grid(True, linestyle='--')
     ax.set_ylabel('数额 ¥')
     ax.legend(loc='upper left') # 图例
@@ -231,6 +235,8 @@ def export_history_buying_line_chart(show=False):
             ax.text(_x, _y, _y, ha='center', va='bottom')
 
     ax.set_title(f"各领域购买历史 {DateTools.today()}")
+    ax.set_xticks(x)
+    ax.set_xticklabels(list(map(lambda t: t.strftime('%Y-%m-%d'), x)))
     ax.yaxis.grid(True, linestyle='--')
     ax.set_ylabel('数额 ¥')
     ax.legend(loc='upper left') # 图例

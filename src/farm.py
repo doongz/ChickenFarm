@@ -170,11 +170,11 @@ class Statistician(SlaveBase):
 
     def draw_charts(self):
         # 绘制图表
-        st_plot.export_position_bar_chart()
-        st_plot.export_profit_bar_chart()
-        st_plot.export_position_profit_bar_chart()
-        st_plot.export_profit_rate_bar_chart()
-        st_plot.export_position_pie_chart()
+        # st_plot.export_position_bar_chart()
+        # st_plot.export_profit_bar_chart()
+        # st_plot.export_position_profit_bar_chart()
+        # st_plot.export_profit_rate_bar_chart()
+        # st_plot.export_position_pie_chart()
         st_plot.export_history_position_line_chart()
         st_plot.export_history_profit_line_chart()
         st_plot.export_history_buying_line_chart()
