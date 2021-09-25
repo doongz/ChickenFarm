@@ -29,7 +29,9 @@ class ChromeDriver():
         self.driver.find_element_by_id('tbname').send_keys(config.tiantian_username)
         time.sleep(0.5)
         self.driver.find_element_by_id('tbpwd').send_keys(config.tiantian_password)
+        self.driver.find_element_by_id('protocolCheckbox').click()
         self.driver.find_element_by_id('btn_login').click()
+        
 
     def _wait(self, by, value, timeout=10, frequency=0.5, message='Element not found'):
         WebDriverWait(driver=self.driver, timeout=timeout, poll_frequency=frequency) \

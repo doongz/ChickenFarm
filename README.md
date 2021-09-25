@@ -99,7 +99,8 @@ python3 cli/chick.py
 | -buy -c `code` -a `amount`      | 买入基金                                       |
 | -sell -c `code` -a `amount`     | 卖出基金                                       |
 | -position -c `code` -a `amount` | 更新单个基金的持仓                             |
-| -show -c `code`                 | 展示基金数据                                   |
+| -show                           | 展示指定领域基金数据                           |
+| -show -c `code`                 | 展示指定基金数据                               |
 | -record-op                      | 从天天基金获取数据，将本周的操作更新至数据库中 |
 | -position-auto                  | 从天天基金获取持仓数据，更新至数据库中         |
 

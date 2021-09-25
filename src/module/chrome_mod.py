@@ -58,9 +58,3 @@ def get_position():
                         }, ignore_index=True)
 
     return df
-
-if __name__ == "__main__":
-    df = get_position()
-    print(df)
-
-

@@ -332,4 +332,4 @@ class Farmer:
         2、导出回测分析图表
         """
         self.slave.backtest()
-        self.slave.draw_backtest_plot()
+        self.slave.draw_backtest_plots()
