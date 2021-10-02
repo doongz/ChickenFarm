@@ -22,7 +22,7 @@ def get_trade_record():
     df = pd.DataFrame(columns=['operate_time', 'name', 'code', 'operate_type', 'amount'])
     for r in records:
         r = r.replace(' ', '\n').split('\n')
-        if "已撤单"  in r[10]:
+        if "已撤单" in r[10] or "无效" in r[10]:
             continue
         if '入' in r[4]:
             operate_type = OperateType.BUY
