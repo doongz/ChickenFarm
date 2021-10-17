@@ -67,7 +67,7 @@ python3 -m pip install -r requirements.txt
 
 ## 每周工作
 
-0. 新买一个基金时，需添加
+0. 需要研究一个基金时，需添加
 ```shell
 python3 cli/chick.py -add -c <code>
 ```
@@ -151,6 +151,8 @@ python3 cli/chick.py -job backtest_job
 
 # Todo
 
+- [ ] 使用chichenfarm接口获取数据
+- [ ] 登陆时，滑块验证
 - [ ] 支持目标止盈、移动止盈等多种投资算法
 - [ ] 自动生成投资策略
 
