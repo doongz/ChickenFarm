@@ -156,6 +156,7 @@ python3 cli/chick.py -job backtest_job
 
 - [ ] 使用chichenfarm接口获取数据
 - [ ] 登陆时，滑块验证
+- [ ] 调整部分图表时间轴
 - [ ] 支持目标止盈、移动止盈等多种投资算法
 - [ ] 自动生成投资策略
 
