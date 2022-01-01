@@ -1,6 +1,6 @@
 pandas==1.3.3
-xalpha==0.11.4
-chinese-calendar==1.5.1
+xalpha==0.11.5
+chinese-calendar==1.6.0
 matplotlib==3.4.3
 numpy==1.21.1
 concurrent-log-handler==0.9.19
