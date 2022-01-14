@@ -160,7 +160,7 @@ python3 cli/chick.py -job backtest_job
 - 各领域最新收益率图
 - 各领域最新持仓 & 收益图
 
-![personal_data_statistics](./docs/images/personal_data_statistics.jpg)
+![personal_data_statistics](./docs/images/1.png)
 
 ### 四、定投分析图
 
@@ -173,7 +173,11 @@ python3 cli/chick.py -job backtest_job
 
 注：定投的起点，也就是开始定投的日子对最终的收益有很大的影响。所以，并没有直接用距今天180天前的那一天开始算单一结果，而是取距今天180天前那一天的「附近区间的多个起点」，统计出多个样本来绘制小提琴图。
 
-![aip_backtest](./docs/images/aip_backtest.jpg)
+例：白酒和半导体的一些基金回测分析
+
+![aip_backtest](./docs/images/2.png)
+
+![aip_backtest](./docs/images/3.png)
 
 ## Todo
 
