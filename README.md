@@ -33,17 +33,26 @@
   <a href="#Community">Community</a> •
   <a href="#License">License</a>
 </p>
-
 非专业养鸡场:hatching_chick::hatched_chick::baby_chick:，统计购买和卖出操作，分析持仓和收益，爬取基金净值，使用各种定投算法回测分析，生成投资策略。所有功能一键式全自动完成 :chart_with_upwards_trend::chart_with_upwards_trend::chart_with_upwards_trend:
 
+## 挖了个大坑
 
-# Features
+本项目计划大规模重构，预计2022年底完成。后端采用 1 + n 的「微服务」形式，前端以「微信小程序」的形式呈现。
+
+支持目标止盈、移动止盈等「传统投资算法」，以及「自创算法」借鉴牛顿运动定律和牛顿迭代法等，并能够给出「卖出时机」。
+
+- 核心服务 + 后台：用 `Golang` `Vue` `Js` 实现
+- 数据采集服务：基金信息和净值数据用 `Python` 爬取
+- 回测分析服务：用 `C++` 实现回测算法
+
+
+## Features
 - 全自动数据采集（天天基金购买记录、最新持仓采集）
 - 爬取最新基金净值
 - [个人数据分析](#个人数据统计图)
 - [定投回测分析](#定投分析图)
 
-# Installation
+## Installation
 
 ### 0、准备 Mysql 数据库
 - 推荐 [阿里云](https://cn.aliyun.com/product/rds/mysql)，一年19.9，阿里云打:moneybag:
@@ -66,9 +75,9 @@ source ~/.bash_profile
 ```shell
 python3 -m pip install -r requirements.txt
 ```
-# Usage
+## Usage
 
-## 每周工作
+### 一、每周工作
 
 0. 需要研究一个基金时，需添加
 ```shell
@@ -87,7 +96,7 @@ python3 cli/chick.py -job base_job
 python3 cli/chick.py -job backtest_job
 ```
 
-## CLI
+### 二、CLI
 
 ```shell
 python3 cli/chick.py
@@ -143,34 +152,46 @@ python3 cli/chick.py -job backtest_job
 1. 更新回测分析数据
 2. 导出回测分析图表
 
-## 个人数据统计图
+### 三、个人数据统计图
+
+- 各领域最新持仓图
+- 各领域持仓占比图
+- 各领域最新收益图
+- 各领域最新收益率图
+- 各领域最新持仓 & 收益图
 
 ![personal_data_statistics](./docs/images/personal_data_statistics.jpg)
 
-## 定投分析图
+### 四、定投分析图
+
+当前已实现最简单的定投分析方法：选择一周中的固定一天（周一至周五），每周以固定的资金进行买入，在近半年、仅一年、仅三年的时间跨度进行定投回测，回测结果绘制出小提琴图。
+
+- 每一行，为一个基金的180天、365天、1095天区间的回测分析
+- 每一列，为一类基金的相同天数回测分析，**可判断不同基金的定投收益**
+- 子图为一周五天的小提琴图，中间横线为中位数，上、下端横线为极值，**可分析选择周内的哪一天定投收益高**
+- 小提琴图中宽的地方为概率密度大的地方，也就是多数样本分布的地方，也就是**最有可能获得的收益率**
+
+注：定投的起点，也就是开始定投的日子对最终的收益有很大的影响。所以，并没有直接用距今天180天前的那一天开始算单一结果，而是取距今天180天前那一天的「附近区间的多个起点」，统计出多个样本来绘制小提琴图。
 
 ![aip_backtest](./docs/images/aip_backtest.jpg)
 
+## Todo
 
-# Todo
-
-- [ ] 使用chichenfarm接口获取数据
-- [ ] 登陆时，滑块验证
-- [ ] 调整部分图表时间轴
+- [ ] 自动生成投资策略，包括卖出时机
 - [ ] 支持目标止盈、移动止盈等多种投资算法
-- [ ] 自动生成投资策略
+- [ ] 采集个人数据登陆天天基金时，集成滑块验证功能
+- [ ] 调整部分图表时间轴
 
-
-# Contribute
+## Contribute
 
 Contributions are always welcome!
 Please read the [contribution guidelines](https://github.com/WalleDong/ChickenFarm/blob/main/docs/contribution.md).:relaxed:
 
-# Community
+## Community
 
 [![Chat](https://img.shields.io/badge/Chat%20on-Wechat-green?logo=wechat&style=social)](./docs/images/wechat.JPG)
 
-# License
+## License
 
 [![License](https://img.shields.io/github/license/WalleDong/ChickenFarm?color=blue&label=license)](https://github.com/WalleDong/ChickenFarm/blob/main/LICENSE)
 
