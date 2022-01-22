@@ -22,8 +22,6 @@
       <img alt="GitHub pull requests" src="https://img.shields.io/github/issues-pr/WalleDong/ChickenFarm?color=0088ff&logo=github" />
     </a>
   </p>
-
-
 <p align="center">
   <a href="#Features">Features</a> •
   <a href="#Installation">Installation</a> •
@@ -34,16 +32,6 @@
   <a href="#License">License</a>
 </p>
 非专业养鸡场:hatching_chick::hatched_chick::baby_chick:，统计购买和卖出操作，分析持仓和收益，爬取基金净值，使用各种定投算法回测分析，生成投资策略。所有功能一键式全自动完成 :chart_with_upwards_trend::chart_with_upwards_trend::chart_with_upwards_trend:
-
-## 挖个大坑
-
-本项目计划大规模重构，预计2022年三季度完成。后端采用 1 + n 的「微服务」形式，前端以「微信小程序」的形式呈现。
-
-支持目标止盈、移动止盈等「传统投资算法」，以及「自研投资算法」借鉴牛顿运动定律和牛顿迭代法等，并能够给出「卖出时机」。
-
-- 核心服务 + 后台：用 `Golang` `Vue` `Js` 实现
-- 数据采集服务：基金信息和净值数据用 `Python` 爬取
-- 回测分析服务：用 `C++` 实现投资算法
 
 
 ## Features
@@ -181,10 +169,14 @@ python3 cli/chick.py -job backtest_job
 
 ## Todo
 
-- [ ] 自动生成投资策略，包括卖出时机
-- [ ] 支持目标止盈、移动止盈等多种投资算法
-- [ ] 采集个人数据登陆天天基金时，集成滑块验证功能
-- [ ] 调整部分图表时间轴
+本项目计划大规模重构，预计2022年三季度完成。后端采用 1 + n 的「微服务」形式，前端以「微信小程序」的形式呈现。
+
+支持目标止盈、移动止盈等**「传统投资算法」**，以及一些简易的**「自研投资算法」**借鉴牛顿运动定律和牛顿迭代法等等，并能够给出**「卖出时机」**
+
+- 核心服务 + 后台：用 `Golang` `Vue` `Js` 实现
+- 数据采集组件：基金信息和净值数据用 `Python` 爬取
+- 回测分析组件：用 `C++` 实现投资算法
+- 有限参考 [Deep Reinforcement Learning for Quantitative Finance](https://github.com/AI4Finance-Foundation/FinRL)
 
 ## Contribute
 
@@ -199,4 +191,4 @@ Please read the [contribution guidelines](https://github.com/WalleDong/ChickenFa
 
 [![License](https://img.shields.io/github/license/WalleDong/ChickenFarm?color=blue&label=license)](https://github.com/WalleDong/ChickenFarm/blob/main/LICENSE)
 
-Copyright © 2021 [Walle Dong](https://github.com/WalleDong). All rights reserved.
+Copyright © 2021 [Do Walle](https://github.com/DoWalle). All rights reserved.
