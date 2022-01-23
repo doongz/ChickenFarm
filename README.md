@@ -4,7 +4,6 @@
 </h1>
 <h4 align="center">一家小小的养鸡场 </h4>
 
-
 <p align="center">
     <a>
       <img alt="env" src="https://img.shields.io/badge/macOS-passing-green?logo=apple" />
@@ -12,14 +11,20 @@
     <a>
       <img alt="Python" src="https://img.shields.io/badge/Python-3.8-blue?logo=python&logoColor=white" />
     </a>
-    <a href="https://github.com/WalleDong/ChickenFarm/graphs/commit-activity">
-      <img alt="commit-activity" src="https://img.shields.io/github/last-commit/WalleDong/ChickenFarm.svg?logo=github&logoColor=white" />
+    <a href="https://github.com/DoWalle/ChickenFarm/graphs/commit-activity">
+      <img alt="commit-activity" src="https://img.shields.io/github/last-commit/DoWalle/ChickenFarm.svg?logo=github&logoColor=white" />
     </a>
-    <a href="https://github.com/WalleDong/ChickenFarm/issues">
-      <img alt="Issues" src="https://img.shields.io/github/issues/WalleDong/ChickenFarm?style=flat&color=%23FFA24E&label=Issues&logo=github" />
+    <a href="https://github.com/DoWalle/ChickenFarm/issues">
+      <img alt="Issues" src="https://img.shields.io/github/issues/DoWalle/ChickenFarm?style=flat&color=6A5EF6&label=Issues&logo=github" />
     </a>
-    <a href="https://github.com/WalleDong/ChickenFarm/pulls">
-      <img alt="GitHub pull requests" src="https://img.shields.io/github/issues-pr/WalleDong/ChickenFarm?color=0088ff&logo=github" />
+    <a href="https://github.com/DoWalle/ChickenFarm/pulls">
+      <img alt="GitHub pull requests" src="https://img.shields.io/github/issues-pr/DoWalle/ChickenFarm?color=0088ff&logo=github" />
+    </a>
+    <a>
+      <img alt="stars" src="https://img.shields.io/github/stars/DoWalle/ChickenFarm?color=E3BA3E&logo=github" />
+    </a>
+    <a>
+      <img alt="forks" src="https://img.shields.io/github/forks/DoWalle/ChickenFarm?color=5EEDF6&logo=github" />
     </a>
   </p>
 <p align="center">
@@ -31,6 +36,7 @@
   <a href="#Community">Community</a> •
   <a href="#License">License</a>
 </p>
+
 非专业养鸡场:hatching_chick::hatched_chick::baby_chick:，统计购买和卖出操作，分析持仓和收益，爬取基金净值，使用各种定投算法回测分析，生成投资策略。所有功能一键式全自动完成 :chart_with_upwards_trend::chart_with_upwards_trend::chart_with_upwards_trend:
 
 
@@ -171,7 +177,7 @@ python3 cli/chick.py -job backtest_job
 
 本项目计划大规模重构，预计2022年三季度完成。后端采用 1 + n 的「微服务」形式，前端以「微信小程序」的形式呈现。
 
-支持目标止盈、移动止盈等**「传统投资算法」**，以及一些简易的**「自研投资算法」**借鉴牛顿运动定律和牛顿迭代法等等，并能够给出**「卖出时机」**
+支持目标止盈、移动止盈等「传统投资算法」，以及一些简易的「自研投资算法」借鉴牛顿运动定律和牛顿迭代法等等，并能够给出「卖出时机」
 
 - 核心服务 + 后台：用 `Golang` `Vue` `Js` 实现
 - 数据采集组件：基金信息和净值数据用 `Python` 爬取
