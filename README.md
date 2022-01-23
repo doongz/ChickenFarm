@@ -11,20 +11,20 @@
     <a>
       <img alt="Python" src="https://img.shields.io/badge/Python-3.8-blue?logo=python&logoColor=white" />
     </a>
-    <a href="https://github.com/DoWalle/ChickenFarm/graphs/commit-activity">
-      <img alt="commit-activity" src="https://img.shields.io/github/last-commit/DoWalle/ChickenFarm.svg?logo=github&logoColor=white" />
+    <a href="https://github.com/dowalle/ChickenFarm/graphs/commit-activity">
+      <img alt="commit-activity" src="https://img.shields.io/github/last-commit/dowalle/ChickenFarm.svg?logo=github&logoColor=white" />
     </a>
-    <a href="https://github.com/DoWalle/ChickenFarm/issues">
-      <img alt="Issues" src="https://img.shields.io/github/issues/DoWalle/ChickenFarm?style=flat&color=6A5EF6&label=Issues&logo=github" />
+    <a href="https://github.com/dowalle/ChickenFarm/issues">
+      <img alt="Issues" src="https://img.shields.io/github/issues/dowalle/ChickenFarm?style=flat&color=6A5EF6&label=Issues&logo=github" />
     </a>
-    <a href="https://github.com/DoWalle/ChickenFarm/pulls">
-      <img alt="GitHub pull requests" src="https://img.shields.io/github/issues-pr/DoWalle/ChickenFarm?color=0088ff&logo=github" />
-    </a>
-    <a>
-      <img alt="stars" src="https://img.shields.io/github/stars/DoWalle/ChickenFarm?color=E3BA3E&logo=github" />
+    <a href="https://github.com/dowalle/ChickenFarm/pulls">
+      <img alt="GitHub pull requests" src="https://img.shields.io/github/issues-pr/dowalle/ChickenFarm?color=0088ff&logo=github" />
     </a>
     <a>
-      <img alt="forks" src="https://img.shields.io/github/forks/DoWalle/ChickenFarm?color=5EEDF6&logo=github" />
+      <img alt="stars" src="https://img.shields.io/github/stars/dowalle/ChickenFarm?color=E3BA3E&logo=github" />
+    </a>
+    <a>
+      <img alt="forks" src="https://img.shields.io/github/forks/dowalle/ChickenFarm?color=5EEDF6&logo=github" />
     </a>
   </p>
 <p align="center">
@@ -197,4 +197,4 @@ Please read the [contribution guidelines](https://github.com/WalleDong/ChickenFa
 
 [![License](https://img.shields.io/github/license/WalleDong/ChickenFarm?color=blue&label=license)](https://github.com/WalleDong/ChickenFarm/blob/main/LICENSE)
 
-Copyright © 2021 [Do Walle](https://github.com/DoWalle). All rights reserved.
+Copyright © 2021 [Do Walle](https://github.com/dowalle). All rights reserved.
