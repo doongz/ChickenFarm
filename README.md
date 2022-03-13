@@ -177,11 +177,11 @@ python3 cli/chick.py -job backtest_job
 
 本项目计划大规模重构，预计2022年三季度完成。后端采用 1 + n 的「微服务」形式，前端以「微信小程序」的形式呈现。
 
-支持目标止盈、移动止盈等「传统投资算法」，以及一些简易的「自研投资算法」借鉴牛顿运动定律和牛顿迭代法等等，并能够给出「卖出时机」
+支持目标止盈、移动止盈等「传统投资算法」，以及一些简易的「自研投资算法」借鉴牛顿运动定律和牛顿迭代法等，并能够给出「卖出时机」
 
-- 核心服务 + 后台：用 `Golang` `Vue` `Js` 实现
+- 核心服务 + 后台：`Golang` `Vue` `Js` 实现
 - 数据采集组件：基金信息和净值数据用 `Python` 爬取
-- 回测分析组件：用 `C++` 实现投资算法
+- 回测分析组件：`C++` 实现算法
 - 有限参考 [Deep Reinforcement Learning for Quantitative Finance](https://github.com/AI4Finance-Foundation/FinRL)
 
 ## Contribute
