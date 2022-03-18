@@ -173,7 +173,7 @@ python3 cli/chick.py -job backtest_job
 
 ![aip_backtest](./docs/images/3.png)
 
-按照策略进行的实际定投情况，买在了相对较低的点上
+按照策略进行的实际定投情况，大多数买在了相对较低的点上
 
 ![实际定投](./docs/images/实际定投.png)
 
