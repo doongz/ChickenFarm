@@ -173,6 +173,10 @@ python3 cli/chick.py -job backtest_job
 
 ![aip_backtest](./docs/images/3.png)
 
+按照策略进行的实际定投情况，买在了相对较低的点上
+
+![实际定投](./docs/images/实际定投.png)
+
 ## Todo
 
 本项目计划大规模重构，预计2022年三季度完成。后端采用 1 + n 的「微服务」形式，前端以「微信小程序」的形式呈现。
