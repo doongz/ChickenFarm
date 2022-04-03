@@ -36,7 +36,6 @@
   <a href="#Community">Community</a> •
   <a href="#License">License</a>
 </p>
-
 非专业养鸡场:hatching_chick::hatched_chick::baby_chick:，统计购买和卖出操作，分析持仓和收益，爬取基金净值，使用各种定投算法回测分析，生成投资策略。所有功能一键式全自动完成 :chart_with_upwards_trend::chart_with_upwards_trend::chart_with_upwards_trend:
 
 
@@ -146,7 +145,7 @@ python3 cli/chick.py -job backtest_job
 1. 更新回测分析数据
 2. 导出回测分析图表
 
-### 三、个人数据统计图
+### 三、个人数据统计
 
 - 各领域最新持仓图
 - 各领域持仓占比图
@@ -156,9 +155,13 @@ python3 cli/chick.py -job backtest_job
 
 ![personal_data_statistics](./docs/images/1.png)
 
-### 四、定投分析图
+### 四、定投分析
 
-当前已实现最简单的定投分析方法：选择一周中的固定一天（周一至周五），每周以固定的资金进行买入，在近半年、近一年、近三年的时间跨度进行定投回测，回测结果绘制出小提琴图。
+> 下面实现的定投方法，仅为一种「最简单的思路」，近期不再实现更复杂的方法
+>
+> 待算法功力大成，归来之时提供更优质的定投策略
+
+选择一周中的固定一天（周一至周五），每周以固定的资金进行买入，在近半年、近一年、近三年的时间跨度进行定投回测，回测结果绘制出小提琴图。
 
 - 每一行，为一个基金的180天、365天、1095天区间的回测分析
 - 每一列，为一类基金的相同天数回测分析，**可判断不同基金的定投收益**
@@ -201,4 +204,4 @@ Please read the [contribution guidelines](https://github.com/WalleDong/ChickenFa
 
 [![License](https://img.shields.io/github/license/WalleDong/ChickenFarm?color=blue&label=license)](https://github.com/WalleDong/ChickenFarm/blob/main/LICENSE)
 
-Copyright © 2021 [Do Walle](https://github.com/dowalle). All rights reserved.
+Copyright © 2022 [Do Walle](https://github.com/dowalle). All rights reserved.
