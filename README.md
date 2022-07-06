@@ -48,6 +48,8 @@
 
 ## Installation
 
+> 本项目，想要部署、调通是有一定难度的。
+
 ### 0、准备 Mysql 数据库
 - 推荐 [阿里云](https://cn.aliyun.com/product/rds/mysql)，一年19.9，阿里云打:moneybag:
 - 数据库 **db_fund** 使用[sql文件](./sql/DDL_db_fund.sql)整库建表
