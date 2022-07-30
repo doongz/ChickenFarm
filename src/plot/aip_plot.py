@@ -16,8 +16,8 @@ logger = get_logger(__file__)
 
 
 plt.rcParams['font.sans-serif'] = ['Arial Unicode MS'] # 显示中文
-plt.rcParams['figure.dpi'] = 300  # 显示分辨率
-plt.rcParams['savefig.dpi'] = 300  # 保存图片分辨率
+plt.rcParams['figure.dpi'] = 200  # 显示分辨率
+plt.rcParams['savefig.dpi'] = 100  # 保存图片分辨率
 
 def export_violin_plot():
     '''
