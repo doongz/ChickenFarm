@@ -16,7 +16,7 @@ register_matplotlib_converters()
 
 
 plt.rcParams['font.sans-serif'] = ['Arial Unicode MS']
-plt.rcParams['savefig.dpi'] = 100  # 保存图片分辨率
+plt.rcParams['savefig.dpi'] = 100  # 保存图片分辨率（有效）
 FIGSIZE = (10, 5)
 COLORS = ['limegreen', 'dodgerblue', 'mediumorchid','lightskyblue',
           'silver', 'gold', 'coral', 'orange', 'royalblue', 'slategray']
