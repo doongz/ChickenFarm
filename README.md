@@ -9,7 +9,7 @@
       <img alt="env" src="https://img.shields.io/badge/macOS-passing-green?logo=apple" />
     </a>
     <a>
-      <img alt="Python" src="https://img.shields.io/badge/Python-3.8-blue?logo=python&logoColor=white" />
+      <img alt="Python" src="https://img.shields.io/badge/Python-3.9-blue?logo=python&logoColor=white" />
     </a>
     <a href="https://github.com/dowalle/ChickenFarm/graphs/commit-activity">
       <img alt="commit-activity" src="https://img.shields.io/github/last-commit/dowalle/ChickenFarm.svg?logo=github&logoColor=white" />

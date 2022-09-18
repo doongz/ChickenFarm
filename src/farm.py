@@ -136,7 +136,8 @@ class Operator(SlaveBase):
             if code in code_list:
                 p = df.loc[df['code'] == code]['position'].values[0] + \
                     Decimal(position).quantize(Decimal('0.00'))
-                df.at[df.loc[df['code'] == code].index, 'position'] = p
+                
+                df.at[df.loc[df['code'] == code].index.values[0], 'position'] = p
             else:
                 df = df.append({'code': code,
                                 'position': Decimal(position).quantize(Decimal('0.00'))

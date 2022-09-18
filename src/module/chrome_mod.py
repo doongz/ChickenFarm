@@ -59,5 +59,4 @@ def get_position():
                         'code': p[0][-7:-1],
                         'position': Decimal(p[2].replace(",", "")).quantize(Decimal('0.00'))
                         }, ignore_index=True)
-
     return df
