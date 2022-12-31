@@ -1,0 +1,12 @@
+DB_USERNAME: # 数据库账户
+DB_PASSWORD: # 数据库密码
+DB_ADDRESS: # 数据库地址
+DB_PORT: 3306 # 数据库端口
+DB_FUND: # 存放个人统计数据的库名
+DB_NETVALUE: # 存放爬取净值的库名
+DB_BACKTEST: # 存放回测数据的库名
+EXPORT_TABLE_PATH: # 导出个人数据统计表的路径
+EXPORT_CHART_PATH: # 导出个人数据统计图的路径
+EXPORT_AIP_PLOT_PATH: # 导出回测分析图的路径
+TIANTIAN_USERNAME: # 天天基金的账号
+TIANTIAN_PASSWORD: # 天天基金的交易密码

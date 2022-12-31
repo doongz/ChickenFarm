@@ -1,5 +1,4 @@
 import os
-import json
 import pandas as pd
 import xalpha as xa
 from chinese_calendar import is_workday
@@ -7,81 +6,11 @@ from datetime import datetime, timedelta
 
 
 from ChickenFarm.src.db.db_fund import Database
-from ChickenFarm.src.db.tbl_operation_record import OperationRecordTable
-from ChickenFarm.src.db.tbl_depository import get_fund_dic_from_dpt
-from ChickenFarm.src.db.types import OperateType
 from ChickenFarm.src.util.config import Config
-from ChickenFarm.src.util.exceptions import OpHasBeenRecordedError
 from ChickenFarm.src.util.log import get_logger
 
 
 logger = get_logger(__file__)
-
-
-def auth(func):
-    # 验证是否有权限，必须需要参数 key
-    def wrapper(*args, **kwargs):
-
-        key = kwargs.get("key", None)
-
-        if not key:
-            logger.error("Your operation key is empty.")
-            raise Exception('Your operation key is empty.')
-        if key != Config().operation_key:
-            logger.error("Your operation key is wrong.")
-            raise Exception('Your operation key is wrong.')
-        logger.debug("Authentication success.")
-
-        func(*args, **kwargs)
-
-    return wrapper
-
-
-def record_operation(operate_type):
-    """
-    将操作前和操作后的 tbl_depository 中的基金进行记录
-    必须需要参数 code
-    """
-    def inner(func):
-        def wrapper(*args, **kwargs):
-
-            code = kwargs.get("code")
-            dpt_before_change = get_fund_dic_from_dpt(code)
-
-            opr = OperationRecordTable()
-            opr.name = dpt_before_change.get('name', 'xxxxxx')
-            opr.code = code
-            opr.operate_type = operate_type
-            opr.amount = kwargs.get("amount", None)
-            opr.info_after_change = "Waiting for operation"
-            opr.info_before_change = json.dumps(dpt_before_change)
-            opr.operate_time = kwargs.get("operate_time", datetime.now())
-
-            operate_id = opr.code + opr.operate_time.strftime('%Y%m%d%H%M%S')
-            if OperationRecordTable.get_by_operate_id(operate_id):
-                raise OpHasBeenRecordedError(f"This operation has been recorded. "
-                                             f"operate_id:{operate_id}, {opr.name}({opr.code}) "
-                                             f"{opr.operate_type} {opr.amount}.")
-            opr.operate_id = operate_id
-            Database().add(opr) # 如果下面的函数发生异常，这里将会插入一条垃圾数据
-
-            try:
-                func(*args, **kwargs)
-            except Exception as error:
-                Database().delete(opr)
-                raise error
-
-            dpt_after_change = get_fund_dic_from_dpt(code)
-            if operate_type != OperateType.DELETE:
-                opr.name = dpt_after_change.get('name')
-                opr.code = dpt_after_change.get('code')
-            opr.info_after_change = json.dumps(dpt_after_change)
-            Database().update()
-            logger.info(f"Record {opr.name}({opr.code}) operation:{opr.operate_type} "
-                        f"amount:{opr.amount} to tbl_operation_record.")
-
-        return wrapper
-    return inner
 
 
 class SheetTools:
@@ -106,8 +35,8 @@ class SheetTools:
     @staticmethod
     def export_tables():
         # 从 db_fund 数据库中导出csv文件
-        table_names = ['tbl_depository', 'tbl_total_for_field', 'tbl_history_buying', 
-                       'tbl_history_position', 'tbl_history_profit']
+        table_names = ['tbl_assets',
+                       'tbl_funds_for_backtest', 'tbl_history']
 
         for tbl in table_names:
             df = Database().to_df(tbl)
@@ -199,8 +128,3 @@ class DateTools:
         end_date = nearly_date + timedelta(days=size)
 
         return (begin_date, end_date)
-
-
-
-
-

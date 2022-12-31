@@ -13,7 +13,8 @@ class Singleton(type):
 
     def __call__(cls, *args, **kwargs):
         if cls not in cls._instances:
-            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+            cls._instances[cls] = super(
+                Singleton, cls).__call__(*args, **kwargs)
         return cls._instances[cls]
 
 
@@ -22,7 +23,7 @@ class Database(metaclass=Singleton):
     def __init__(self):
         self.engine = create_engine(
             f"mysql+pymysql://{config.db_username}:{config.db_password}@{config.db_address}:{config.db_port}/{config.db_fund}"
-            )
+        )
 
         # 创建DBSession类型:
         DBSession = sessionmaker(bind=self.engine)
@@ -33,25 +34,20 @@ class Database(metaclass=Singleton):
         self.engine.dispose()
 
     def add(self, obj):
-        # work
         self.session.add(obj)
         self.session.commit()
 
     def query(self, clz):
-        # work
         return self.session.query(clz)
 
     def delete(self, obj):
-        # work
         self.session.delete(obj)
         self.session.commit()
 
     def update(self):
-        # work
         self.session.commit()
 
     def to_df(self, tbl_name):
-        # work
         return pd.read_sql(tbl_name, self.engine)
 
     def rollback(self):
@@ -61,12 +57,9 @@ class Database(metaclass=Singleton):
         return self.session.update(clz)
 
     def save(self, obj):
-        if not Session.object_session(obj):
+        if not self.session.object_session(obj):
             self.add(obj)
         self.session.commit()
 
     def execute(self, stmt):
         return self.session.execute(stmt)
-
-
-

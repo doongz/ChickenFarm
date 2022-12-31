@@ -14,7 +14,7 @@ logger = get_logger(__file__)
 
 class AutomaticInvestmentPlan(ABC):
 
-    InvestmentCycles = [180, 365, 1095]
+    InvestmentCycles = [90, 180, 365, 730, 1095]
 
     @abstractmethod
     def create_algo(self):
@@ -33,26 +33,29 @@ class AutomaticInvestmentPlan(ABC):
         :return df                                  dataframe
         """
 
-        df = pd.DataFrame(columns=['start', 'week', 'algorithm', 'cycle', 'profit_rate', 'test_date'])
+        df = pd.DataFrame(
+            columns=['start', 'week', 'algorithm', 'cycle', 'profit_rate', 'test_date'])
 
         stupid = self.create_algo(code)
-        
+
         for start in DateTools.get_between_data(start_interval[0], start_interval[1]):
             try:
-                stupid.prepare_data(start, end) 
+                stupid.prepare_data(start, end)
             except NonTradingError as error:
                 logger.debug(f"Start:{start} is non-trading day, continue.")
                 continue
 
             res = stupid.invest_weekly()
             for index, rate in enumerate(res):
-                df = df.append({'start': start, 
-                                'week': index+1,
-                                'algorithm': 'stupid',
-                                'cycle': cycle,
-                                'profit_rate': rate,
-                                'test_date': datetime.now()
-                                }, ignore_index=True)
+                tmp_pd = pd.DataFrame({'start': [start],
+                                'week': [index+1],
+                                'algorithm': ['stupid'],
+                                'cycle': [cycle],
+                                'profit_rate': [rate],
+                                'test_date': [datetime.now()]
+                                })
+                df = pd.concat([df, tmp_pd])
+
         logger.info(f"统计完成:{code}, 起始日区间为{start_interval}, 结束日为{end}.")
         return df
 
@@ -90,19 +93,7 @@ class AutomaticInvestmentPlan(ABC):
         return df
 
 
-
 class StupidPlan(AutomaticInvestmentPlan):
 
     def create_algo(self, code):
         return StupidAlgorithm(code)
-
-
-
-
-
-
-
-
-
-
-

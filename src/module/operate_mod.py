@@ -1,14 +1,9 @@
-'''
-操作模块，负责添加、删除、更新、购买、卖出、更新持仓等功能
-'''
-from decimal import Decimal
-
 from ChickenFarm.src.db.db_fund import Database
-from ChickenFarm.src.db.tbl_depository import DepositoryTable, \
-    get_fund_dic_from_dpt, get_filed_pd_from_dpt
-from ChickenFarm.src.db.types import OperateType
+from ChickenFarm.src.db.tbl_assets import AssetsTable
+from ChickenFarm.src.db.tbl_history import HistoryTable
+from ChickenFarm.src.db.tbl_funds_for_backtest import FundsForBacktestTable
+from src.util.types import get_fileds_en
 from ChickenFarm.src.util.tools import XAlphaTools
-from ChickenFarm.src.util.tools import auth, record_operation
 from ChickenFarm.src.util.exceptions import FundNotFoundError
 from ChickenFarm.src.util.log import get_logger
 
@@ -16,20 +11,20 @@ from ChickenFarm.src.util.log import get_logger
 logger = get_logger(__file__)
 
 
-@auth
-@record_operation(OperateType.ADD)
 def add_fund(code, *args, **kwargs):
     '''
-    向 tbl_depository 添加第一次购买的基金
+    向 tbl_funds_for_backtest 添加第一次购买的基金
     '''
     fundinfo = XAlphaTools.get_fundinfo_from_xalpha(code)
-    fund_dpt = DepositoryTable.get_by_code(code)
+    fund_dpt = FundsForBacktestTable.get_by_code(code)
 
     if fund_dpt:
-        logger.error(f"{fund_dpt.code}({fund_dpt.name}) has been in tbl_depository.")
-        raise Exception(f"{fund_dpt.code}({fund_dpt.name}) has been in tbl_depository.")
+        logger.error(
+            f"{fund_dpt.code}({fund_dpt.name}) has been in tbl_funds_for_backtest.")
+        raise Exception(
+            f"{fund_dpt.code}({fund_dpt.name}) has been in tbl_funds_for_backtest.")
 
-    fund_dpt = DepositoryTable()
+    fund_dpt = FundsForBacktestTable()
     fund_dpt.name = fundinfo.name
     fund_dpt.code = code
     fund_dpt.filed = kwargs.get("filed", None)
@@ -39,106 +34,89 @@ def add_fund(code, *args, **kwargs):
     fund_dpt.url = fundinfo._url
 
     Database().add(fund_dpt)
-    logger.info(f"Add {fund_dpt.name}({fund_dpt.code}) to tbl_depository successfully, "
+    logger.info(f"Add {fund_dpt.name}({fund_dpt.code}) to tbl_funds_for_backtest successfully, "
                 f"filed:{fund_dpt.filed}, comment:{fund_dpt.comment}.")
 
 
-@auth
-@record_operation(OperateType.UPDATE)
-def update_fund(code, update_data, *args, **kwargs):
-    """
-    更新 tbl_depository 表中基金的数据，直接指定数据
-    :param update_data: dict {"name": name, "profit": profit,}
-    """
-    fund_dpt = DepositoryTable.get_by_code(code)
-    if not fund_dpt:
-        logger.error(f"Not found {code} in tbl_depository.")
-        raise Exception(f"Not found {code} in tbl_depository.")
-
-    for attr in fund_dpt.get_attrs():
-        value = update_data.get(attr, None)
-        if value:
-            setattr(fund_dpt, attr, value)
-            # logger.debug(getattr(fund_dpt, attr))
-
-    Database().update()
-    logger.info(f"Update {fund_dpt.name}({fund_dpt.code}) data({update_data}).")
-
-
-@auth
-@record_operation(OperateType.DELETE)
 def delete_fund(code, *args, **kwargs):
     '''
-    删除 tbl_depository 表中一条基金记录
+    删除 tbl_funds_for_backtest 表中一条基金记录
     '''
-    fund_dpt = DepositoryTable.get_by_code(code)
+    fund_dpt = FundsForBacktestTable.get_by_code(code)
     if not fund_dpt:
-        raise FundNotFoundError(f"Not found {code} in tbl_depository.")
+        raise FundNotFoundError(f"Not found {code} in tbl_funds_for_backtest.")
 
     Database().delete(fund_dpt)
-    logger.info(f"Delete {fund_dpt.name}({fund_dpt.code}) from tbl_depository.")
+    logger.info(
+        f"Delete {fund_dpt.name}({fund_dpt.code}) from tbl_funds_for_backtest.")
 
 
-@auth
-@record_operation(OperateType.BUY)
-def buy_fund(code, amount, *args, **kwargs):
+def update_assets(row, *args, **kwargs):
     '''
-    加仓基金，更新 tbl_depository 表中该基金的 buying position profit_rate 数据
+    上传基金最新持仓，更新 tbl_assets 表中该基金的 position netvalue profit profit_rate 数据
+    name           前海开源优质企业6个月持有混合C
+    code                                   010718
+    position                                 6.55
+    netvalue                               0.5719
+    profit                                  -3.45
+    profit_rate                           -0.3450
+    Name: 0, dtype: object
     '''
-    amount = Decimal(amount).quantize(Decimal('0.00'))
-    
-    fund_dpt = DepositoryTable.get_by_code(code)
+    fund_dpt = AssetsTable.get_by_code(row['code'])
+    fundinfo = XAlphaTools.get_fundinfo_from_xalpha(row['code'])
+
     if not fund_dpt:
-        raise FundNotFoundError(f"Not found {code} in tbl_depository.")
+        logger.info(f"Add fund {row['code']} in tbl_assets.")
+        fund_dpt = AssetsTable()
 
-    fund_dpt.buying += amount
-    fund_dpt.position += amount
-    fund_dpt.profit_rate = round(fund_dpt.profit/fund_dpt.buying, 4)
+        fund_dpt.name = fundinfo.name
+        fund_dpt.code = row['code']
 
-    Database().update()
-    logger.info(f"Buy fund {fund_dpt.name}({fund_dpt.code}), amount({amount}), buying({fund_dpt.buying}), "
-                f"position({fund_dpt.position}), profit_rate({fund_dpt.profit_rate}).")
+        fileds = get_fileds_en()
+        options = f"{fundinfo.name} {row['code']} Choose filed:\n" + "0 - None\n"
+        for i, filed in enumerate(fileds):
+            options += f"{i+1} - {filed}\n"
+        choose = int(input(options + ": "))
+        filed = None if choose == 0 else fileds[choose-1]
+        fund_dpt.filed = filed
+
+        fund_dpt.position = row['position']
+        fund_dpt.netvalue = row['netvalue']
+        fund_dpt.profit = row['profit']
+        fund_dpt.profit_rate = row['profit_rate']
+        fund_dpt.comment = kwargs.get("comment", None)
+        fund_dpt.buy_rate = fundinfo.rate / 100
+        fund_dpt.sell_rate_info = str(fundinfo.feeinfo)
+        fund_dpt.url = fundinfo._url
+
+        Database().add(fund_dpt)
+    else:
+        fund_dpt.position = row['position']
+        fund_dpt.netvalue = row['netvalue']
+        fund_dpt.profit = row['profit']
+        fund_dpt.profit_rate = row['profit_rate']
+
+        Database().update()
+
+    logger.info(f"Update asserts {fund_dpt.name}({fund_dpt.code}), "
+                f"position({fund_dpt.position}), netvalue({fund_dpt.netvalue}), "
+                f"profit({fund_dpt.profit}), profit_rate({fund_dpt.profit_rate}).")
 
 
-@auth
-@record_operation(OperateType.SELL)
-def sell_fund(code, amount, *args, **kwargs):
-    '''
-    卖出基金，更新 tbl_depository 表中该基金的 selling position 数据
-    '''
-    amount = Decimal(amount).quantize(Decimal('0.00'))
+def record_history():
+    funds_obj = AssetsTable.get_all()
 
-    fund_dpt = DepositoryTable.get_by_code(code)
-    if not fund_dpt:
-        logger.error(f"Not found {code} in tbl_depository.")
-        raise Exception(f"Not found {code} in tbl_depository.")
+    for fobj in funds_obj:
+        if fobj.position == 0:
+            continue
 
-    fund_dpt.selling += amount
-    fund_dpt.position -= amount
+        hs = HistoryTable()
+        hs.code = fobj.code
+        hs.position = fobj.position
+        hs.netvalue = fobj.netvalue
+        hs.profit = fobj.profit
+        hs.profit_rate = fobj.profit_rate
+        Database().add(hs)
 
-    Database().update()
-    logger.info(f"Sell fund {fund_dpt.name}({fund_dpt.code}), amount({amount}), "
-                f"selling({fund_dpt.selling}), position({fund_dpt.position}).")
-
-
-@auth
-@record_operation(OperateType.UPDATE)
-def update_position(code, amount, *args, **kwargs):
-    '''
-    上传基金最新持仓，更新 tbl_depository 表中该基金的 position profit profit_rate 数据
-    '''
-    amount = Decimal(amount).quantize(Decimal('0.00'))
-
-    fund_dpt = DepositoryTable.get_by_code(code)
-    if not fund_dpt:
-        logger.error(f"Not found {code} in tbl_depository.")
-        raise Exception(f"Not found {code} in tbl_depository.")
-
-    fund_dpt.position = amount
-    fund_dpt.profit = fund_dpt.position + fund_dpt.selling - fund_dpt.buying
-    fund_dpt.profit_rate = round(fund_dpt.profit/fund_dpt.buying, 4)
-
-    Database().update()
-    logger.info(f"Update position {fund_dpt.name}({fund_dpt.code}), amount({amount}), "
-                f"position({fund_dpt.position}), profit({fund_dpt.profit}), "
-                f"profit_rate({fund_dpt.profit_rate}).")
+    logger.info(
+        f"Record {len(funds_obj)} funds history to tbl_history successfully.")

@@ -3,5 +3,5 @@ __pycache__/
 .DS_Store
 *dev*
 *.pyc
-*.log
+*.log*
 *.lock

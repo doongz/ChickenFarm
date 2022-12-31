@@ -1,7 +1,7 @@
 import pandas as pd
 from abc import ABC, abstractmethod
 
-from ChickenFarm.src.db.tbl_depository import DepositoryTable
+from ChickenFarm.src.db.tbl_funds_for_backtest import FundsForBacktestTable
 from ChickenFarm.src.db.db_netvalue import FundNetValue
 from ChickenFarm.src.util.tools import DateTools
 from ChickenFarm.src.util.exceptions import NonTradingError
@@ -22,7 +22,7 @@ class Algorithm(ABC):
         """
 
         self.code = code
-        self.name = DepositoryTable.get_by_code(code).name
+        self.name = FundsForBacktestTable.get_by_code(code).name
 
         self._value_df = FundNetValue(code).read_sql()
         self._amount = 1000
