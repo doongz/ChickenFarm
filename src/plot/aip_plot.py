@@ -6,7 +6,7 @@ import multiprocessing
 from src.module.backtest_mod import AutomaticInvestmentPlan
 from ChickenFarm.src.db.tbl_funds_for_backtest import FundsForBacktestTable
 from ChickenFarm.src.db.db_backtest import FundBacktest
-from src.util.types import get_fileds_en
+from ChickenFarm.src.util.industry_class import get_fileds_en
 from ChickenFarm.src.util.tools import DateTools
 from ChickenFarm.src.util.config import Config
 from ChickenFarm.src.util.log import get_logger
@@ -81,7 +81,6 @@ def export_aip_violin_plot_by_filed(filed, show=False):
             # 这里 *100 变为百分比
             bodies = [fund_df.loc[fund_df['week'] == day]
                       ['profit_rate']*100 for day in range(1, 6)]
-            # TODO: 如果该领域下只有一个基金，这里会有异常
             violin_plot = axs[math.floor(i/cols)][i % cols].violinplot(bodies,
                                                                        showmeans=False,  # 均值
                                                                        showmedians=True,  # 中位数

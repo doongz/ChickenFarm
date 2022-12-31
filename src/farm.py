@@ -3,13 +3,13 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from termcolor import colored
 
-from ChickenFarm.src.module.operate_mod import add_fund, delete_fund
-from ChickenFarm.src.module.operate_mod import update_assets, record_history
-from ChickenFarm.src.module.transport_mod import transport_netvalue_multiprocess, transport_backtest_data_multiprocess
-from ChickenFarm.src.module.chrome_mod import get_assets
-from src.util.types import get_fileds_en
 import ChickenFarm.src.plot.aip_plot as aip_plot
 import ChickenFarm.src.plot.statistics_plot as st_plot
+from ChickenFarm.src.module.operate_mod import add_fund, delete_fund
+from ChickenFarm.src.module.operate_mod import get_assets, update_assets, record_history
+from ChickenFarm.src.module.statistics_mod import get_filed_dataframe
+from ChickenFarm.src.module.transport_mod import transport_netvalue_multiprocess, transport_backtest_data_multiprocess
+from ChickenFarm.src.util.industry_class import get_fileds_en, get_fileds_cn
 from ChickenFarm.src.util.tools import SheetTools
 from ChickenFarm.src.util.log import get_logger
 
@@ -86,42 +86,27 @@ class Statistician():
         SheetTools.export_tables()
         print(colored(f"导出基金最新数据总表、每个领域合计表、历史购买表、历史仓位表、历史收益表完成。", "green"))
 
-    def draw_charts(self):
+    def draw_charts(self, is_show=False):
         # 绘制图表
-        st_plot.export_position_bar_chart()
-        st_plot.export_profit_bar_chart()
-        st_plot.export_position_profit_bar_chart()
-        st_plot.export_position_pie_chart()
-        # st_plot.export_history_position_line_chart()
-        # st_plot.export_history_profit_line_chart()
+        st_plot.export_position_bar_chart(is_show)
+        st_plot.export_profit_bar_chart(is_show)
+        st_plot.export_position_profit_bar_chart(is_show)
+        st_plot.export_position_pie_chart(is_show)
+        # st_plot.export_history_position_line_chart(is_show)
+        # st_plot.export_history_profit_line_chart(is_show)
         print(colored(f"绘制图表完成。", "green"))
 
     def show(self):
-        # TODO: 展示基金数据,排好序，按领域展示，展示图
+        print(colored(f"展示所有持仓的基金", "green"))
+        fileds_en = get_fileds_en()
+        fileds_cn = get_fileds_cn()
+        for i, en in enumerate(fileds_en):
+            print(colored(f"{fileds_cn[i]} 领域的基金", "blue"))
+            print(get_filed_dataframe(en))
+
+        self.draw_charts(is_show=True)
+        input("confirm is done: ")
         return
-        # fileds = get_fileds_en()
-        # options = "Choose filed:\n" + "0 - All\n"
-        # for i, filed in enumerate(fileds):
-        #     options += f"{i+1} - {filed}\n"
-        # choose = int(input(options + ": "))
-        # filed = None if choose == 0 else fileds[choose-1]
-
-        # if code != None:
-        #     fund_dict = get_fund_dic_from_dpt(code)
-        #     for key, value in fund_dict.items():
-        #         print(colored(f"{key}: {value}", "green"))
-        #     return
-
-        # if filed != None:
-        #     filed_pd = get_filed_pd_from_dpt(filed)
-        #     print(colored(f"展示 {filed} 领域的基金", "green"))
-        #     print(filed_pd)
-        #     return
-
-        # funds_dp = get_all_pd_from_dpt()
-        # print(colored(f"展示所有持仓的基金", "green"))
-        # print(funds_dp)
-        # return
 
 
 class Analyst():

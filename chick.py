@@ -66,7 +66,7 @@ def main():
         farmer.job_run(args.job)
         return 0
     elif args.show:
-        farmer.show()
+        farmer.statistician.show()
         return 0
 
     if args.add or args.delete:

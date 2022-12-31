@@ -34,19 +34,11 @@ class AssetsTable(Base):
     @staticmethod
     def get_holding_by_filed(filed):
         # 仅包含持仓中的基金
-        return Database().query(AssetsTable).filter_by(filed=filed) \
-            .filter_by(position != 0) \
-            .all()
-
-    @staticmethod
-    def get_all_holding():
-        return Database().query(AssetsTable).filter_by(status=Status.HOLD).all()
-
-    @staticmethod
-    def get_all_holding_code():
-        all_holding = AssetsTable.get_all_holding()
-        all_holding_code = [dpt.code for dpt in all_holding]
-        return all_holding_code
+        res = []
+        for fund in Database().query(AssetsTable).filter_by(filed=filed).all():
+            if fund.position != 0:
+                res.append(fund)
+        return res
 
     @staticmethod
     def get_all():
@@ -61,61 +53,3 @@ class AssetsTable(Base):
                 continue
             attrs.append(attr)
         return attrs
-
-
-def get_fund_dic_from_dpt(code):
-    '''
-    获取 tbl_assets 表中指定基金的dict，仅可作为展示
-    '''
-    fund_dpt = AssetsTable.get_by_code(code)
-    if not fund_dpt:
-        return {}
-
-    fund_dpt_dic = {}
-    for attr in fund_dpt.get_attrs():
-        value = getattr(fund_dpt, attr)
-        fund_dpt_dic[attr] = str(value)
-    return fund_dpt_dic
-
-
-def get_filed_pd_from_dpt(filed):
-    '''
-    获取 tbl_assets 表中指定领域的df，仅可作为展示
-    '''
-    funds = AssetsTable.get_holding_by_filed(filed)
-    df = pd.DataFrame(columns=['name', 'code', 'buying', 'selling',
-                               'position', 'profit', 'profit_rate', 'priority',])
-    for f in funds:
-        tmp_pd = pd.DataFrame({'name': [f.name],
-                               'code': [f.code],
-                               'buying': [f.buying],
-                               'selling': [f.selling],
-                               'position': [f.position],
-                               'profit': [f.profit],
-                               'profit_rate': [f.profit_rate],
-                               'priority': [f.priority]
-                               })
-        df = pd.concat([df, tmp_pd])
-    return df.sort_values(by='priority').reset_index(drop=True)
-
-
-def get_all_pd_from_dpt():
-    '''
-    获取 tbl_assets 表中所有基金的df，仅可作为展示
-    '''
-    funds = AssetsTable.get_all_holding()
-    df = pd.DataFrame(columns=['name', 'code', "filed", 'buying', 'selling',
-                               'position', 'profit', 'profit_rate', 'priority',])
-    for f in funds:
-        tmp_pd = pd.DataFrame({'name': [f.name],
-                               'code': [f.code],
-                               'filed': [f.filed],
-                               'buying': [f.buying],
-                               'selling': [f.selling],
-                               'position': [f.position],
-                               'profit': [f.profit],
-                               'profit_rate': [f.profit_rate],
-                               'priority': [f.priority]
-                               })
-        df = pd.concat([df, tmp_pd])
-    return df.sort_values(by='filed').reset_index(drop=True)

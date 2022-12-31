@@ -9,7 +9,7 @@ from ChickenFarm.src.db.db_fund import Database
 from ChickenFarm.src.db.tbl_funds_for_backtest import FundsForBacktestTable
 from ChickenFarm.src.db.db_netvalue import FundNetValue
 from ChickenFarm.src.db.db_backtest import FundBacktest
-from src.module.backtest_mod import StupidPlan
+from ChickenFarm.src.module.backtest_mod import StupidPlan
 from ChickenFarm.src.util.tools import XAlphaTools
 from ChickenFarm.src.util.log import get_logger
 

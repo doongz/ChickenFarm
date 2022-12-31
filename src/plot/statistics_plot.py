@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from pandas.plotting import register_matplotlib_converters
 
 from ChickenFarm.src.module.statistics_mod import get_fileds_position, get_fileds_profit
-from src.util.types import get_fileds_color, get_fileds_en, get_fileds_cn
+from ChickenFarm.src.util.industry_class import get_fileds_color, get_fileds_en, get_fileds_cn
 from ChickenFarm.src.db.db_fund import Database
 from ChickenFarm.src.util.tools import DateTools
 from ChickenFarm.src.util.config import Config
@@ -43,7 +43,7 @@ def export_position_bar_chart(show=False):
         plt.text(a, b+100, b, ha='center', va='bottom')
 
     if show:
-        plt.show()
+        plt.show(block=False)
     else:
         plt.savefig(os.path.join(
             config.export_chart_path, 'position_bar_chart.png'))
@@ -68,7 +68,7 @@ def export_profit_bar_chart(show=False):
         plt.text(b, a, b, ha='center', va='center')
 
     if show:
-        plt.show()
+        plt.show(block=False)
     else:
         plt.savefig(os.path.join(
             config.export_chart_path, 'profit_bar_chart.png'))
@@ -103,7 +103,7 @@ def export_position_profit_bar_chart(show=False):
     ax.yaxis.grid(True)
 
     if show:
-        plt.show()
+        plt.show(block=False)
     else:
         plt.savefig(os.path.join(config.export_chart_path,
                     'position&profit_bar_chart.png'))
@@ -139,7 +139,7 @@ def export_position_pie_chart(show=False):
     ax.set_title(f"各领域持仓占比 {DateTools.today()}")
 
     if show:
-        plt.show()
+        plt.show(block=False)
     else:
         plt.savefig(os.path.join(
             config.export_chart_path, 'position_pie_chart.png'))
@@ -170,7 +170,7 @@ def export_history_position_line_chart(show=False):
     ax.legend(loc='upper left')  # 图例
 
     if show:
-        plt.show()
+        plt.show(block=False)
     else:
         plt.savefig(os.path.join(config.export_chart_path,
                     'history_position_line_chart.png'))
@@ -201,7 +201,7 @@ def export_history_profit_line_chart(show=False):
     ax.legend(loc='upper left')  # 图例
 
     if show:
-        plt.show()
+        plt.show(block=False)
     else:
         plt.savefig(os.path.join(config.export_chart_path,
                     'history_profit_line_chart.png'))
