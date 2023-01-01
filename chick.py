@@ -31,8 +31,8 @@ def main():
                        action='store_true',
                        help='绘制各领域基金回测的小提琴图')
 
-    group.add_argument('-assets',
-                       dest='assets',
+    group.add_argument('-update',
+                       dest='update',
                        action='store_true',
                        help='从天天基金获取最新资产数据，更新至数据库中')
     group.add_argument('-record',
@@ -85,8 +85,8 @@ def main():
     elif args.plots:
         farmer.analyst.draw_backtest_plots()
 
-    elif args.assets:
-        farmer.operator.update_assets()
+    elif args.update:
+        farmer.operator.update()
     elif args.record:
         farmer.statistician.record_history()
     elif args.tables:

@@ -6,7 +6,7 @@ from termcolor import colored
 import ChickenFarm.src.plot.aip_plot as aip_plot
 import ChickenFarm.src.plot.statistics_plot as st_plot
 from ChickenFarm.src.module.operate_mod import add_fund, delete_fund
-from ChickenFarm.src.module.operate_mod import get_assets, update_assets, record_history
+from ChickenFarm.src.module.operate_mod import get_assets, update_assets, get_investments, update_investments, record_history
 from ChickenFarm.src.module.statistics_mod import get_filed_dataframe
 from ChickenFarm.src.module.transport_mod import transport_netvalue_multiprocess, transport_backtest_data_multiprocess
 from ChickenFarm.src.util.industry_class import get_fileds_en, get_fileds_cn
@@ -64,14 +64,19 @@ class Operator():
         delete_fund(code=code)
         print(colored(f"删除基金: {code}", "green"))
 
-    def update_assets(self):
+    def update(self):
         # 从天天基金获取持仓数据，更新至数据库中
-        df = get_assets()
-        for _, row in df.iterrows():
+        df_asts = get_assets()
+        for _, row in df_asts.iterrows():
             update_assets(row)
-
-        print(colored(df, "green"))
+        print(colored(df_asts, "green"))
         print(colored(f"自动更新持仓数据完成。", "green"))
+
+        df_invs = get_investments()
+        for _, row in df_invs.iterrows():
+            update_investments(row)
+        print(colored(df_invs, "green"))
+        print(colored(f"自动更新定投数据完成。", "green"))
 
 
 class Statistician():
@@ -92,6 +97,7 @@ class Statistician():
         st_plot.export_profit_bar_chart(is_show)
         st_plot.export_position_profit_bar_chart(is_show)
         st_plot.export_position_pie_chart(is_show)
+        st_plot.export_investment_bar_chart(is_show)
         # st_plot.export_history_position_line_chart(is_show)
         # st_plot.export_history_profit_line_chart(is_show)
         print(colored(f"绘制图表完成。", "green"))
@@ -155,7 +161,7 @@ class Farmer:
         4. 导出个人数据统计表
         5. 导出个人数据统计图
         """
-        self.operator.update_assets()
+        self.operator.update()
         self.statistician.record_history()
         self.statistician.export_tables()
         self.statistician.draw_charts()

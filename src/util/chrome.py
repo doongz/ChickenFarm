@@ -41,7 +41,7 @@ class ChromeDriver():
                    message=message)
 
     @retry(exceptions=(TimeoutException, StaleElementReferenceException), tries=3, delay=3)
-    def query_position(self):
+    def query_assets(self):
         '''
         获取仓位数据
         '''
@@ -70,5 +70,38 @@ class ChromeDriver():
         finally:
             self.driver.quit()
         positions = positions[1:]  # 去除标题列名
-        logger.info(f"Query positions:{len(positions)} success.")
+        logger.info(f"Query assets: {len(positions)} success.")
         return positions
+
+    @retry(exceptions=(TimeoutException, StaleElementReferenceException), tries=3, delay=3)
+    def query_investments(self):
+        """
+        获取定投数据
+        """
+        try:
+            url = "https://trade.1234567.com.cn/Investment/default"
+            self._login(url)
+            self._wait(by=By.CLASS_NAME, value='mctb')
+
+            timeout = 5
+            while True:
+                investments = []
+                tables = self.driver.find_elements(By.CLASS_NAME, 'mctb')
+                for table in tables:
+                    tag_elements = table.find_elements(By.TAG_NAME, 'tr')
+                    for tag in tag_elements:
+                        investments.append(tag.text)
+
+                if "数据加载中" not in "".join(investments):
+                    break
+                elif timeout < 0:
+                    raise Exception(f"Query position timeout.")
+                else:
+                    logger.warning(f"数据加载中..., 正在重试。")
+                    time.sleep(1)
+                    timeout -= 1
+
+        finally:
+            self.driver.quit()
+        logger.info(f"Query assets: {len(investments)} success.")
+        return investments

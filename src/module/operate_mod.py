@@ -3,6 +3,7 @@ from decimal import Decimal
 
 from ChickenFarm.src.db.db_fund import Database
 from ChickenFarm.src.db.tbl_assets import AssetsTable
+from ChickenFarm.src.db.tbl_investments import InvestmentsTable
 from ChickenFarm.src.db.tbl_history import HistoryTable
 from ChickenFarm.src.db.tbl_funds_for_backtest import FundsForBacktestTable
 from ChickenFarm.src.util.industry_class import get_fileds_en
@@ -42,9 +43,22 @@ def add_fund(code, *args, **kwargs):
                 f"filed:{fund_dpt.filed}, comment:{fund_dpt.comment}.")
 
 
+def delete_fund(code, *args, **kwargs):
+    '''
+    删除 tbl_funds_for_backtest 表中一条基金记录
+    '''
+    fund_dpt = FundsForBacktestTable.get_by_code(code)
+    if not fund_dpt:
+        raise FundNotFoundError(f"Not found {code} in tbl_funds_for_backtest.")
+
+    Database().delete(fund_dpt)
+    logger.info(
+        f"Delete {fund_dpt.name}({fund_dpt.code}) from tbl_funds_for_backtest.")
+
+
 def get_assets():
 
-    positions = ChromeDriver().query_position()
+    positions = ChromeDriver().query_assets()
 
     df = pd.DataFrame(columns=['name', 'code', 'position'])
     for p in positions:
@@ -56,9 +70,9 @@ def get_assets():
         ['易方达蓝筹精选混合（005827）', '混合型最新净值：2.1693（12-29）',
             '3,647.09', '-77.91', '-2.10%', '买入卖出明细']
         也可能有个状态 '有在途交易'
-        ['前海开源金银珠宝混合A（001302）', '混合型最新净值：1.2200（12-29）', '1,272.01', '有在途交易', '22.01', '1.78%', '买入卖出明细']
+        ['前海开源金银珠宝混合A（001302）', '混合型最新净值：1.2200（12-29）',
+            '1,272.01', '有在途交易', '22.01', '1.78%', '买入卖出明细']
         """
-        print(p)
         if p[-3] == '--':
             p[-3] = "0.00"
         if p[-2] == '--':
@@ -71,21 +85,8 @@ def get_assets():
                                'profit_rate': [Decimal(p[-2][:-1]).quantize(Decimal('0.0000')) / 100],
                                })
         df = pd.concat([df, tmp_pd])
-
+    df = df.reset_index(drop=True)
     return df
-
-
-def delete_fund(code, *args, **kwargs):
-    '''
-    删除 tbl_funds_for_backtest 表中一条基金记录
-    '''
-    fund_dpt = FundsForBacktestTable.get_by_code(code)
-    if not fund_dpt:
-        raise FundNotFoundError(f"Not found {code} in tbl_funds_for_backtest.")
-
-    Database().delete(fund_dpt)
-    logger.info(
-        f"Delete {fund_dpt.name}({fund_dpt.code}) from tbl_funds_for_backtest.")
 
 
 def update_assets(row, *args, **kwargs):
@@ -138,6 +139,71 @@ def update_assets(row, *args, **kwargs):
     logger.info(f"Update asserts {fund_dpt.name}({fund_dpt.code}), "
                 f"position({fund_dpt.position}), netvalue({fund_dpt.netvalue}), "
                 f"profit({fund_dpt.profit}), profit_rate({fund_dpt.profit_rate}).")
+
+
+def get_investments():
+    investments = ChromeDriver().query_investments()
+    df = pd.DataFrame(
+        columns=['name', 'code', 'amount', 'period', 'data', 'state'])
+    for inv in investments:
+        if len(inv) == 0:  # 跳过空行
+            continue
+        if not ("每周" in inv or "星期" in inv):  # 去掉无效的行
+            continue
+        inv = inv.replace(' ', '\n').split('\n')
+
+        """
+        ['005669', '前海开源公用事业股票', '活期宝', '农业银行', '|', '1578',
+            '10.00', '每周', '星期一', '2023-01-03', '正常', '暂不支持']
+        """
+        tmp_pd = pd.DataFrame({'name': [inv[1]],
+                               'code': [inv[0]],
+                               'amount': [Decimal(inv[6]).quantize(Decimal('0.00'))],
+                               'period': [inv[7]],
+                               'data': [inv[8]],
+                               'state': [inv[10]],
+                               })
+        df = pd.concat([df, tmp_pd])
+    df = df.reset_index(drop=True)
+    return df
+
+
+def update_investments(row, *args, **kwargs):
+    """
+    上传基金最新定投数据
+    name      华安纳斯达克100ETF联接(QDII)A
+    code                             040046
+    amount                            20.00
+    period                             每周
+    data                             星期一
+    state                              正常
+    Name: 0, dtype: object
+    """
+    fund = InvestmentsTable.get_by_code(row['code'])
+
+    if not fund:
+        logger.info(f"Add fund {row['code']} in tbl_investments.")
+        fund = InvestmentsTable()
+
+        fund.name = row['name']
+        fund.code = row['code']
+        fund.amount = row['amount']
+        fund.period = row['period']
+        fund.data = row['data']
+        fund.state = row['state']
+        Database().add(fund)
+    else:
+        fund.name = row['name']
+        fund.amount = row['amount']
+        fund.period = row['period']
+        fund.data = row['data']
+        fund.state = row['state']
+
+        Database().update()
+
+    logger.info(f"Update investment {fund.name}({fund.code}), "
+                f"amount({fund.amount}), period({fund.period}), "
+                f"data({fund.data}), state({fund.state}).")
 
 
 def record_history():

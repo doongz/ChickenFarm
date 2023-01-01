@@ -26,6 +26,24 @@ def get_fileds_position():
     return data
 
 
+def get_fileds_investment():
+    df = Database().to_df('tbl_assets')
+    code_to_filed = defaultdict(int)
+    for _, row in df.iterrows():
+        code_to_filed[row['code']] = row["filed"]
+
+    df = Database().to_df('tbl_investments')
+    filed_to_amount = defaultdict(int)
+    for _, row in df.iterrows():
+        filed_to_amount[code_to_filed[row['code']]] += row["amount"]
+
+    data = []
+    keys = get_fileds_en()
+    for en in keys:
+        data.append(filed_to_amount[en])
+    return data
+
+
 def get_fileds_profit():
     df = Database().to_df('tbl_assets')
     data_map = defaultdict(int)

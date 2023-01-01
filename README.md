@@ -43,16 +43,8 @@
 
 计划进行重构，特性：
 
-- 定投导致成本和收益计算错误
-- 定投回测分析参考 xalpha 内置的 backtest
-- 完善全量系统测试 python chick.py -job base_job && python chick.py -job backtest_job
-
-tbl_assets 存储最新信息，里面的基金由页面上的自动采集（采集后需要手动配置领域，才能展示）
-tbl_fund_history 存储每个基金的历史信息
-tbl_operation_record 记录的一些操作
-
-
-tbl_funds_for_backtest 专门为回测使用，需要手动往里面添加
+- 定投份额采集，和绘图
+- 自动跳过花窗
 
 
 ## Features

@@ -20,6 +20,19 @@ CREATE TABLE `tbl_assets` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='基金的各项最新数据'
 ;
 
+CREATE TABLE `tbl_investments` (
+  `name` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '名称',
+  `code` char(6) NOT NULL COMMENT '代码',
+  `amount` decimal(10,2) DEFAULT '0.00' COMMENT '每期金额',
+  `period` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '扣款周期',
+  `data` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '扣款日期',
+  `state` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '计划状态',
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '更新日期',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (`code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='基金的各项最新数据'
+;
+
 /******************************************/
 /*   DatabaseName = db_fund_test   */
 /*   TableName = tbl_funds_for_backtest   */

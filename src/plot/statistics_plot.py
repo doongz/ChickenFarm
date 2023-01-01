@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from pandas.plotting import register_matplotlib_converters
 
-from ChickenFarm.src.module.statistics_mod import get_fileds_position, get_fileds_profit
+from ChickenFarm.src.module.statistics_mod import get_fileds_position, get_fileds_profit, get_fileds_investment
 from ChickenFarm.src.util.industry_class import get_fileds_color, get_fileds_en, get_fileds_cn
 from ChickenFarm.src.db.db_fund import Database
 from ChickenFarm.src.util.tools import DateTools
@@ -19,6 +19,33 @@ register_matplotlib_converters()
 FIGSIZE = (10, 5)
 COLORS = ['limegreen', 'dodgerblue', 'mediumorchid', 'lightskyblue',
           'silver', 'gold', 'coral', 'orange', 'royalblue', 'slategray']
+
+
+def export_investment_bar_chart(show=False):
+    # 导出当前每个领域定投的柱状图
+    data = get_fileds_investment()
+    lables = get_fileds_cn()
+    color = get_fileds_color()
+    fig, ax = plt.subplots(nrows=1, ncols=1, figsize=FIGSIZE)
+    bar_plot = ax.bar(x=lables,
+                      height=data,
+                      width=0.5,
+                      color=color)
+
+    ax.set_title(f"各领域最新定投 {DateTools.today()}")
+    ax.set_ylabel('数额')
+    ax.yaxis.grid(True)
+
+    # 显示在图形上的值
+    for a, b in zip(lables, data):
+        plt.text(a, b, b, ha='center', va='bottom')
+
+    if show:
+        plt.show(block=False)
+    else:
+        plt.savefig(os.path.join(
+            config.export_chart_path, 'investment_bar_chart.png'))
+        logger.info(f"Successfully exported investment bar chart.")
 
 
 def export_position_bar_chart(show=False):
@@ -40,7 +67,7 @@ def export_position_bar_chart(show=False):
 
     # 显示在图形上的值
     for a, b in zip(lables, data):
-        plt.text(a, b+100, b, ha='center', va='bottom')
+        plt.text(a, b+100, b, ha='center', va='bottom')   # b+100 柱形数值高度位置
 
     if show:
         plt.show(block=False)
