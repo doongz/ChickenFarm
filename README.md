@@ -39,14 +39,6 @@
 
 非专业养鸡场:hatching_chick::hatched_chick::baby_chick:，统计购买和卖出操作，分析持仓和收益，爬取基金净值，使用各种定投算法回测分析，生成投资策略 :chart_with_upwards_trend::chart_with_upwards_trend::chart_with_upwards_trend:
 
-## Todo
-
-计划进行重构，特性：
-
-- 定投份额采集，和绘图
-- 自动跳过花窗
-
-
 ## Features
 - 全自动数据采集（天天基金购买记录、最新持仓采集）
 - 爬取最新基金净值
@@ -55,55 +47,70 @@
 
 ## Installation
 
-> 本项目，想要部署、调通是有一定难度的。
+### 1、准备 Mysql 数据库
 
-### 0、准备 Mysql 数据库
-- 推荐 [阿里云](https://cn.aliyun.com/product/rds/mysql)，一年19.9，阿里云打:moneybag:
-- 数据库 **db_fund** 使用[sql文件](./sql/DDL_db_fund.sql)整库建表
-- 数据库 **db_netvalue** 库名保持一致，无需建表
-- 数据库 **db_backtest** 库名保持一致，无需建表
+1. 创建数据库 **db_fund**，使用[sql文件](./sql/DDL_db_fund.sql)整库建表
+2. 数据库 **db_netvalue**，无需建表
+3. 数据库 **db_backtest**，无需建表
 
-### 1、填写配置表
-将 [配置表(farmConfig.json)](./farmConfig.json) 移动到项目目录外，按照注释填写配置表。**该表涉及账号密码，请勿提交此表！！！**
+### 2、填写配置表
 
-### 2、配置环境变量
+将 [配置文件(config.yaml)](./config.yaml) ，按照注释填写配置表。
+
+### 3、配置环境变量
+
 ```shell
 echo "export PYTHONPATH=$PYTHONPATH:<项目所在的父目录>" >> ~/.bash_profile
-echo "export FARM_CONFIG_PATH=<配置表(farmConfig.json)路径>" >> ~/.bash_profile
+echo "export FARM_CONFIG_PATH=<配置文件(config.yaml)路径" >> ~/.bash_profile
 source ~/.bash_profile
 ```
 
-### 3、安装依赖包
+将 `<>` 替换成自己的配置
+
+### 4、安装依赖包
+
 ```shell
-python3 -m pip install -r requirements.txt
+python -m pip install -r requirements.txt
 ```
+
 ## Usage
 
 ### 回测
 
-1. 添加基金
+将需要分析的基金添加至数据库（之后不用再添加），根据提示选择分类
 
 ```shell
-python3 chick.py -add -c <code>
+python chick.py -add -c `code`
 ```
 
-2. 执行回测分析任务
+执行回测分析任务
 
 ```shell
-python3 chick.py -job backtest_job
+python chick.py -job backtest_job
 ```
+
+1. 把基金的历史净值上传至 db_netvalue 数据库中
+2. 更新回测分析数据
+3. 导出回测分析图表
 
 ### 个人数据分析
 
+执行个人数据分析任务
+
 ```shell
-python3 chick.py -job base_job
+python chick.py -job base_job
 ```
 
+1. 更新本周的操作记录，
+2. 更新本周所有基金的持仓
+3. 统计并记录本周各个领域的持仓、收益
+4. 导出个人数据统计表
+5. 导出个人数据统计图
 
 ### 二、CLI
 
 ```shell
-python3 chick.py
+python chick.py
 ```
 
 #### 1、操作
@@ -112,8 +119,6 @@ python3 chick.py
 | :------------------------------ | :--------------------------------------------- |
 | -add -c `code`                  | 添加基金                                       |
 | -delete -c `code`               | 删除基金                                       |
-| -show                           | 展示指定领域基金数据                           |
-| -show -c `code`                 | 展示指定基金数据                               |
 | -assets            | 从天天基金获取最新资产数据，更新至数据库中         |
 
 #### 2、个人数据分析
@@ -123,6 +128,7 @@ python3 chick.py
 | -record | 统计并记录各个领域以及总的投入、持仓、收益历史               |
 | -tables         | 导出基金最新数据总表、每个领域合计表、历史购买表、历史仓位表、历史收益表 |
 | -charts         | 绘制个人数据图表                                             |
+| -show                           | 展示基金数据和图表                           |
 
 #### 3、回测分析
 
@@ -130,27 +136,7 @@ python3 chick.py
 | :-------------- | :--------------------------- |
 | -netvalue       | 更新基金历史净值数据         |
 | -backtest       | 回测，并将回测数据上传       |
-| -backtest-plots | 绘制各领域基金回测的小提琴图 |
-
-#### 4、执行任务
-
-```shell
-python chick.py -job base_job
-```
-
-1. 更新本周的操作记录，
-2. 更新本周所有基金的持仓
-3. 统计并记录本周各个领域的投入、持仓、收益
-4. 导出个人数据统计表
-5. 导出个人数据统计图
-
-```shell
-python chick.py -job backtest_job
-```
-
-1. 把基金的历史净值上传至 db_netvalue 数据库中
-2. 更新回测分析数据
-3. 导出回测分析图表
+| -plots | 绘制各领域基金回测的小提琴图 |
 
 ### 三、个人数据统计
 

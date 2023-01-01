@@ -1,5 +1,5 @@
 /******************************************/
-/*   DatabaseName = db_fund_test   */
+/*   DatabaseName = db_fund_v2   */
 /*   TableName = tbl_assets   */
 /******************************************/
 CREATE TABLE `tbl_assets` (
@@ -20,21 +20,8 @@ CREATE TABLE `tbl_assets` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='基金的各项最新数据'
 ;
 
-CREATE TABLE `tbl_investments` (
-  `name` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '名称',
-  `code` char(6) NOT NULL COMMENT '代码',
-  `amount` decimal(10,2) DEFAULT '0.00' COMMENT '每期金额',
-  `period` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '扣款周期',
-  `data` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '扣款日期',
-  `state` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '计划状态',
-  `update_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '更新日期',
-  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  PRIMARY KEY (`code`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='基金的各项最新数据'
-;
-
 /******************************************/
-/*   DatabaseName = db_fund_test   */
+/*   DatabaseName = db_fund_v2   */
 /*   TableName = tbl_funds_for_backtest   */
 /******************************************/
 CREATE TABLE `tbl_funds_for_backtest` (
@@ -52,7 +39,7 @@ CREATE TABLE `tbl_funds_for_backtest` (
 ;
 
 /******************************************/
-/*   DatabaseName = db_fund_test   */
+/*   DatabaseName = db_fund_v2   */
 /*   TableName = tbl_history   */
 /******************************************/
 CREATE TABLE `tbl_history` (
@@ -64,5 +51,22 @@ CREATE TABLE `tbl_history` (
   `profit_rate` decimal(5,4) DEFAULT '0.0000' COMMENT '收益率',
   `record_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '记录时间',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=124 DEFAULT CHARSET=utf8 COMMENT='各项的基金历史数据'
+) ENGINE=InnoDB AUTO_INCREMENT=155 DEFAULT CHARSET=utf8 COMMENT='各项的基金历史数据'
+;
+
+/******************************************/
+/*   DatabaseName = db_fund_v2   */
+/*   TableName = tbl_investments   */
+/******************************************/
+CREATE TABLE `tbl_investments` (
+  `name` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '名称',
+  `code` char(6) NOT NULL COMMENT '代码',
+  `amount` decimal(10,2) DEFAULT '0.00' COMMENT '每期金额',
+  `period` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '扣款周期',
+  `data` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '扣款日期',
+  `state` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '计划状态',
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '更新日期',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (`code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='基金的各项最新数据'
 ;

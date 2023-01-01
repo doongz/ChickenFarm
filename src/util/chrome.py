@@ -35,6 +35,9 @@ class ChromeDriver():
         self.driver.find_element(By.ID, 'protocolCheckbox').click()
         self.driver.find_element(By.ID, 'btn_login').click()
 
+        # TODO: 登陆时滑窗验证码解决
+        # https://zhuanlan.zhihu.com/p/558564102
+
     def _wait(self, by, value, timeout=10, frequency=0.5, message='Element not found'):
         WebDriverWait(driver=self.driver, timeout=timeout, poll_frequency=frequency) \
             .until(lambda x: x.find_element(by=by, value=value),

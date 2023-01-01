@@ -1,6 +1,7 @@
 import os
 import yaml
 import threading
+from datetime import datetime
 
 
 class Config(object):
@@ -75,6 +76,7 @@ class Config(object):
     def export_table_path(self):
         # 导出的个人数据统计表的路径
         path = self.config_data.get("EXPORT_TABLE_PATH")
+        path = os.path.join(path, datetime.today().strftime('%Y-%m-%d'))
         os.makedirs(path, exist_ok=True)
         return path
 
@@ -82,6 +84,7 @@ class Config(object):
     def export_chart_path(self):
         # 导出的个人数据图的路径
         path = self.config_data.get("EXPORT_CHART_PATH")
+        path = os.path.join(path, datetime.today().strftime('%Y-%m-%d'))
         os.makedirs(path, exist_ok=True)
         return path
 
@@ -89,6 +92,7 @@ class Config(object):
     def export_aip_plot_path(self):
         # 导出的回测分析图的路径
         path = self.config_data.get("EXPORT_AIP_PLOT_PATH")
+        path = os.path.join(path, datetime.today().strftime('%Y-%m-%d'))
         os.makedirs(path, exist_ok=True)
         return path
 
