@@ -172,14 +172,6 @@ python chick.py
 
 <img src="./docs/images/实际定投.png" alt="实际定投" style="zoom:60%;" />
 
-## Todo
-
-计划进行重构，特性：
-
-- 极简使用，甚至无需本地算力；
-- 无需申请数据库，使用本地 splite；
-- 支持回测分析，不在兼容个人数据统计；
-
 ## Contribute
 
 Contributions are always welcome!

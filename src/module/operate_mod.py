@@ -155,13 +155,17 @@ def get_investments():
         """
         ['005669', '前海开源公用事业股票', '活期宝', '农业银行', '|', '1578',
             '10.00', '每周', '星期一', '2023-01-03', '正常', '暂不支持']
+        or:
+        ['005669', '前海开源公用事业股票', '招商银行', '|', '4917', '10.00', 
+        '每周', '星期一', '2023-01-09', '正常', '暂不支持']
         """
+        print(inv)
         tmp_pd = pd.DataFrame({'name': [inv[1]],
                                'code': [inv[0]],
-                               'amount': [Decimal(inv[6]).quantize(Decimal('0.00'))],
-                               'period': [inv[7]],
-                               'data': [inv[8]],
-                               'state': [inv[10]],
+                               'amount': [Decimal(inv[5]).quantize(Decimal('0.00'))],
+                               'period': [inv[6]],
+                               'data': [inv[7]],
+                               'state': [inv[9]],
                                })
         df = pd.concat([df, tmp_pd])
     df = df.reset_index(drop=True)
