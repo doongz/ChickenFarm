@@ -11,8 +11,7 @@ SEMI = Industry("Semiconductor", "半导体", "mediumorchid")
 MEDI = Industry("Medical", "医疗", "lightskyblue")
 CONS = Industry("Consumption", "消费", "silver")
 FINA = Industry("Finance", "金融", "gold")
-HK = Industry("HongKong", "港股", "coral")
-US = Industry("United_States", "美股", "orange")
+QDII = Industry("QDII", "QDII基金", "coral")
 
 Fileds = [
     MANU,
@@ -21,8 +20,7 @@ Fileds = [
     MEDI,
     CONS,
     FINA,
-    HK,
-    US,
+    QDII,
 ]
 
 

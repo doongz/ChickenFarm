@@ -35,6 +35,7 @@ def get_fileds_investment():
     df = Database().to_df('tbl_investments')
     filed_to_amount = defaultdict(int)
     for _, row in df.iterrows():
+        if row['state'] == "暂停": continue
         filed_to_amount[code_to_filed[row['code']]] += row["amount"]
 
     data = []

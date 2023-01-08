@@ -43,7 +43,6 @@ def confirm(func):
 
 class Operator():
 
-    @confirm
     def add(self, code):
         # 「回测列表」中「添加」基金
         fileds = get_fileds_en()

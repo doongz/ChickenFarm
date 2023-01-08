@@ -17,22 +17,20 @@ register_matplotlib_converters()
 
 
 FIGSIZE = (10, 5)
-COLORS = ['limegreen', 'dodgerblue', 'mediumorchid', 'lightskyblue',
-          'silver', 'gold', 'coral', 'orange', 'royalblue', 'slategray']
 
 
 def export_investment_bar_chart(show=False):
     # 导出当前每个领域定投的柱状图
     data = get_fileds_investment()
     lables = get_fileds_cn()
-    color = get_fileds_color()
+    colors = get_fileds_color()
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=FIGSIZE)
     bar_plot = ax.bar(x=lables,
                       height=data,
                       width=0.5,
-                      color=color)
+                      color=colors)
 
-    ax.set_title(f"各领域最新定投 {DateTools.today()}")
+    ax.set_title(f"{DateTools.today()} 各领域最新定投 Total: 4*{sum(data)} ¥")
     ax.set_ylabel('数额')
     ax.yaxis.grid(True)
 
@@ -53,15 +51,15 @@ def export_position_bar_chart(show=False):
 
     data = get_fileds_position()
     lables = get_fileds_cn()
-    color = get_fileds_color()
+    colors = get_fileds_color()
 
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=FIGSIZE)
     bar_plot = ax.bar(x=lables,
                       height=data,
                       width=0.5,
-                      color=color)
+                      color=colors)
 
-    ax.set_title(f"各领域最新持仓 {DateTools.today()}")
+    ax.set_title(f"{DateTools.today()} 各领域最新持仓 Total: {sum(data)} ¥")
     ax.set_ylabel('数额')
     ax.yaxis.grid(True)
 
@@ -88,7 +86,7 @@ def export_profit_bar_chart(show=False):
                        width=data,
                        height=0.7,
                        color=colors)
-    ax.set_title(f"各领域最新收益 {DateTools.today()}")
+    ax.set_title(f"{DateTools.today()} 各领域最新收益 Total: {sum(data)} ¥")
     ax.xaxis.grid(True)
 
     for a, b in zip(labels, data):
@@ -123,7 +121,7 @@ def export_position_profit_bar_chart(show=False):
         plt.text(a, b+50, b, ha='center', va='bottom', fontsize=7)
 
     ax.set_ylabel('数额')
-    ax.set_title(f"各领域最新持仓 & 收益 {DateTools.today()}")
+    ax.set_title(f"{DateTools.today()} 各领域最新持仓 & 收益")
     ax.set_xticks(x)
     ax.set_xticklabels(label)
     ax.legend(fontsize=10)
@@ -143,10 +141,11 @@ def export_position_pie_chart(show=False):
     label = get_fileds_cn()
     position_data = get_fileds_position()
     p_sum = sum(position_data)
+    colors = get_fileds_color()
 
     fig, ax = plt.subplots(figsize=FIGSIZE, subplot_kw=dict(aspect="equal"))
     wedges, texts = ax.pie(position_data, wedgeprops=dict(
-        width=0.35), startangle=-40, colors=COLORS)
+        width=0.35), startangle=-40, colors=colors)
 
     bbox_props = dict(boxstyle="square,pad=0.3", fc="w", ec="k", lw=0.72)
     kw = dict(arrowprops=dict(arrowstyle="-"),
@@ -163,7 +162,7 @@ def export_position_pie_chart(show=False):
         ax.annotate(label[i]+' '+percent, xy=(x, y), xytext=(1.35*np.sign(x), 1.4*y),
                     horizontalalignment=horizontalalignment, **kw)
 
-    ax.set_title(f"各领域持仓占比 {DateTools.today()}")
+    ax.set_title(f"{DateTools.today()} 各领域持仓占比")
 
     if show:
         plt.show(block=False)
@@ -179,17 +178,18 @@ def export_history_position_line_chart(show=False):
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(10, 10))
     fileds = get_fileds_en()
     x = df['date'].tolist()
+    colors = get_fileds_color()
 
     for i, filed in enumerate(fileds):
         y = df[filed].tolist()
         ax.plot(x, y, label=filed,
-                color=COLORS[i], linestyle='-', marker='.', linewidth=1.5)
+                color=colors[i], linestyle='-', marker='.', linewidth=1.5)
 
         # 在最后一个数据点加标注
         for _x, _y in zip(x[-1:], y[-1:]):
             ax.text(_x, _y, _y, ha='center', va='bottom')
 
-    ax.set_title(f"各领域持仓历史 {DateTools.today()}")
+    ax.set_title(f"{DateTools.today()} 各领域持仓历史")
     ax.set_xticks(x)
     ax.set_xticklabels(list(map(lambda t: t.strftime('%Y-%m-%d'), x)))
     ax.yaxis.grid(True, linestyle='--')
@@ -210,17 +210,18 @@ def export_history_profit_line_chart(show=False):
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(10, 10))
     fileds = get_fileds_en()
     x = df['date'].tolist()
+    colors = get_fileds_color()
 
     for i, filed in enumerate(fileds):
         y = df[filed].tolist()
         ax.plot(x, y, label=filed,
-                color=COLORS[i], linestyle='-', marker='.', linewidth=1.5)
+                color=colors[i], linestyle='-', marker='.', linewidth=1.5)
 
         # 在最后一个数据点加标注
         for _x, _y in zip(x[-1:], y[-1:]):
             ax.text(_x, _y, _y, ha='center', va='bottom')
 
-    ax.set_title(f"各领域收益历史 {DateTools.today()}")
+    ax.set_title(f"{DateTools.today()} 各领域收益历史")
     ax.set_xticks(x)
     ax.set_xticklabels(list(map(lambda t: t.strftime('%Y-%m-%d'), x)))
     ax.yaxis.grid(True, linestyle='--')
