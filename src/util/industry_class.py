@@ -7,7 +7,7 @@ class Industry:
 
 MANU = Industry("Manufacture", "制造", "limegreen")
 RESO = Industry("Resource", "资源", "dodgerblue")
-SEMI = Industry("Semiconductor", "半导体", "mediumorchid")
+SEMI = Industry("Technology", "科技", "mediumorchid")
 MEDI = Industry("Medical", "医疗", "lightskyblue")
 CONS = Industry("Consumption", "消费", "silver")
 FINA = Industry("Finance", "金融", "gold")

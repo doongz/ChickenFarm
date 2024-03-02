@@ -82,7 +82,7 @@ def get_assets():
                                'netvalue': [p[1].split("：")[1].split("（")[0]],
                                'position': [Decimal(p[2].replace(",", "")).quantize(Decimal('0.00'))],
                                'profit': [Decimal(p[-3].replace(",", "")).quantize(Decimal('0.00'))],
-                               'profit_rate': [Decimal(p[-2][:-1]).quantize(Decimal('0.0000')) / 100],
+                               'profit_rate': [Decimal(p[-2][:-1].replace(",", "")).quantize(Decimal('0.0000')) / 100],
                                })
         df = pd.concat([df, tmp_pd])
     df = df.reset_index(drop=True)

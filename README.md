@@ -73,6 +73,14 @@ source ~/.bash_profile
 python -m pip install -r requirements.txt
 ```
 
+> [!IMPORTANT]
+>
+> 每年都需要更新一下 chinesecalendar 包
+>
+> ```bash
+> pip install chinesecalendar
+> ```
+
 ## Usage
 
 ### 回测
