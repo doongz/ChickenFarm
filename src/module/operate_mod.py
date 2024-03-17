@@ -161,9 +161,17 @@ def get_investments():
         ['162411', '华宝标普油气上游股票人民币A', '招商银行', '|', '4917', '20.00', 
         '每周', '星期五', '已暂停', '暂停', '恢复', '|', '更多']
         """
+        if "~" in inv[5]:
+            # 如果是浮动的定投策略，获得的定投份额是个范围值 20.00~80.00
+            low = float(inv[5].split("~")[0])
+            hight = float(inv[5].split("~")[1])
+            amount = Decimal(low + (hight-low)/2).quantize(Decimal('0.00'))
+        else:
+            amount = Decimal(inv[5]).quantize(Decimal('0.00'))
+
         tmp_pd = pd.DataFrame({'name': [inv[1]],
                                'code': [inv[0]],
-                               'amount': [Decimal(inv[5]).quantize(Decimal('0.00'))],
+                               'amount': [amount],
                                'period': [inv[6]],
                                'data': [inv[7]],
                                'state': [inv[9]],
