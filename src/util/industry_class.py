@@ -12,6 +12,7 @@ MEDI = Industry("Medical", "医疗", "lightskyblue")
 CONS = Industry("Consumption", "消费", "silver")
 FINA = Industry("Finance", "金融", "gold")
 QDII = Industry("QDII", "QDII基金", "coral")
+BOND = Industry("Bond", "债券", "red")
 
 Fileds = [
     MANU,
@@ -21,6 +22,7 @@ Fileds = [
     CONS,
     FINA,
     QDII,
+    BOND,
 ]
 
 
