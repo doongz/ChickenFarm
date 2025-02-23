@@ -79,6 +79,7 @@ python -m pip install -r requirements.txt
 >
 > ```bash
 > pip install chinesecalendar
+> pip install -U xalpha
 > ```
 
 ## Usage
