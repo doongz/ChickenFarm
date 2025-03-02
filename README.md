@@ -82,6 +82,12 @@ python -m pip install -r requirements.txt
 > pip install -U xalpha
 > ```
 
+ChromeDriver 下载，需要与Chrome版本对应
+
+https://developer.chrome.com/docs/chromedriver/downloads
+
+cp chromedriver-mac-x64/chromedriver /usr/local/bin
+
 ## Usage
 
 ### 回测

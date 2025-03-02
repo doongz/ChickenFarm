@@ -21,10 +21,12 @@ class Singleton(type):
 class Database(metaclass=Singleton):
 
     def __init__(self):
+        # self.engine = create_engine(
+        #     f"mysql+pymysql://{config.db_username}:{config.db_password}@{config.db_address}:{config.db_port}/{config.db_fund}"
+        # )
         self.engine = create_engine(
-            f"mysql+pymysql://{config.db_username}:{config.db_password}@{config.db_address}:{config.db_port}/{config.db_fund}"
+            f"mysql+pymysql://{config.db_username}@{config.db_address}:{config.db_port}/{config.db_fund}"
         )
-
         # 创建DBSession类型:
         DBSession = sessionmaker(bind=self.engine)
         # 创建session对象:
