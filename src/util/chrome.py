@@ -48,30 +48,28 @@ class ChromeDriver():
         '''
         获取仓位数据
         '''
-        try:
-            url = "https://trade.1234567.com.cn/MyAssets/hold"
-            self._login(url)
-            self._wait(by=By.CLASS_NAME, value='table-hold')
+        url = "https://trade.1234567.com.cn/MyAssets/hold"
+        self._login(url)
+        self._wait(by=By.ID, value='fundlist')
+        time.sleep(3) # 强行等数据刷出来，上面一行没用等到也没数据
 
-            timeout = 5
-            while True:
-                positions = []
-                tag_elements = self.driver.find_element(
-                    By.CLASS_NAME, 'table-hold').find_elements(By.TAG_NAME, 'tr')
-                for tag in tag_elements:
-                    positions.append(tag.text)
+        timeout = 5
+        positions = []
+        while True:
+            # 这里网站里的元素变化了，这里要重新改
+            tag_elements = self.driver.find_element(By.ID, 'fundlist').find_elements(By.TAG_NAME, 'ul')
+            for tag in tag_elements:
+                positions.append(tag.text)
 
-                if "数据加载中" not in "".join(positions):
-                    break
-                elif timeout < 0:
-                    raise Exception(f"Query position timeout.")
-                else:
-                    logger.warning(f"数据加载中..., 正在重试。")
-                    time.sleep(1)
-                    timeout -= 1
+            if "数据加载中" not in "".join(positions):
+                break
+            elif timeout < 0:
+                raise Exception(f"Query position timeout.")
+            else:
+                logger.warning(f"数据加载中..., 正在重试。")
+                time.sleep(1)
+                timeout -= 1
 
-        finally:
-            self.driver.quit()
         positions = positions[1:]  # 去除标题列名
         logger.info(f"Query assets: {len(positions)} success.")
         return positions

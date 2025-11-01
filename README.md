@@ -45,9 +45,31 @@
 - [个人数据分析](#个人数据统计图)
 - [定投回测分析](#定投分析图)
 
+**2022.03.17 按照策略进行的实际定投情况，大多数买在了相对较低的点上。**
+
+<img src="./docs/images/实际定投.png" alt="实际定投" style="zoom:60%;" />
+
+**2025.10.22 更新一下定投四年来的收益。**
+
+自2021.07.23开户以来，最大收益为28.60%。同期沪深300为-9.76%。目前年化6.09%。
+
+<img src="./docs/images/PixPin_2025-10-22_22-53-13.png" alt="PixPin_2025-10-22_22-53-13" style="zoom:50%;" />
+
+部分基金的收益在50%以上。
+
+<img src="./docs/images/PixPin_2025-10-22_22-51-25.png" alt="PixPin_2025-10-22_22-51-25" style="zoom:50%;" />
+
 ## Installation
 
 ### 1、准备 Mysql 数据库
+
+```bash
+brew install mysql
+brew services start mysql
+brew services stop mysql
+brew services restart mysql
+brew services info mysql
+```
 
 1. 创建数据库 **db_fund**，使用[sql文件](./sql/DDL_db_fund.sql)整库建表
 2. 数据库 **db_netvalue**，无需建表
@@ -70,7 +92,7 @@ source ~/.bash_profile
 ### 4、安装依赖包
 
 ```shell
-python -m pip install -r requirements.txt
+python3 -m pip install -r requirements.txt
 ```
 
 > [!IMPORTANT]
@@ -88,6 +110,14 @@ https://developer.chrome.com/docs/chromedriver/downloads
 
 cp chromedriver-mac-x64/chromedriver /usr/local/bin
 
+关闭chrome自动升级
+
+```shell
+sudo defaults write com.google.Keystone.Agent checkInterval 0
+sudo defaults write com.google.Keystone.Installer checkInterval 0
+```
+
+
 ## Usage
 
 ### 回测
@@ -95,13 +125,13 @@ cp chromedriver-mac-x64/chromedriver /usr/local/bin
 将需要分析的基金添加至数据库（之后不用再添加），根据提示选择分类
 
 ```shell
-python chick.py -add -c `code`
+python3 chick.py -add -c `code`
 ```
 
 执行回测分析任务
 
 ```shell
-python chick.py -job backtest_job
+python3 chick.py -job backtest_job
 ```
 
 1. 把基金的历史净值上传至 db_netvalue 数据库中
@@ -113,7 +143,7 @@ python chick.py -job backtest_job
 执行个人数据分析任务
 
 ```shell
-python chick.py -job base_job
+python3 chick.py -job base_job
 ```
 
 1. 更新本周的操作记录，
@@ -125,7 +155,7 @@ python chick.py -job base_job
 ### 二、CLI
 
 ```shell
-python chick.py
+python3 chick.py
 ```
 
 #### 1、操作
@@ -183,9 +213,7 @@ python chick.py
 
 ![aip_backtest](./docs/images/3.png)
 
-按照策略进行的实际定投情况，大多数买在了相对较低的点上
 
-<img src="./docs/images/实际定投.png" alt="实际定投" style="zoom:60%;" />
 
 ## Contribute
 
