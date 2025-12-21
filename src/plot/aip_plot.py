@@ -1,6 +1,8 @@
 import os
 import math
+import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MultipleLocator
 import multiprocessing
 
 from src.module.backtest_mod import AutomaticInvestmentPlan
@@ -77,19 +79,45 @@ def export_aip_violin_plot_by_filed(filed, show=False):
                      fontsize=30)
 
         i = 0
+        low_high = [[(0,0) for _ in range(cols) ] for _ in range(rows)]
         for name, fund_df in df_dict.items():
             # 这里 *100 变为百分比
             bodies = [fund_df.loc[fund_df['week'] == day]
-                      ['profit_rate']*100 for day in range(1, 6)]
-            violin_plot = axs[math.floor(i/cols)][i % cols].violinplot(bodies,
-                                                                       showmeans=False,  # 均值
-                                                                       showmedians=True,  # 中位数
-                                                                       showextrema=True,  # 极值
-                                                                       )
-            axs[math.floor(i/cols)][i % cols].set_title(name)
+                      ['profit_rate']*100 for day in range(1, 6)] # 5天
+            
+            low = float("inf")
+            high = float("-inf")
+            for i_i in range(5): # 5天
+                low = min(low, bodies[i_i].min())
+                high = max(high, bodies[i_i].max())
+            low_high[i//cols][i%cols] = (low, high)
+            
+            ax = axs[math.floor(i/cols)][i % cols]
+            violin_plot = ax.violinplot(bodies,
+                                        showmeans=False,  # 均值
+                                        showmedians=True,  # 中位数
+                                        showextrema=True,  # 极值
+                                        )
+            ax.set_title(name)
             i += 1
 
-        # adding horizontal grid lines
+        # 为每个子图添加y坐标最大最小值和间隔
+        interval = 2
+        for r in range(rows):
+            max_range = 0 # 找到每一行的最大跨度
+            for c in range(cols):
+                low = low_high[r][c][0]
+                high = low_high[r][c][1]
+                max_range = max(max_range, high-low)
+            for c in range(cols):
+                low = low_high[r][c][0]
+                high = low_high[r][c][1]
+                d = (max_range - (high - low)) / 2
+                ytick_low = low - d
+                ytick_high = high + d
+                axs[r][c].set_yticks(np.arange(ytick_low, ytick_high + 1, interval))
+
+        # 为每个子图添加水平线
         idx = 0
         for r in range(rows):
             for c in range(cols):

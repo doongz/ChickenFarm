@@ -1,5 +1,5 @@
 import pandas as pd
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy import DateTime, DECIMAL, INT, VARCHAR
 
 from ChickenFarm.src.util.config import Config
@@ -31,16 +31,26 @@ class FundBacktest():
 
     def to_sql(self, df):
 
-        df.to_sql(name=self.tbl,
-                  con=self.engine,
-                  if_exists="replace",
-                  index=False,
-                  dtype=self.columns)
+        # df.to_sql(name=self.tbl,
+        #           con=self.engine,
+        #           if_exists="replace",
+        #           index=False,
+        #           dtype=self.columns)
+        
+        with self.engine.connect() as conn:
+            df.to_sql(name=self.tbl,
+                      con=conn,
+                      if_exists='replace',
+                      index=False,
+                      dtype=self.columns
+                      )
+            
+            conn.commit()
         return self.tbl
 
     def read_sql(self):
-        return pd.read_sql(self.tbl, self.engine)
-
-    def query_sql(self, sql):
-        sql = f"select * from {self.tbl};"
-        return pd.read_sql_query(sql, self.engine)
+        # return pd.read_sql(self.tbl, self.engine)
+        with self.engine.connect() as connection:
+            sql = text(f"SELECT * FROM {self.tbl}")
+            df = pd.read_sql(sql, con=connection)
+        return df

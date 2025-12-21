@@ -121,17 +121,12 @@ def _upload_backtest_data(code):
     '''
     aip_plans = [StupidPlan()]
 
-    try:
-        for plan in aip_plans:
-            backtest_df = pd.DataFrame()
-            for cycle in plan.InvestmentCycles:
-                df = plan.analysis_realtime(code=code, cycle=cycle)
-                backtest_df = pd.concat([backtest_df, df])
+    for plan in aip_plans:
+        backtest_df = pd.DataFrame()
+        for cycle in plan.InvestmentCycles:
+            df = plan.analysis_realtime(code=code, cycle=cycle)
+            backtest_df = pd.concat([backtest_df, df])
 
-            FundBacktest(code).to_sql(backtest_df)
-            logger.info(f"Upload backtest data({code}) success.")
-        return True
-
-    except Exception as error:
-        logger.error(f"Upload backtest data occur error:{error}.")
-        return False
+        FundBacktest(code).to_sql(backtest_df)
+        logger.info(f"Upload backtest data({code}) success.")
+    return True

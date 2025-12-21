@@ -1,5 +1,5 @@
 import pandas as pd
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy import DateTime, DECIMAL
 
 from ChickenFarm.src.util.config import Config
@@ -36,11 +36,11 @@ class FundNetValue():
         return self.tbl
 
     def read_sql(self):
-        return pd.read_sql(self.tbl, self.engine)
-
-    def query_sql(self, sql):
-        sql = f"select * from {self.tbl};"
-        return pd.read_sql_query(sql, self.engine)
+        # return pd.read_sql(self.tbl, self.engine)
+        with self.engine.connect() as connection:
+            sql = text(f"SELECT * FROM {self.tbl}")
+            df = pd.read_sql(sql, con=connection)
+        return df
 
     @property
     def release_date(self):

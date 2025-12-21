@@ -11,3 +11,4 @@ PyMySQL
 SQLAlchemy
 PyYAML
 cryptography
+akshare
