@@ -14,7 +14,8 @@ logger = get_logger(__file__)
 
 class AutomaticInvestmentPlan(ABC):
 
-    InvestmentCycles = [90, 180, 365, 730, 1095]
+    InvestmentCycles =  [30, 60, 90, 180, 365, 730] # 730, 1095
+    StartIntervalSize = [10, 20, 30,  60,  60,  60]
 
     @abstractmethod
     def create_algo(self):
