@@ -56,6 +56,17 @@ class AutomaticInvestmentPlan(ABC):
                                 })
                 df = pd.concat([df, tmp_pd])
 
+            profit_rate = stupid.invest_daily()
+            if profit_rate!=999:
+                tmp_pd = pd.DataFrame({'start': [start],
+                                'week': [-1],
+                                'algorithm': ['stupid'],
+                                'cycle': [cycle],
+                                'profit_rate': [profit_rate],
+                                'test_date': [datetime.now()]
+                                })
+                df = pd.concat([df, tmp_pd])
+
         logger.info(f"统计完成:{code}, 起始日区间为{start_interval}, 结束日为{end}.")
         return df
 

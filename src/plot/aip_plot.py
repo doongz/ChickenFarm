@@ -42,6 +42,25 @@ def export_violin_plot_multiprocess(cpus=8):
     logger.info(
         f"Export violin plot:{len(successes)} successful. fails:{fails}")
 
+def get_best(bodies):
+    n = len(bodies)
+    bodies_median = []
+    for j in range(n):
+        df = bodies[j]
+        # step1: describe()获取均值、分位数、极值、数据量（不含中位数）
+        basic_stats = df.describe().T  # 转置后列是统计项，行是分组，更直观
+        # step2: 单独计算中位数，合并到统计表
+        basic_stats['median'] = df.median()
+        # step3: 保留3位小数
+        basic_stats = basic_stats.round(3)
+        bodies_median.append(basic_stats['median'])
+
+        # 打印/查看统计结果（DataFrame格式，清晰）
+        # print('各组分步统计结果：')
+        # print(basic_stats[['count', 'mean', 'median', '25%', '75%', 'min', 'max']])
+    idx = bodies_median.index(max(bodies_median))
+    # print(f"best idx:{idx}")
+    return idx
 
 def export_aip_violin_plot_by_filed(filed, show=False):
     '''
@@ -84,10 +103,13 @@ def export_aip_violin_plot_by_filed(filed, show=False):
             # 这里 *100 变为百分比
             bodies = [fund_df.loc[fund_df['week'] == day]
                       ['profit_rate']*100 for day in range(1, 6)] # 5天
-            
+            bodies.append(fund_df.loc[fund_df['week'] == -1]['profit_rate']*100) # 每天，-1是特殊标记
+
+            best_day = get_best(bodies)
+
             low = float("inf")
             high = float("-inf")
-            for i_i in range(5): # 5天
+            for i_i in range(6): # 5天+每天
                 low = min(low, bodies[i_i].min())
                 high = max(high, bodies[i_i].max())
             low_high[i//cols][i%cols] = (low, high)
@@ -96,8 +118,18 @@ def export_aip_violin_plot_by_filed(filed, show=False):
             violin_plot = ax.violinplot(bodies,
                                         showmeans=False,  # 均值
                                         showmedians=True,  # 中位数
-                                        showextrema=True,  # 极值
+                                        showextrema=True,  # 是否显示极值线（小提琴顶部 / 底部的短刻度，对应数据的最大值 / 最小值）
+                                        quantiles=[[0.25, 0.75] for _ in range(5+1)] # 显示 25%/75% 分位
                                         )
+
+            # 设置每天定投的颜色
+            violin_plot['bodies'][5].set_facecolor('gold')      # 填充色
+            violin_plot['bodies'][5].set_edgecolor('orange')    # 边框色
+
+            # 设置best day的颜色
+            violin_plot['bodies'][best_day].set_facecolor('red')    # 填充色
+            violin_plot['bodies'][best_day].set_edgecolor('orange') # 边框色
+
             ax.set_title(name)
             i += 1
 
@@ -131,7 +163,8 @@ def export_aip_violin_plot_by_filed(filed, show=False):
 
         # add x-tick labels
         labels = [f"{day}" for day in range(1, 6)]
-        plt.setp(axs, xticks=[i+1 for i in range(5)],
+        labels.append("daily")
+        plt.setp(axs, xticks=[i+1 for i in range(6)],
                  xticklabels=labels)
 
         if show:

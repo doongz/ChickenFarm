@@ -29,7 +29,9 @@ class FundBacktest():
                         'test_date': DateTime
                         }
 
-    def to_sql(self, df):
+    def to_sql(self, df, if_exists='replace'):
+        # if_exists: replace append
+        # 注意使用 append 会导致数据库连接数爆掉
 
         # df.to_sql(name=self.tbl,
         #           con=self.engine,
@@ -40,7 +42,7 @@ class FundBacktest():
         with self.engine.connect() as conn:
             df.to_sql(name=self.tbl,
                       con=conn,
-                      if_exists='replace',
+                      if_exists=if_exists,
                       index=False,
                       dtype=self.columns
                       )
