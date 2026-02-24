@@ -32,6 +32,12 @@ class FundBacktest():
     def to_sql(self, df, if_exists='replace'):
         # if_exists: replace append
         # 注意使用 append 会导致数据库连接数爆掉
+        # # 查看当前最大连接数
+        # show variables like 'max_connections';
+        # # 查看当前活跃连接数
+        # show status like 'Threads_connected';
+        # # 临时调高最大连接数（重启MySQL后失效）
+        # set global max_connections = 1000;
 
         # df.to_sql(name=self.tbl,
         #           con=self.engine,

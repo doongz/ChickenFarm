@@ -26,7 +26,7 @@ def export_violin_plot_multiprocess(cpus=8):
     pool = multiprocessing.Pool(processes=job_cnt)
 
     fileds = get_fileds_en()
-    for filed in fileds:
+    for filed in fileds: # ["Bond"]
         res = pool.apply_async(export_aip_violin_plot_by_filed, args=(filed, ))
         results.append((filed, res))
     pool.close()
@@ -68,7 +68,7 @@ def export_aip_violin_plot_by_filed(filed, show=False):
     '''
     try:
         fund_list = FundsForBacktestTable.get_by_filed(filed)
-        df_dict = {}
+        df_dict = [] # [[code, name, fund_df], ]
 
         if len(fund_list) == 0:
             logger.info(f"filed: {filed} dont have any fund.")
@@ -77,7 +77,7 @@ def export_aip_violin_plot_by_filed(filed, show=False):
         for fund in fund_list:
             for cycle in AutomaticInvestmentPlan.InvestmentCycles:
                 df = FundBacktest(fund.code).read_sql()
-                df_dict[f'{fund.code} {cycle}天'] = df.loc[df['cycle'] == cycle]
+                df_dict.append([f'{fund.code}', f'定投{cycle}天', df.loc[df['cycle'] == cycle]])
                 logger.debug(f"Loaded {fund.name}-{cycle} to df_dict.")
 
         df_cnt = len(df_dict)
@@ -91,7 +91,7 @@ def export_aip_violin_plot_by_filed(filed, show=False):
         ncols = cols
         fig, axs = plt.subplots(nrows=nrows,
                                 ncols=ncols,
-                                figsize=(15, 5*rows),  # Width, height
+                                figsize=(20, 5*rows),  # Width, height
                                 )
         plt.subplots_adjust(wspace=0.3, hspace=0.3)
         fig.suptitle(f"{filed} {DateTools.today()}",
@@ -99,13 +99,13 @@ def export_aip_violin_plot_by_filed(filed, show=False):
 
         i = 0
         low_high = [[(0,0) for _ in range(cols) ] for _ in range(rows)]
-        for name, fund_df in df_dict.items():
+        for _, name, fund_df in df_dict:
             # 这里 *100 变为百分比
             bodies = [fund_df.loc[fund_df['week'] == day]
                       ['profit_rate']*100 for day in range(1, 6)] # 5天
             bodies.append(fund_df.loc[fund_df['week'] == -1]['profit_rate']*100) # 每天，-1是特殊标记
 
-            best_day = get_best(bodies)
+            best_day_idx = get_best(bodies)
 
             low = float("inf")
             high = float("-inf")
@@ -127,10 +127,10 @@ def export_aip_violin_plot_by_filed(filed, show=False):
             violin_plot['bodies'][5].set_edgecolor('orange')    # 边框色
 
             # 设置best day的颜色
-            violin_plot['bodies'][best_day].set_facecolor('red')    # 填充色
-            violin_plot['bodies'][best_day].set_edgecolor('orange') # 边框色
+            violin_plot['bodies'][best_day_idx].set_facecolor('red')    # 填充色
+            violin_plot['bodies'][best_day_idx].set_edgecolor('orange') # 边框色
 
-            ax.set_title(name)
+            ax.set_xlabel(name)
             i += 1
 
         # 为每个子图添加y坐标最大最小值和间隔
@@ -155,10 +155,11 @@ def export_aip_violin_plot_by_filed(filed, show=False):
             for c in range(cols):
                 axs[r][c].yaxis.grid(True)
                 axs[r][c].set_xticks([i+1 for i in range(5)])
-                axs[r][c].set_xlabel('week')
                 if c == 0:
-                    axs[r][c].set_ylabel(
-                        f"{fund_list[idx].name} Profit Rate / %")
+                    axs[r][c].set_title(f"{fund_list[idx].name}")
+                    axs[r][c].set_ylabel(f"Profit Rate / %")
+                if c == 1:
+                    axs[r][c].set_title(f"{fund_list[idx].code}")
                     idx += 1
 
         # add x-tick labels
