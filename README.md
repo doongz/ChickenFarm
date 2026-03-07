@@ -75,6 +75,13 @@ brew services info mysql
 2. 数据库 **db_netvalue**，无需建表
 3. 数据库 **db_backtest**，无需建表
 
+修改最大连接数，Linux/macOS：/etc/mysql/my.cnf
+
+```shell
+[mysqld]
+max_connections = 500  # 设置最大连接数
+```
+
 ### 2、填写配置表
 
 将 [配置文件(config.yaml)](./config.yaml) ，按照注释填写配置表。
@@ -82,14 +89,32 @@ brew services info mysql
 ### 3、配置环境变量
 
 ```shell
-echo "export PYTHONPATH=$PYTHONPATH:<项目所在的父目录>" >> ~/.bash_profile
-echo "export FARM_CONFIG_PATH=<配置文件(config.yaml)路径" >> ~/.bash_profile
-source ~/.bash_profile
+echo "export PYTHONPATH=$PYTHONPATH:<项目所在的父目录>" >> ~/.zshrc
+echo "export FARM_CONFIG_PATH=<配置文件(config.yaml)路径>" >> ~/.zshrc
+source ~/.zshrc
 ```
 
-将 `<>` 替换成自己的配置
+将 `<>` 替换成自己的配置，bash替换为 `.bash_profile`
 
 ### 4、安装依赖包
+
+uv
+
+```shell
+# 创建独立的虚拟环境（指定 Python 3.10）
+uv venv --python 3.10
+# 激活环境（macOS/Linux）
+source .venv/bin/activate
+
+uv pip install -r requirements.txt
+
+# 退出虚拟环境
+deactivate
+# 删除虚拟环境
+rm -rf .venv
+```
+
+pip
 
 ```shell
 python3 -m pip install -r requirements.txt
@@ -125,12 +150,14 @@ sudo defaults write com.google.Keystone.Installer checkInterval 0
 将需要分析的基金添加至数据库（之后不用再添加），根据提示选择分类
 
 ```shell
+uv run chick.py -add -c `code`
 python3 chick.py -add -c `code`
 ```
 
 执行回测分析任务
 
 ```shell
+uv run chick.py -job backtest_job
 python3 chick.py -job backtest_job
 ```
 

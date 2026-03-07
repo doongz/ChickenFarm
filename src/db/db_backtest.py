@@ -12,12 +12,12 @@ class FundBacktest():
 
     def __init__(self, code):
 
-        # self.engine = create_engine(
-        #     f"mysql+pymysql://{config.db_username}:{config.db_password}@{config.db_address}:{config.db_port}/{config.db_backtest}"
-        # )
         self.engine = create_engine(
-            f"mysql+pymysql://{config.db_username}@{config.db_address}:{config.db_port}/{config.db_backtest}"
+            f"mysql+pymysql://{config.db_username}:{config.db_password}@{config.db_address}:{config.db_port}/{config.db_backtest}"
         )
+        # self.engine = create_engine(
+        #     f"mysql+pymysql://{config.db_username}@{config.db_address}:{config.db_port}/{config.db_backtest}"
+        # )
         self.code = code
         self.tbl = f"tbl_{self.code}"
 
@@ -53,7 +53,7 @@ class FundBacktest():
                       dtype=self.columns
                       )
             
-            conn.commit()
+            # conn.commit()
         return self.tbl
 
     def read_sql(self):
