@@ -1,9 +1,26 @@
 import os
 import math
+import pandas as pd
 import numpy as np
+import matplotlib
 import matplotlib.pyplot as plt
+from matplotlib import font_manager
 from matplotlib.ticker import MultipleLocator
 import multiprocessing
+
+
+def _setup_chinese_font():
+    # 选择系统可用中文字体，避免中文与负号显示为方框
+    candidates = ['Arial Unicode MS', 'STHeiti', 'Hiragino Sans GB',
+                  'Songti SC', 'PingFang SC']
+    available = {f.name for f in font_manager.fontManager.ttflist}
+    chosen = next((name for name in candidates if name in available), None)
+    if chosen:
+        matplotlib.rcParams['font.sans-serif'] = [chosen]
+    matplotlib.rcParams['axes.unicode_minus'] = False
+
+
+_setup_chinese_font()
 
 from src.module.backtest_mod import AutomaticInvestmentPlan
 from ChickenFarm.src.algorithm.significance import build_paired_matrix, \
@@ -56,12 +73,19 @@ def build_full_matrix(fund_df):
     return matrix.dropna()
 
 
-def get_best(fund_df):
+def get_best(fund_df, bodies=None):
     """
-    判定 best day（FR-2）并叠加多估值日稳健性（FR-4）：
-    将情景按时间分 4 块逐块检验，仅当同一工作日在 ≥60% 块中都显著最优才标红。
-    :return: best day 在 bodies 中的下标（0~4），不显著或不稳健时返回 None
+    判定 best day：默认按配对显著性 + 多估值日稳健性（FR-2/FR-4）。
+    配置 significance_test=False 时回退到旧的裸中位数最大值。
+    :return: best day 在 bodies 中的下标（0~4；仅工作日组）
     """
+    cfg = Config().backtest_config or {}
+
+    if not cfg.get('significance_test', True):
+        # 旧行为：周一~周五中位数最大者
+        medians = [b.median() for b in bodies[:5]]
+        return int(np.argmax(medians))
+
     matrix = build_paired_matrix(fund_df)
     if matrix.shape[0] < 8 or matrix.shape[1] < 5:
         return None
@@ -72,8 +96,13 @@ def get_best(fund_df):
 def get_ci(fund_df):
     """
     对 6 个分组的中位数做 bootstrap 95% 置信区间（FR-3），返回按 bodies 顺序的数组。
-    :return: (median[6], ci_low[6], ci_high[6])，数据不足时返回 None
+    配置 bootstrap=False 时关闭（返回 None）。
+    :return: (median[6], ci_low[6], ci_high[6])，数据不足或关闭时返回 None
     """
+    cfg = Config().backtest_config or {}
+    if not cfg.get('bootstrap', True):
+        return None
+
     matrix = build_full_matrix(fund_df)
     if matrix.shape[0] < 8:
         return None
@@ -84,6 +113,61 @@ def get_ci(fund_df):
     return (ci['median'].values * 100,
             ci['ci_low'].values * 100,
             ci['ci_high'].values * 100)
+
+def export_filed_stats(filed, fund_list):
+    """
+    汇总该领域所有基金×周期的统计结果并导出 CSV：
+    - pairwise：工作日配对 Wilcoxon（median_diff/p/p_adj/effect_size）
+    - ci：6 个分组的中位数 bootstrap 95% CI
+    - stability：分时间块的 best day 与稳健结论
+    """
+    from ChickenFarm.src.algorithm.significance import (
+        pairwise_wilcoxon, best_day_by_block)
+
+    pairwise_rows, ci_rows, stability_rows = [], [], []
+
+    for fund in fund_list:
+        fund_df_all = FundBacktest(fund.code).read_sql()
+        for cycle in AutomaticInvestmentPlan.InvestmentCycles:
+            fund_df = fund_df_all[fund_df_all['cycle'] == cycle]
+            matrix = build_paired_matrix(fund_df)
+            if matrix.shape[0] < 8 or matrix.shape[1] < 5:
+                continue
+
+            # 配对检验
+            pairs = pairwise_wilcoxon(matrix)
+            pairs.insert(0, 'code', fund.code)
+            pairs.insert(1, 'cycle', cycle)
+            pairwise_rows.append(pairs)
+
+            # bootstrap CI（含 daily）
+            ci = bootstrap_median_ci(build_full_matrix(fund_df))
+            ci.insert(0, 'code', fund.code)
+            ci.insert(1, 'cycle', cycle)
+            ci_rows.append(ci)
+
+            # 稳健性：分块 best day
+            block_days = [day for _, day in
+                          best_day_by_block(matrix)]
+            stable_day, _ = stability_verdict(matrix)
+            stability_rows.append(pd.DataFrame({
+                'code': [fund.code], 'cycle': [cycle],
+                'block_best_days': [str(block_days)],
+                'stable_best_day': [stable_day],
+            }))
+
+    if pairwise_rows:
+        pd.concat(pairwise_rows, ignore_index=True) \
+            .to_csv(os.path.join(Config().export_stats_path,
+                                 f'{filed}_pairwise.csv'), index=False)
+        pd.concat(ci_rows, ignore_index=True) \
+            .to_csv(os.path.join(Config().export_stats_path,
+                                 f'{filed}_ci.csv'), index=False)
+        pd.concat(stability_rows, ignore_index=True) \
+            .to_csv(os.path.join(Config().export_stats_path,
+                                 f'{filed}_stability.csv'), index=False)
+        logger.info(f"Export {filed} stats to {Config().export_stats_path}.")
+
 
 def export_aip_violin_plot_by_filed(filed, show=False):
     '''
@@ -132,7 +216,7 @@ def export_aip_violin_plot_by_filed(filed, show=False):
                       ['profit_rate']*100 for day in range(1, 6)] # 5天
             bodies.append(fund_df.loc[fund_df['week'] == -1]['profit_rate']*100) # 每天，-1是特殊标记
 
-            best_day_idx = get_best(fund_df)
+            best_day_idx = get_best(fund_df, bodies)
 
             low = float("inf")
             high = float("-inf")
@@ -182,21 +266,26 @@ def export_aip_violin_plot_by_filed(filed, show=False):
             ax.set_xlabel(name)
             i += 1
 
-        # 为每个子图添加y坐标最大最小值和间隔
-        interval = 2
+        # 同一行（同一 ETF 的不同周期）统一绝对纵坐标范围，便于横向对比；
+        # 刻度间隔按范围动态选择，避免刻度过密（每图约 8~12 个刻度）
+        nice_steps = [1, 2, 5, 10, 20, 50, 100]
         for r in range(rows):
-            max_range = 0 # 找到每一行的最大跨度
+            row_low = min(low_high[r][c][0] for c in range(cols))
+            row_high = max(low_high[r][c][1] for c in range(cols))
+
+            span = row_high - row_low
+            target_ticks = 10
+            interval = next((s for s in nice_steps
+                             if span / s <= target_ticks), nice_steps[-1])
+
+            # 用整间隔对齐边界，使同一行各子图刻度完全一致
+            y_min = math.floor(row_low / interval) * interval
+            y_max = math.ceil(row_high / interval) * interval
+
+            ticks = np.arange(y_min, y_max + interval / 2, interval)
             for c in range(cols):
-                low = low_high[r][c][0]
-                high = low_high[r][c][1]
-                max_range = max(max_range, high-low)
-            for c in range(cols):
-                low = low_high[r][c][0]
-                high = low_high[r][c][1]
-                d = (max_range - (high - low)) / 2
-                ytick_low = low - d
-                ytick_high = high + d
-                axs[r][c].set_yticks(np.arange(ytick_low, ytick_high + 1, interval))
+                axs[r][c].set_yticks(ticks)
+                axs[r][c].set_ylim(y_min, y_max)
 
         # 为每个子图添加水平线
         idx = 0
@@ -223,6 +312,9 @@ def export_aip_violin_plot_by_filed(filed, show=False):
             plt.savefig(os.path.join(
                 Config().export_aip_plot_path, f'{filed}.png'))
             logger.info(f"Successfully exported {filed} aip violin plot.")
+            if Config().backtest_config is None or \
+                    Config().backtest_config.get('export_stats', True):
+                export_filed_stats(filed, fund_list)
         return True
 
     except Exception as error:

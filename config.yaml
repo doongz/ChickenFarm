@@ -14,3 +14,14 @@ EXPORT_TABLE_PATH: # 导出个人数据统计表的路径
 EXPORT_CHART_PATH: # 导出个人数据统计图的路径
 EXPORT_AIP_PLOT_PATH: # 导出回测分析图的路径
 
+# 回测参数（可选项，缺省时使用代码内默认值）
+#BACKTEST:
+#  etf_lots: 1            # ETF 每期买入手数（1手=100份）
+#  spread: 0.0005         # 尾盘买入相对价差（万5）
+#  commission: 0          # 佣金率（免5账户可设0）
+#  slippage: 0            # 滑点
+#  fund_fee_discount: 0.1 # 场外申购费率折扣（一折=0.1）
+#  significance_test: true  # 配对显著性检验（false 回退裸中位数选最优日）
+#  bootstrap: true          # bootstrap 置信区间误差线
+#  export_stats: true       # 导出 p值/效应量/CI/稳健性到 stats/
+

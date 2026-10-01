@@ -107,6 +107,14 @@ class Config(object):
         return self.config_data.get("BACKTEST")
 
     @property
+    def export_stats_path(self):
+        # 回测统计结果（p 值/效应量/CI/稳健性）导出目录，与图同级 stats/
+        path = os.path.join(self.config_data.get("EXPORT_AIP_PLOT_PATH"),
+                            datetime.today().strftime('%Y-%m-%d'), 'stats')
+        os.makedirs(path, exist_ok=True)
+        return path
+
+    @property
     def tiantian_username(self):
         # 天天基金账户
         return self.config_data.get("TIANTIAN_USERNAME")

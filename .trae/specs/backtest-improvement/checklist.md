@@ -33,7 +33,9 @@
 
 ## 横切与回归
 
-- [ ] 统计结果（p 值 / 效应量 / CI / 稳健性）已导出到 `aip_plots/stats/`（CSV 或 JSON）。
-- [ ] 新行为由配置开关控制且默认开启，可回退旧逻辑。
+- [x] 统计结果（p 值 / 效应量 / CI / 稳健性）已导出到 `aip_plots/<date>/stats/`（每领域 pairwise/ci/stability 三个 CSV）。
+- [x] 新行为由配置开关（significance_test / bootstrap / export_stats）控制且默认开启，可回退旧逻辑。
+- [x] 图表中文与负号正常显示。
+- [x] 同一行（同一 ETF 不同周期）纵坐标绝对范围统一，刻度疏密适中（约 8~12 个）。
 - [x] 现有 17 只基金 `backtest_job` 全流程跑通，Technology / Finance 两图正常导出且顺序正确。
 - [x] 未破坏现有表的读取（仅追加字段），采集链路不受影响。

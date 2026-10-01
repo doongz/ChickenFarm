@@ -72,9 +72,9 @@
 
 ## 横切：统计导出与开关
 
-- [ ] **T10 统计结果导出 + 配置开关**
-  - 文件：`src/util/config.py`、[aip_plot.py](file:///Users/dodo/Desktop/ChickenFarm/src/plot/aip_plot.py) 或新增 `src/module/report_mod.py`
-  - 改动：将 p 值 / 效应量 / CI / 稳健性导出到 `EXPORT_AIP_PLOT_PATH/stats/`（CSV/JSON）；新增配置 `backtest.align_window / significance_test / rolling_exit / bootstrap`，默认开启、可回退旧行为。
+- [x] **T10 统计结果导出 + 配置开关 + 图表可读性**
+  - 文件：`src/util/config.py`、[aip_plot.py](file:///Users/dodo/Desktop/ChickenFarm/src/plot/aip_plot.py)
+  - 改动：p 值 / 效应量 / CI / 稳健性导出到 `EXPORT_AIP_PLOT_PATH/<date>/stats/`（每领域 3 个 CSV）；配置 `significance_test / bootstrap / export_stats` 默认开启、可回退旧行为；修复中文字体与负号；同一行统一绝对纵坐标范围并动态选择刻度间隔。
 
-- [ ] **T11 全流程回归**
+- [x] **T11 全流程回归**
   - 对当前 17 只基金跑 `backtest_job`，确认净值→回测→绘图全部成功且排序、口径正确。
