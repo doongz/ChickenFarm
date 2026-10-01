@@ -63,6 +63,11 @@ class Config(object):
         return self.config_data.get("DB_BACKTEST")
 
     @property
+    def db_etf(self):
+        # 存放 ETF 日线行情的数据库
+        return self.config_data.get("DB_ETF")
+
+    @property
     def log_path(self):
         # 日志配置文件路径
         return os.path.join(os.path.dirname(os.path.abspath(__file__)), "log.conf")

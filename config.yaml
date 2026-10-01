@@ -5,6 +5,7 @@ DB_PORT: 3306 # 数据库端口
 DB_FUND: # 存放个人统计数据的库名，如 db_fund
 DB_NETVALUE: # 存放爬取净值的库名，如 db_netvalue
 DB_BACKTEST: # 存放回测数据的库名，如 db_backtest
+DB_ETF: # 存放ETF日线行情的库名，如 db_etf
 
 # 若不需要采集个人数据，做分析，可不用填写下方配置
 TIANTIAN_USERNAME: # 天天基金的账号

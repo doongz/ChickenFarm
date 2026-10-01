@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 
 from ChickenFarm.src.db.tbl_funds_for_backtest import FundsForBacktestTable
 from ChickenFarm.src.db.db_netvalue import FundNetValue
+from ChickenFarm.src.db.db_etf import ETFDaily
 from ChickenFarm.src.util.tools import DateTools, FundTypeTools
 from ChickenFarm.src.util.config import Config
 from ChickenFarm.src.util.exceptions import NonTradingError
@@ -25,7 +26,6 @@ class Algorithm(ABC):
         self.code = code
         self.name = FundsForBacktestTable.get_by_code(code).name
 
-        self._value_df = FundNetValue(code).read_sql()
         self._amount = 1000
 
         # 标的类型决定下单模型：fund 固定金额，etf 固定手数
@@ -34,25 +34,64 @@ class Algorithm(ABC):
         # ETF 每期买入手数 L，1 手 = 100 份
         self.lots = int(bt_cfg.get('etf_lots', 1))
         self.lot_size = 100
-        # 成交价类型：nav（累计净值）/ close（日线，本期预留，未接入数据源）
-        self.price_type = bt_cfg.get('price_type', 'nav')
 
-    def place_order(self, price):
+        # 交易成本参数（T8），均可配置，给出贴合实盘的默认值
+        # 尾盘买入：用相对价差近似（买入价相对收盘价的上浮比例）
+        self.spread = float(bt_cfg.get('spread', 0.0005))
+        # 佣金（账户免5，默认 0）；滑点默认 0
+        self.commission = float(bt_cfg.get('commission', 0.0))
+        self.slippage = float(bt_cfg.get('slippage', 0.0))
+        # 场外申购费率折扣（一折常见，0.1）；实际申购费 = buy_rate × discount
+        self.fund_fee_discount = float(
+            bt_cfg.get('fund_fee_discount', 0.1))
+
+        if self.fund_type == 'etf':
+            # ETF：用 db_etf 前复权收盘价 adj_close 成交与盯市（T9）
+            raw = ETFDaily(code).read_sql()
+            self._value_df = raw[['date', 'adj_close']] \
+                .rename(columns={'adj_close': 'totvalue'})
+        else:
+            # 场外基金：用累计净值 totvalue
+            self._value_df = FundNetValue(code).read_sql()[['date', 'totvalue']]
+
+    def effective_buy_price(self, close_price):
         """
-        一笔下单：按标的类型返回 (买入份额, 实际花费本金)。
-        - fund：固定金额 _amount，份额 = amount/price（可小数），花费 = amount
-        - etf ：固定手数 lots，份额 = lots*100（整数），花费 = lots*100*price
+        买入实际成交价：收盘价 + 价差 + 滑点（尾盘买入近似）。
         """
+        return close_price * (1 + self.spread + self.slippage)
+
+    def fund_subscription_fee(self):
+        """
+        场外基金实际申购费率：已采集 buy_rate × 折扣；无数据时为 0。
+        """
+        record = FundsForBacktestTable.get_by_code(self.code)
+        raw_rate = float(record.buy_rate) if record and record.buy_rate else 0.0
+        return raw_rate * self.fund_fee_discount
+
+    def place_order(self, close_price):
+        """
+        一笔下单：按标的类型返回 (买入份额, 实际花费本金，含交易成本)。
+        买入成交价在收盘价基础上加价差/滑点；
+        - fund：固定金额 _amount，份额 = amount/成交价，
+                花费 = amount + 申购费(amount×打折费率)
+        - etf ：固定手数 lots，份额 = lots*100，
+                花费 = 份额×成交价 × (1+佣金率)
+        """
+        buy_price = self.effective_buy_price(close_price)
+
         if self.fund_type == 'etf':
             shares = self.lots * self.lot_size
-            cost = shares * price
+            cost = shares * buy_price * (1 + self.commission)
             return shares, cost
-        return self._amount / price, self._amount
+
+        shares = self._amount / buy_price
+        cost = self._amount * (1 + self.fund_subscription_fee())
+        return shares, cost
 
     def execution_price(self, row):
         """
-        取该笔成交价。本期统一使用累计净值 totvalue；
-        price_type=close 需 ETF 日线数据源，未接入时回退到 totvalue。
+        取该笔成交价：场外基金为累计净值 totvalue，ETF 为前复权收盘价 adj_close。
+        统一映射到 totvalue 列。
         """
         return float(row['totvalue'])
 

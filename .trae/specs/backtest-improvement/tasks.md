@@ -62,11 +62,11 @@
 
 ## 第四批：成本与口径
 
-- [ ] **T8 费率 / 滑点参数化（FR-5 / FR-6）**
+- [x] **T8 费率 / 滑点参数化（FR-5 / FR-6）**
   - 文件：`src/util/config.py`、[algorithm.py](file:///Users/dodo/Desktop/ChickenFarm/src/algorithm/algorithm.py)、[stupid.py](file:///Users/dodo/Desktop/ChickenFarm/src/algorithm/stupid.py)
   - 改动：收益计算扣除可配置单边成本；可选从 `tbl_funds_for_backtest.buy_rate` 读取。
 
-- [ ] **T9 成交价类型预留 + 周期口径（FR-5 / FR-6）**
+- [x] **T9 成交价类型预留 + 周期口径（FR-5 / FR-6）**
   - 文件：[algorithm.py](file:///Users/dodo/Desktop/ChickenFarm/src/algorithm/algorithm.py)、[aip_plot.py](file:///Users/dodo/Desktop/ChickenFarm/src/plot/aip_plot.py)
   - 改动：`price_type(nav/close)` 参数（本期仅 nav 生效，图题注明口径）；短周期子图加「样本少、噪声大」。
 

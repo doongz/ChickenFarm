@@ -9,8 +9,11 @@ from ChickenFarm.src.db.db_fund import Database
 from ChickenFarm.src.db.tbl_funds_for_backtest import FundsForBacktestTable
 from ChickenFarm.src.db.db_netvalue import FundNetValue
 from ChickenFarm.src.db.db_backtest import FundBacktest
+from ChickenFarm.src.db.db_etf import ETFDaily
 from ChickenFarm.src.module.backtest_mod import StupidPlan
-from ChickenFarm.src.util.tools import XAlphaTools
+from ChickenFarm.src.module.etf_mod import fetch_etf_daily
+from ChickenFarm.src.module.etf_adjust import apply_forward_adjust
+from ChickenFarm.src.util.tools import XAlphaTools, FundTypeTools
 from ChickenFarm.src.util.log import get_logger
 
 
@@ -111,6 +114,50 @@ def _update_info(code):
         return True
     except Exception as error:
         logger.error(f"Upload info occurre an error: {error}.")
+        return False
+
+
+def transport_etf_daily_multiprocess(cpus=4):
+    """
+    多进程采集 ETF 日线行情（含前复权）并上传 db_etf。
+    仅处理类型为 etf 的标的。并发默认 4，避免触发新浪限流。
+    """
+    results = []
+    job_cnt = min(multiprocessing.cpu_count(), int(cpus))
+    pool = multiprocessing.Pool(processes=job_cnt)
+
+    code_list = [c for c in FundsForBacktestTable.get_all_code()
+                 if FundTypeTools.classify(c) == 'etf']
+    for code in code_list:
+        res = pool.apply_async(_upload_etf_daily, args=(code, ))
+        results.append((code, res))
+    pool.close()
+    pool.join()
+
+    successes, fails = [], []
+    for code, res in results:
+        if res.get():
+            successes.append(code)
+        else:
+            fails.append(code)
+
+    logger.info(
+        f"Transport ETF daily:{successes} successful. fails:{fails}.")
+    return successes, fails
+
+
+def _upload_etf_daily(code):
+    '''
+    采集单只 ETF 原始日线，合成前复权价并上传 db_etf。
+    '''
+    try:
+        price_df = fetch_etf_daily(code)
+        price_df = apply_forward_adjust(price_df, code)
+        ETFDaily(code).to_sql(price_df)
+        logger.info(f"Upload ETF daily({code}) success, rows:{len(price_df)}.")
+        return True
+    except Exception as error:
+        logger.error(f"Upload ETF daily({code}) occurred an error: {error}.")
         return False
 
 

@@ -117,12 +117,16 @@ def export_aip_violin_plot_by_filed(filed, show=False):
                                 figsize=(20, 5*rows),  # Width, height
                                 )
         plt.subplots_adjust(wspace=0.3, hspace=0.3)
-        fig.suptitle(f"{filed} {DateTools.today()}",
-                     fontsize=30)
+        fig.suptitle(f"{filed} {DateTools.today()}  "
+                     f"(fund: totvalue nav / etf: adjusted close)",
+                     fontsize=24)
 
         i = 0
         low_high = [[(0,0) for _ in range(cols) ] for _ in range(rows)]
         for _, name, fund_df in df_dict:
+            # 短周期（30/60 天）每组仅 4~8 笔扣款，噪声大，加注提示
+            short_cycle = name in ('定投30天', '定投60天')
+
             # 这里 *100 变为百分比
             bodies = [fund_df.loc[fund_df['week'] == day]
                       ['profit_rate']*100 for day in range(1, 6)] # 5天
@@ -157,6 +161,13 @@ def export_aip_violin_plot_by_filed(filed, show=False):
                 ax.text(0.02, 0.98, 'no significant\nweekday effect',
                         transform=ax.transAxes, fontsize=9,
                         verticalalignment='top', color='gray')
+
+            # 短周期噪声提示（右上角）
+            if short_cycle:
+                ax.text(0.98, 0.02, 'few buys\nhigh noise',
+                        transform=ax.transAxes, fontsize=9,
+                        verticalalignment='bottom', horizontalalignment='right',
+                        color='darkorange')
 
             # bootstrap 中位数 95% CI 误差线（黑色，覆盖 6 个分组）
             ci_result = get_ci(fund_df)
