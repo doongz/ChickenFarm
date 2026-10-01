@@ -54,11 +54,55 @@ class XAlphaTools:
         return fundinfo
 
 
+class FundTypeTools:
+    # 识别场内 ETF 的代码前两位（沪 51/56/58，深 15/16）
+    ETF_PREFIXES = ('51', '56', '58', '15', '16')
+
+    @staticmethod
+    def classify(code):
+        '''
+        按 6 位代码段判定标的类型
+        :return 'fund'（场外基金，固定金额下单）/ 'etf'（场内，固定手数下单）
+        '''
+        overrides = Config().backtest_config.get('fund_type_overrides', {}) \
+            if Config().backtest_config else {}
+        code = str(code)
+        if code in overrides:
+            return overrides[code]
+        return 'etf' if code[:2] in FundTypeTools.ETF_PREFIXES else 'fund'
+
+
 class DateTools:
 
     @staticmethod
     def today():
         return datetime.today().strftime('%Y-%m-%d')
+
+    @staticmethod
+    def complete_trade_weeks(value_df):
+        '''
+        识别净值 df 中的「完整交易周」：周一至周五 5 个工作日全部为交易日
+        节假日导致任一工作日休市的整周剔除
+        :param value_df: 含 date 列的净值 DataFrame
+        :return: list[week_df]，按时间先后，每个 week_df 恰含周一~周五 5 行
+        '''
+        df = value_df.copy()
+        df['weekday'] = df['date'].dt.weekday
+        iso = df['date'].dt.isocalendar()
+        df['iso_year'] = iso['year']
+        df['iso_week'] = iso['week']
+
+        weeks = []
+        for _, grp in df.groupby(['iso_year', 'iso_week']):
+            weekdays = set(grp['weekday'].tolist())
+            if len(grp) == 5 and weekdays == {0, 1, 2, 3, 4}:
+                weeks.append(
+                    grp.drop(columns=['weekday', 'iso_year', 'iso_week'])
+                       .sort_values('date')
+                       .reset_index(drop=True)
+                )
+        weeks.sort(key=lambda week: week['date'].iloc[0])
+        return weeks
 
     @staticmethod
     def is_trade_day(date):

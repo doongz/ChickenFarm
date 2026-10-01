@@ -97,6 +97,11 @@ class Config(object):
         return path
 
     @property
+    def backtest_config(self):
+        # 回测相关配置（下单口径、类型覆盖、采样步长等），可选，缺省为空
+        return self.config_data.get("BACKTEST")
+
+    @property
     def tiantian_username(self):
         # 天天基金账户
         return self.config_data.get("TIANTIAN_USERNAME")

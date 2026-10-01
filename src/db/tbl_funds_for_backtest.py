@@ -1,6 +1,6 @@
 from datetime import datetime
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, DateTime, DECIMAL, VARCHAR, CHAR
+from sqlalchemy import Column, DateTime, DECIMAL, VARCHAR, CHAR, INT
 
 from ChickenFarm.src.db.db_fund import Database
 
@@ -14,6 +14,7 @@ class FundsForBacktestTable(Base):
     name = Column(VARCHAR(256), unique=True, nullable=False)
     code = Column(CHAR(6), primary_key=True)
     filed = Column(VARCHAR(255))
+    order_index = Column(INT)
     update_time = Column(DateTime, onupdate=datetime.now(),
                          default=datetime.now())
     create_time = Column(DateTime, default=datetime.now())
@@ -28,8 +29,9 @@ class FundsForBacktestTable(Base):
 
     @staticmethod
     def get_by_filed(filed):
-        # 包含持仓和清仓的基金
-        return Database().query(FundsForBacktestTable).filter_by(filed=filed).all()
+        # 包含持仓和清仓的基金，按领域内排序字段 order_index 升序
+        return Database().query(FundsForBacktestTable).filter_by(filed=filed)\
+            .order_by(FundsForBacktestTable.order_index).all()
 
     @staticmethod
     def get_all_code():

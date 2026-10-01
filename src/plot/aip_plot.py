@@ -6,6 +6,8 @@ from matplotlib.ticker import MultipleLocator
 import multiprocessing
 
 from src.module.backtest_mod import AutomaticInvestmentPlan
+from ChickenFarm.src.algorithm.significance import build_paired_matrix, \
+    bootstrap_median_ci, stability_verdict
 from ChickenFarm.src.db.tbl_funds_for_backtest import FundsForBacktestTable
 from ChickenFarm.src.db.db_backtest import FundBacktest
 from ChickenFarm.src.util.industry_class import get_fileds_en
@@ -42,25 +44,46 @@ def export_violin_plot_multiprocess(cpus=8):
     logger.info(
         f"Export violin plot:{len(successes)} successful. fails:{fails}")
 
-def get_best(bodies):
-    n = len(bodies)
-    bodies_median = []
-    for j in range(n):
-        df = bodies[j]
-        # step1: describe()获取均值、分位数、极值、数据量（不含中位数）
-        basic_stats = df.describe().T  # 转置后列是统计项，行是分组，更直观
-        # step2: 单独计算中位数，合并到统计表
-        basic_stats['median'] = df.median()
-        # step3: 保留3位小数
-        basic_stats = basic_stats.round(3)
-        bodies_median.append(basic_stats['median'])
+def build_full_matrix(fund_df):
+    """
+    在工作日配对矩阵基础上并入 daily(week=-1) 列，供 bootstrap CI 覆盖 6 个分组。
+    """
+    matrix = build_paired_matrix(fund_df)
+    daily = fund_df[fund_df['week'] == -1] \
+        .pivot_table(index='mark_day', values='profit_rate', aggfunc='first')
+    if not daily.empty:
+        matrix[-1] = daily
+    return matrix.dropna()
 
-        # 打印/查看统计结果（DataFrame格式，清晰）
-        # print('各组分步统计结果：')
-        # print(basic_stats[['count', 'mean', 'median', '25%', '75%', 'min', 'max']])
-    idx = bodies_median.index(max(bodies_median))
-    # print(f"best idx:{idx}")
-    return idx
+
+def get_best(fund_df):
+    """
+    判定 best day（FR-2）并叠加多估值日稳健性（FR-4）：
+    将情景按时间分 4 块逐块检验，仅当同一工作日在 ≥60% 块中都显著最优才标红。
+    :return: best day 在 bodies 中的下标（0~4），不显著或不稳健时返回 None
+    """
+    matrix = build_paired_matrix(fund_df)
+    if matrix.shape[0] < 8 or matrix.shape[1] < 5:
+        return None
+    stable_day, block_days = stability_verdict(matrix)
+    return stable_day - 1 if stable_day is not None else None
+
+
+def get_ci(fund_df):
+    """
+    对 6 个分组的中位数做 bootstrap 95% 置信区间（FR-3），返回按 bodies 顺序的数组。
+    :return: (median[6], ci_low[6], ci_high[6])，数据不足时返回 None
+    """
+    matrix = build_full_matrix(fund_df)
+    if matrix.shape[0] < 8:
+        return None
+    ci = bootstrap_median_ci(matrix)
+    # group 列按工作日 1..5 与 -1 排序；重排为 bodies 顺序（1..5, -1）
+    order = [1, 2, 3, 4, 5, -1]
+    ci = ci.set_index('group').reindex(order)
+    return (ci['median'].values * 100,
+            ci['ci_low'].values * 100,
+            ci['ci_high'].values * 100)
 
 def export_aip_violin_plot_by_filed(filed, show=False):
     '''
@@ -105,7 +128,7 @@ def export_aip_violin_plot_by_filed(filed, show=False):
                       ['profit_rate']*100 for day in range(1, 6)] # 5天
             bodies.append(fund_df.loc[fund_df['week'] == -1]['profit_rate']*100) # 每天，-1是特殊标记
 
-            best_day_idx = get_best(bodies)
+            best_day_idx = get_best(fund_df)
 
             low = float("inf")
             high = float("-inf")
@@ -126,9 +149,24 @@ def export_aip_violin_plot_by_filed(filed, show=False):
             violin_plot['bodies'][5].set_facecolor('gold')      # 填充色
             violin_plot['bodies'][5].set_edgecolor('orange')    # 边框色
 
-            # 设置best day的颜色
-            violin_plot['bodies'][best_day_idx].set_facecolor('red')    # 填充色
-            violin_plot['bodies'][best_day_idx].set_edgecolor('orange') # 边框色
+            # 设置best day的颜色；不显著或不稳健则不标红并加注
+            if best_day_idx is not None:
+                violin_plot['bodies'][best_day_idx].set_facecolor('red')    # 填充色
+                violin_plot['bodies'][best_day_idx].set_edgecolor('orange') # 边框色
+            else:
+                ax.text(0.02, 0.98, 'no significant\nweekday effect',
+                        transform=ax.transAxes, fontsize=9,
+                        verticalalignment='top', color='gray')
+
+            # bootstrap 中位数 95% CI 误差线（黑色，覆盖 6 个分组）
+            ci_result = get_ci(fund_df)
+            if ci_result is not None:
+                medians, ci_low, ci_high = ci_result
+                x_pos = np.arange(1, 7)
+                ax.errorbar(x_pos, medians,
+                            yerr=[medians - ci_low, ci_high - medians],
+                            fmt='none', ecolor='black', capsize=3,
+                            elinewidth=1.2, zorder=5)
 
             ax.set_xlabel(name)
             i += 1

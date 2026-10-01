@@ -28,6 +28,7 @@ CREATE TABLE `tbl_funds_for_backtest` (
   `name` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '名称',
   `code` char(6) NOT NULL COMMENT '代码',
   `filed` varchar(255) DEFAULT NULL COMMENT '领域',
+  `order_index` int(11) DEFAULT NULL COMMENT '领域内排序',
   `update_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '更新日期',
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `comment` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '备注',

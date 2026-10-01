@@ -123,9 +123,8 @@ def _upload_backtest_data(code):
 
     for plan in aip_plans:
         backtest_df = pd.DataFrame()
-        for i, cycle in enumerate(plan.InvestmentCycles):
-            size = plan.StartIntervalSize[i]
-            df = plan.analysis_realtime(code, cycle, size)
+        for cycle in plan.InvestmentCycles:
+            df = plan.analysis_realtime(code, cycle)
             backtest_df = pd.concat([backtest_df, df])
 
         FundBacktest(code).to_sql(backtest_df)

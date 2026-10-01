@@ -1,11 +1,8 @@
 import pandas as pd
-from datetime import datetime, timedelta
+from datetime import datetime
 from abc import ABC, abstractmethod
 
 from ChickenFarm.src.algorithm.stupid import StupidAlgorithm
-from ChickenFarm.src.db.db_netvalue import FundNetValue
-from ChickenFarm.src.util.tools import DateTools
-from ChickenFarm.src.util.exceptions import NonTradingError
 from ChickenFarm.src.util.log import get_logger
 
 
@@ -14,94 +11,75 @@ logger = get_logger(__file__)
 
 class AutomaticInvestmentPlan(ABC):
 
-    InvestmentCycles =  [30, 60, 90, 180, 365, 730] # 1095
-    StartIntervalSize = [10, 20, 30,  60,  60,  60]
+    InvestmentCycles = [30, 60, 90, 180, 365, 730]  # 展示标签（天）
+    # 周期标签 -> 买入窗口完整周数 N（N = round(cycle/7)）
+    WeeksPerCycle = {30: 4, 60: 8, 90: 13, 180: 26, 365: 52, 730: 104}
+    # 估值日采样步长：每 K 个交易日取一个估值日 C
+    MarkDayInterval = 5
 
     @abstractmethod
     def create_algo(self):
         # factory method
         pass
 
-    def invest_with_start_interval(self, code, start_interval, end, cycle=None):
-        """
-        每周定投 起始日为一个区间
-        须确保end为交易日，起始区间内的非交易日会被自动剔除 
+    def analysis_realtime(self, code, cycle, size=None):
+        '''
+        长期持有盯市回测：在历史交易日上等间隔采样估值日 C（默认每 5 个一个），
+        每个 C 之前取最近 N=WeeksPerCycle[cycle] 个完整交易周买入，C 日盯市。
 
-        :param code:             基金代码            str       '005827'
-        :param start_interval:   定投开始日          (datetime, datetime)     ('2021-01-08', '2021-02-23')
-        :param end:              定投结束日          str       '2021-08-09'
-        :param cycle:            投资周期，仅作为标记  int        180 365 365*3
-        :return df                                  dataframe
-        """
-
-        df = pd.DataFrame(
-            columns=['start', 'week', 'algorithm', 'cycle', 'profit_rate', 'test_date'])
-
+        :param code:   基金代码         str   '005827'
+        :param cycle:  周期展示标签      int   30/60/.../730
+        :param size:   已废弃（兼容旧签名），忽略
+        :return df                      dataframe
+        '''
+        n_weeks = self.WeeksPerCycle[cycle]
         stupid = self.create_algo(code)
 
-        for start in DateTools.get_between_data(start_interval[0], start_interval[1]):
-            try:
-                stupid.prepare_data(start, end)
-            except NonTradingError as error:
-                logger.debug(f"Start:{start} is non-trading day, continue.")
+        # 在库内全部交易日上等间隔采样估值日 C
+        trading_days = (stupid._value_df.sort_values('date')['date']
+                        .tolist())
+        mark_days = trading_days[::self.MarkDayInterval]
+
+        df = pd.DataFrame(
+            columns=['start', 'mark_day', 'week', 'algorithm', 'cycle',
+                     'profit_rate', 'sample_insufficient', 'test_date'])
+
+        for mark_day in mark_days:
+            stupid.prepare_data(mark_day, n_weeks)
+            if stupid.buy_df.empty:
                 continue
+
+            insufficient = 1 if stupid.sample_insufficient else 0
+            mark_ts = pd.Timestamp(mark_day)
 
             res = stupid.invest_weekly()
             for index, rate in enumerate(res):
-                tmp_pd = pd.DataFrame({'start': [start],
+                tmp_pd = pd.DataFrame({'start': [stupid.start],
+                                'mark_day': [mark_ts],
                                 'week': [index+1],
                                 'algorithm': ['stupid'],
                                 'cycle': [cycle],
                                 'profit_rate': [rate],
+                                'sample_insufficient': [insufficient],
                                 'test_date': [datetime.now()]
                                 })
                 df = pd.concat([df, tmp_pd])
 
             profit_rate = stupid.invest_daily()
-            if profit_rate!=999:
-                tmp_pd = pd.DataFrame({'start': [start],
+            if profit_rate is not None:
+                tmp_pd = pd.DataFrame({'start': [stupid.start],
+                                'mark_day': [mark_ts],
                                 'week': [-1],
                                 'algorithm': ['stupid'],
                                 'cycle': [cycle],
                                 'profit_rate': [profit_rate],
+                                'sample_insufficient': [insufficient],
                                 'test_date': [datetime.now()]
                                 })
                 df = pd.concat([df, tmp_pd])
 
-        logger.info(f"统计完成:{code}, 起始日区间为{start_interval}, 结束日为{end}.")
-        return df
-
-    def analysis_realtime(self, code, cycle, size=60):
-        '''
-        距离今天指定时间前（半年、一年、三年）的定投分析
-
-        :param code:             基金代码         str     '005827'
-        :param cycle:            投资周期         int     180
-        :param size:             起始区间大小      int     60
-        :return df                               dataframe
-        '''
-        fund_value = FundNetValue(code)
-
-        # 处理起始区间，如果起始点在发行日之前，就调整为发行日那天
-        start_interval = DateTools.get_before_date_interval(cycle, size)
-        start = start_interval[0]
-        if start < fund_value.release_date:
-            start_interval = (fund_value.release_date,
-                              fund_value.release_date + timedelta(days=size)
-                              )
-            logger.warning(f"基金:{code}, 起始日:{start} 超过首发日:{fund_value.release_date}, "
-                           f"start_interval修复为{start_interval}.")
-
-        # 处理结束的那天，如果结束的那天在数据库里还没上传，就调整为数据库中最后的日子
-        end = DateTools.get_recent_trading_day(datetime.today())
-        if end > fund_value.last_date:
-            end = fund_value.last_date
-            logger.debug(f"基金:{code}, 结束日在数据库中不存在, 修复为{end}.")
-
-        logger.info(f"开始统计，{code} 前{cycle}天每周定投，区间大小:{size}"
-                    f" 起始区间:{start_interval}, 结束日:{end}.")
-
-        df = self.invest_with_start_interval(code, start_interval, end, cycle)
+        logger.info(f"统计完成:{code}, 周期:{cycle}天 N:{n_weeks}, "
+                    f"估值日数:{len(mark_days)}.")
         return df
 
 

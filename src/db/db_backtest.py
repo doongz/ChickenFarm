@@ -22,10 +22,12 @@ class FundBacktest():
         self.tbl = f"tbl_{self.code}"
 
         self.columns = {'start': VARCHAR(64),
+                        'mark_day': DateTime,
                         'week': INT,
                         'algorithm': VARCHAR(64),
                         'cycle': INT,
-                        'profit_rate': DECIMAL(5, 4),
+                        'profit_rate': DECIMAL(7, 4),
+                        'sample_insufficient': INT,
                         'test_date': DateTime
                         }
 
