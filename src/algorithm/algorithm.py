@@ -1,13 +1,13 @@
 import pandas as pd
 from abc import ABC, abstractmethod
 
-from ChickenFarm.src.db.tbl_funds_for_backtest import FundsForBacktestTable
-from ChickenFarm.src.db.db_netvalue import FundNetValue
-from ChickenFarm.src.db.db_etf import ETFDaily
-from ChickenFarm.src.util.tools import DateTools, FundTypeTools
-from ChickenFarm.src.util.config import Config
-from ChickenFarm.src.util.exceptions import NonTradingError
-from ChickenFarm.src.util.log import get_logger
+from src.db.tbl_funds_for_backtest import FundsForBacktestTable
+from src.db.db_netvalue import FundNetValue
+from src.db.db_etf import ETFDaily
+from src.util.tools import DateTools, FundTypeTools
+from src.util.config import Config
+from src.util.exceptions import NonTradingError
+from src.util.log import get_logger
 
 
 logger = get_logger(__file__)
@@ -136,7 +136,3 @@ class Algorithm(ABC):
         # 估值日 C 的累计净值（盯市价格，不产生卖出）
         mark_price = self._value_df.loc[self._value_df['date'] == self.end]['totvalue']
         return float(mark_price)
-
-        
-
-

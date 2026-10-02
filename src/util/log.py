@@ -1,10 +1,16 @@
 import logging
 import logging.config
 
-from ChickenFarm.src.util.config import Config
+from src.util.config import REPO_ROOT
 
 
-logging.config.fileConfig(Config().log_path)
+CONF_PATH = REPO_ROOT / 'src' / 'util' / 'log.conf'
+LOG_FILE = REPO_ROOT / 'farm.log'
+
+logging.config.fileConfig(
+    str(CONF_PATH),
+    defaults={'logfile': str(LOG_FILE)},
+)
 
 
 def get_logger(filename):

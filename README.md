@@ -2,14 +2,14 @@
   <br>
   <a href="https://github.com/doongz/ChickenFarm"><img src="./docs/images/logo.png" alt="Chicken Farm"></a>
 </h1>
-<h4 align="center">一家小小的养鸡场 </h4>
+<h4 align="center">一家小小的养鸡场（定投回测版） </h4>
 
 <p align="center">
     <a>
       <img alt="env" src="https://img.shields.io/badge/macOS-passing-green?logo=apple" />
     </a>
     <a>
-      <img alt="Python" src="https://img.shields.io/badge/Python-3.12-blue?logo=python&logoColor=white" />
+      <img alt="Python" src="https://img.shields.io/badge/Python-3.10%2B-blue?logo=python&logoColor=white" />
     </a>
     <a href="https://github.com/doongz/ChickenFarm/graphs/commit-activity">
       <img alt="commit-activity" src="https://img.shields.io/github/last-commit/doongz/ChickenFarm.svg?logo=github&logoColor=white" />
@@ -26,42 +26,30 @@
     <a>
       <img alt="forks" src="https://img.shields.io/github/forks/doongz/ChickenFarm?color=5EEDF6&logo=github" />
     </a>
-  </p>
+</p>
 <p align="center">
-  <a href="#Features">Features</a> •
-  <a href="#Installation">Installation</a> •
-  <a href="#Usage">Usage</a> •
-  <a href="#Todo">Todo</a> •
-  <a href="#Contribute">Contribute</a> •
-  <a href="#Community">Community</a> •
-  <a href="#License">License</a>
+  <a href="#features">Features</a> •
+  <a href="#installation">Installation</a> •
+  <a href="#usage">Usage</a> •
+  <a href="#%E5%AE%9A%E6%8A%95%E5%88%86%E6%9E%90">定投分析</a> •
+  <a href="#%E9%A1%B9%E7%9B%AE%E7%BB%93%E6%9E%84">项目结构</a> •
+  <a href="#license">License</a>
 </p>
 
-非专业养鸡场:hatching_chick::hatched_chick::baby_chick:，统计购买和卖出操作，分析持仓和收益，爬取基金净值，使用各种定投算法回测分析，生成投资策略 :chart_with_upwards_trend::chart_with_upwards_trend::chart_with_upwards_trend:
+非专业养鸡场:hatching_chick::hatched_chick::baby_chick:，一个纯回测工具：维护回测标的清单，爬取场外基金累计净值与场内 ETF 前复权日线，使用定投算法在多个时间跨度上做历史回测，并通过显著性检验与小提琴图回答「周几定投更划算」。:chart_with_upwards_trend::chart_with_upwards_trend::chart_with_upwards_trend:
+
+> 仅用于个人学习与研究，不构成任何投资建议。
 
 ## Features
-- 全自动数据采集（天天基金购买记录、最新持仓采集）
-- 爬取最新基金净值
-- [个人数据分析](#个人数据统计图)
-- [定投回测分析](#定投分析图)
 
-**2022.03.17 按照策略进行的实际定投情况，大多数买在了相对较低的点上。**
-
-<img src="./docs/images/实际定投.png" alt="实际定投" style="zoom:60%;" />
-
-**2025.10.22 更新一下定投四年来的收益。**
-
-自2021.07.23开户以来，最大收益为28.60%。同期沪深300为-9.76%。目前年化6.09%。
-
-<img src="./docs/images/PixPin_2025-10-22_22-53-13.png" alt="PixPin_2025-10-22_22-53-13" style="zoom:50%;" />
-
-部分基金的收益在50%以上。
-
-<img src="./docs/images/PixPin_2025-10-22_22-51-25.png" alt="PixPin_2025-10-22_22-51-25" style="zoom:50%;" />
+- **行情采集**：场外基金历史净值（[xalpha](https://github.com/refraction-ray/xalpha)）；ETF 日线以新浪财经为主源、akshare 东方财富兜底，含指数退避重试与分红/拆分前复权合成
+- **定投回测**：30/60/90/180/365/730 天六个周期，统一估值日盯市、完整交易周对齐、等间隔采样估值日；场外基金按固定金额买入、ETF 按固定手数（1 手=100 份）买入，计入价差/佣金/滑点/申购费折扣
+- **统计检验**：工作日配对 Wilcoxon 符号秩检验 + Holm 多重比较校正、bootstrap 95% 置信区间、分时间块稳健性判定
+- **图表与数据导出**：按领域导出小提琴图（含中位数/分位/最佳定投日/CI 误差线），并导出 p 值、效应量、CI、稳健性结论 CSV
 
 ## Installation
 
-### 1、准备 Mysql 数据库
+### 1、准备 MySQL 数据库
 
 ```bash
 brew install mysql
@@ -71,168 +59,101 @@ brew services restart mysql
 brew services info mysql
 ```
 
-1. 创建数据库 **db_fund**，使用[sql文件](./sql/DDL_db_fund.sql)整库建表
-2. 数据库 **db_netvalue**，无需建表
-3. 数据库 **db_backtest**，无需建表
+创建四个数据库：
 
-修改最大连接数，Linux/macOS：/etc/mysql/my.cnf
+| 数据库 | 是否需要建表 | 用途 |
+| :-- | :-- | :-- |
+| `db_fund` | 是，使用 [sql 文件](./sql/DDL_db_fund.sql) 建表 | 回测标的清单（tbl_funds_for_backtest） |
+| `db_netvalue` | 否（程序自动建表） | 场外基金历史净值，每只基金一张表 |
+| `db_backtest` | 否（程序自动建表） | 回测结果，每只基金一张表 |
+| `db_etf` | 否（程序自动建表） | ETF 前复权日线，每只 ETF 一张表 |
 
-```shell
+```bash
+mysql -u <user> -p -e "CREATE DATABASE IF NOT EXISTS db_fund DEFAULT CHARACTER SET utf8mb4;"
+mysql -u <user> -p db_fund < sql/DDL_db_fund.sql
+mysql -u <user> -p -e "CREATE DATABASE IF NOT EXISTS db_netvalue; CREATE DATABASE IF NOT EXISTS db_backtest; CREATE DATABASE IF NOT EXISTS db_etf;"
+```
+
+回测多进程并发写入需要较多连接，建议调大最大连接数（Linux/macOS：`/etc/mysql/my.cnf`）：
+
+```ini
 [mysqld]
-max_connections = 500  # 设置最大连接数
+max_connections = 500
 ```
 
-### 2、填写配置表
+### 2、填写配置文件
 
-将 [配置文件(config.yaml)](./config.yaml) ，按照注释填写配置表。
+编辑根目录 [config.yaml](./config.yaml)，填写数据库账号与图表导出目录；`BACKTEST` 回测参数为可选项，缺省使用代码内默认值。
 
-### 3、配置环境变量
+### 3、安装依赖（uv）
 
-```shell
-echo "export PYTHONPATH=$PYTHONPATH:<项目所在的父目录>" >> ~/.zshrc
-echo "export FARM_CONFIG_PATH=<配置文件(config.yaml)路径>" >> ~/.zshrc
-source ~/.zshrc
-```
-
-将 `<>` 替换成自己的配置，bash替换为 `.bash_profile`
-
-### 4、安装依赖包
-
-uv
+无需配置 `PYTHONPATH`，在**仓库根目录**直接运行脚本即可。
 
 ```shell
-# 创建独立的虚拟环境（指定 Python 3.10）
+# 创建独立的虚拟环境（Python 3.10+）
 uv venv --python 3.10
 # 激活环境（macOS/Linux）
 source .venv/bin/activate
 
 uv pip install -r requirements.txt
-
-# 退出虚拟环境
-deactivate
-# 删除虚拟环境
-rm -rf .venv
 ```
 
-pip
+或使用 pip：
 
 ```shell
 python3 -m pip install -r requirements.txt
 ```
 
-> [!IMPORTANT]
->
-> 每年都需要更新一下 chinesecalendar 包
->
-> ```bash
-> pip install chinesecalendar
-> pip install -U xalpha
-> ```
-
-ChromeDriver 下载，需要与Chrome版本对应
-
-https://developer.chrome.com/docs/chromedriver/downloads
-
-cp chromedriver-mac-x64/chromedriver /usr/local/bin
-
-关闭chrome自动升级
+配置文件默认读取仓库根 `config.yaml`；如需自定义位置，可设置环境变量：
 
 ```shell
-sudo defaults write com.google.Keystone.Agent checkInterval 0
-sudo defaults write com.google.Keystone.Installer checkInterval 0
+export FARM_CONFIG_PATH=/your/path/config.yaml
 ```
 
+> [!IMPORTANT]
+>
+> 每年需要更新一下 chinesecalendar 包，并保持 xalpha 为最新版本：
+>
+> ```bash
+> pip install -U chinesecalendar xalpha
+> ```
 
 ## Usage
 
-### 回测
+所有命令均在仓库根目录执行，主命令互斥，一次只能执行一个。
 
-将需要分析的基金添加至数据库（之后不用再添加），根据提示选择分类
+| 命令 | 说明 |
+| :-- | :-- |
+| `chick.py -add -c <code>` | 添加回测标的，运行后按提示选择所属领域（只需添加一次） |
+| `chick.py -delete -c <code>` | 从回测标的清单删除（执行前需 `Y` 确认） |
+| `chick.py -fetch` | 采集行情：场外基金累计净值 + ETF 前复权日线，为回测提供数据 |
+| `chick.py -backtest` | 运行回测并将结果写入 `db_backtest` |
+| `chick.py -plots` | 绘制各领域回测小提琴图并导出 stats CSV |
+| `chick.py -job backtest_job` | 一键流水线：采集 → 回测 → 绘图（执行前需 `Y` 确认） |
 
-```shell
-uv run chick.py -add -c `code`
-python3 chick.py -add -c `code`
-```
-
-执行回测分析任务
-
-```shell
-uv run chick.py -job backtest_job
-python3 chick.py -job backtest_job
-```
-
-1. 把基金的历史净值上传至 db_netvalue 数据库中
-2. 更新回测分析数据
-3. 导出回测分析图表
-
-### 个人数据分析
-
-执行个人数据分析任务
+典型流程：
 
 ```shell
-python3 chick.py -job base_job
+uv run chick.py -add -c 005827      # 添加标的
+uv run chick.py -job backtest_job  # 后续可反复运行，更新行情、回测与图表
 ```
 
-1. 更新本周的操作记录，
-2. 更新本周所有基金的持仓
-3. 统计并记录本周各个领域的持仓、收益
-4. 导出个人数据统计表
-5. 导出个人数据统计图
+不使用 uv 时将 `uv run chick.py` 替换为 `python3 chick.py` 即可。
 
-### 二、CLI
+## 定投分析
 
-```shell
-python3 chick.py
-```
-
-#### 1、操作
-
-| command                         | help                                           |
-| :------------------------------ | :--------------------------------------------- |
-| -add -c `code`                  | 添加基金                                       |
-| -delete -c `code`               | 删除基金（回测）                                       |
-| -assets            | 从天天基金获取最新资产数据，更新至数据库中         |
-
-#### 2、个人数据分析
-
-| command         | help                                                         |
-| :-------------- | :----------------------------------------------------------- |
-| -record | 统计并记录各个领域以及总的投入、持仓、收益历史               |
-| -tables         | 导出基金最新数据总表、每个领域合计表、历史购买表、历史仓位表、历史收益表 |
-| -charts         | 绘制个人数据图表                                             |
-| -show                           | 展示基金数据和图表                           |
-
-#### 3、回测分析
-
-| command         | help                         |
-| :-------------- | :--------------------------- |
-| -netvalue       | 更新基金历史净值数据         |
-| -backtest       | 回测，并将回测数据上传       |
-| -plots | 绘制各领域基金回测的小提琴图 |
-
-### 三、个人数据统计
-
-- 各领域最新持仓图
-- 各领域持仓占比图
-- 各领域最新收益图
-- 各领域最新收益率图
-- 各领域最新持仓 & 收益图
-
-![personal_data_statistics](./docs/images/1.png)
-
-### 四、定投分析
-
-> 下面实现的定投方法，仅为一种「最简单的思路」，抛砖引玉
+> 下面实现的定投方法，仅为一种「最简单的思路」，抛砖引玉，不构成投资建议。
 >
+> 原理与口径详见 [docs/backtest.md](./docs/backtest.md)。
 
-选择一周中的固定一天（周一至周五），每周以固定的资金进行买入，在近半年、近一年、近三年的时间跨度进行定投回测，回测结果绘制出小提琴图。
+选择一周中的固定一天（周一至周五），每周以固定的资金（基金按固定金额、ETF 按固定手数）买入，在近 1~24 个月的多个时间跨度进行回测，回测结果绘制为小提琴图。
 
-- 每一行，为一个基金的180天、365天、1095天区间的回测分析
-- 每一列，为一类基金的相同天数回测分析，**可判断不同基金的定投收益**
-- 子图为一周五天的小提琴图，中间横线为中位数，上、下端横线为极值，**可分析选择周内的哪一天定投收益高**
-- 小提琴图中宽的地方为概率密度大的地方，也就是多数样本分布的地方，也就是**最有可能获得的收益率**
+- 每一行，为一只基金在 30/60/90/180/365/730 天各周期的回测分析
+- 每一列，为同一周期下不同基金的结果，**可判断不同基金的定投收益**
+- 子图为一周五天 + daily（每日定投）的小提琴图，中间横线为中位数，上、下端横线为极值，黑色误差线为中位数 95% bootstrap 置信区间
+- 小提琴中宽的地方概率密度大，即**最有可能获得的收益率**；显著且稳健占优的「最佳定投日」标红，不显著时标注 `no significant weekday effect`
 
-注：定投的起点，也就是开始定投的日子对最终的收益有很大的影响。所以，并没有直接用距今天180天前的那一天开始算单一结果，而是取距今天180天前那一天的「附近区间的多个起点」，统计出多个样本来绘制「Violin Plot」。
+注：定投起点对最终收益影响很大。程序并非从单一日期算一个结果，而是在历史交易日上等间隔采样估值日（每 5 个交易日一个情景），每个情景取之前最近 N 个完整交易周回测，用大量样本绘制分布。
 
 例：白酒和半导体的一些基金回测分析
 
@@ -240,17 +161,27 @@ python3 chick.py
 
 ![aip_backtest](./docs/images/3.png)
 
+## 项目结构
+
+```text
+ChickenFarm/
+├── chick.py                  # CLI 入口（argparse），仓库根直接运行
+├── config.yaml               # 数据库 / 导出路径 / 回测参数配置
+├── requirements.txt
+├── sql/DDL_db_fund.sql       # 回测标的清单建表脚本
+├── docs/backtest.md          # 回测原理与图表解读
+└── src/                      # 顶层包（import src.xxx，无需 PYTHONPATH）
+    ├── farm.py               # 角色编排（Farmer / Operator / Analyst）
+    ├── algorithm/            # 定投算法（algorithm / stupid）与显著性检验
+    ├── db/                   # 数据库连接与表模型（清单库 / 净值 / 回测 / ETF）
+    ├── module/               # 业务模块（回测计划、行情采集、清单维护、传输编排）
+    ├── plot/                 # 回测小提琴图与 stats CSV 导出
+    └── util/                 # 配置、日志、交易日工具、领域定义、异常
+```
+
 ## DEV
 
-akshare文档：
-
-https://akshare.akfamily.xyz/introduction.html
-
-
-## Contribute
-
-Contributions are always welcome!
-Please read the [contribution guidelines](https://github.com/doongz/ChickenFarm/blob/main/docs/contribution.md).:relaxed:
+- akshare 文档：https://akshare.akfamily.xyz/introduction.html
 
 ## Community
 

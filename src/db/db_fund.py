@@ -2,7 +2,7 @@ import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from ChickenFarm.src.util.config import Config
+from src.util.config import Config
 
 
 config = Config()
@@ -24,9 +24,6 @@ class Database(metaclass=Singleton):
         self.engine = create_engine(
             f"mysql+pymysql://{config.db_username}:{config.db_password}@{config.db_address}:{config.db_port}/{config.db_fund}"
         )
-        # self.engine = create_engine(
-        #     f"mysql+pymysql://{config.db_username}@{config.db_address}:{config.db_port}/{config.db_fund}"
-        # )
         # 创建DBSession类型:
         DBSession = sessionmaker(bind=self.engine)
         # 创建session对象:

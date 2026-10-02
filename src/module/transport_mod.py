@@ -1,35 +1,43 @@
 """Transport
-1、将xalpha的数据传输到自建数据库
+1、将xalpha/新浪/akshare 的行情数据传输到自建数据库
 2、将回测的数据传输到自建数据库
+
+统一入口 update_market_data_multiprocess 按标的类型（fund/etf）自动分流。
 """
 import pandas as pd
 import multiprocessing
 
-from ChickenFarm.src.db.db_fund import Database
-from ChickenFarm.src.db.tbl_funds_for_backtest import FundsForBacktestTable
-from ChickenFarm.src.db.db_netvalue import FundNetValue
-from ChickenFarm.src.db.db_backtest import FundBacktest
-from ChickenFarm.src.db.db_etf import ETFDaily
-from ChickenFarm.src.module.backtest_mod import StupidPlan
-from ChickenFarm.src.module.etf_mod import fetch_etf_daily
-from ChickenFarm.src.module.etf_adjust import apply_forward_adjust
-from ChickenFarm.src.util.tools import XAlphaTools, FundTypeTools
-from ChickenFarm.src.util.log import get_logger
+from src.db.db_fund import Database
+from src.db.tbl_funds_for_backtest import FundsForBacktestTable
+from src.db.db_netvalue import FundNetValue
+from src.db.db_backtest import FundBacktest
+from src.db.db_etf import ETFDaily
+from src.module.backtest_mod import StupidPlan
+from src.module.etf_mod import fetch_etf_daily
+from src.module.etf_adjust import apply_forward_adjust
+from src.util.tools import XAlphaTools, FundTypeTools
+from src.util.log import get_logger
 
 
 logger = get_logger(__file__)
 
 
-def transport_netvalue_multiprocess(cpus=8):
+def transport_netvalue_multiprocess(code_list=None, fund_cpus=8):
     """
-    将xalpha的数据传输到自建数据库
+    将 xalpha 的场外基金净值传输到 db_netvalue，并同步清单中的费率信息。
+    净值上传与信息更新各自独立进程池，同一代码两项均成功才算成功。
+
+    :param code_list: 指定代码列表；None 时取清单中全部 fund 类型代码
+    :return: (successes, fails)
     """
     results = []
-    job_cnt = min(multiprocessing.cpu_count(), int(cpus))
+    job_cnt = min(multiprocessing.cpu_count(), int(fund_cpus))
     pool_1 = multiprocessing.Pool(processes=job_cnt)
     pool_2 = multiprocessing.Pool(processes=job_cnt)
 
-    code_list = FundsForBacktestTable.get_all_code()
+    if code_list is None:
+        code_list = [c for c in FundsForBacktestTable.get_all_code()
+                     if FundTypeTools.classify(c) != 'etf']
     for code in code_list:
         res_1 = pool_1.apply_async(_upload_netvalue, args=(code, ))
         res_2 = pool_2.apply_async(_update_info, args=(code, ))
@@ -53,7 +61,7 @@ def transport_netvalue_multiprocess(cpus=8):
 
 def transport_backtest_data_multiprocess(cpus=8):
     """
-    将回测的数据传输到自建数据库
+    将回测的数据传输到 db_backtest
     """
     results = []
     job_cnt = min(multiprocessing.cpu_count(), int(cpus))
@@ -117,17 +125,21 @@ def _update_info(code):
         return False
 
 
-def transport_etf_daily_multiprocess(cpus=4):
+def transport_etf_daily_multiprocess(code_list=None, etf_cpus=4):
     """
     多进程采集 ETF 日线行情（含前复权）并上传 db_etf。
     仅处理类型为 etf 的标的。并发默认 4，避免触发新浪限流。
+
+    :param code_list: 指定代码列表；None 时取清单中全部 etf 类型代码
+    :return: (successes, fails)
     """
     results = []
-    job_cnt = min(multiprocessing.cpu_count(), int(cpus))
+    job_cnt = min(multiprocessing.cpu_count(), int(etf_cpus))
     pool = multiprocessing.Pool(processes=job_cnt)
 
-    code_list = [c for c in FundsForBacktestTable.get_all_code()
-                 if FundTypeTools.classify(c) == 'etf']
+    if code_list is None:
+        code_list = [c for c in FundsForBacktestTable.get_all_code()
+                     if FundTypeTools.classify(c) == 'etf']
     for code in code_list:
         res = pool.apply_async(_upload_etf_daily, args=(code, ))
         results.append((code, res))
@@ -144,6 +156,28 @@ def transport_etf_daily_multiprocess(cpus=4):
     logger.info(
         f"Transport ETF daily:{successes} successful. fails:{fails}.")
     return successes, fails
+
+
+def update_market_data_multiprocess(fund_cpus=8, etf_cpus=4):
+    """
+    行情采集统一入口：按标的类型分流。
+    - fund：xalpha 历史净值写 db_netvalue + 同步清单费率信息
+    - etf ：新浪（退避重试）→ akshare 兜底 → 前复权 → db_etf
+    :return: {'fund': (successes, fails), 'etf': (successes, fails)}
+    """
+    code_list = FundsForBacktestTable.get_all_code()
+    fund_codes = [c for c in code_list if FundTypeTools.classify(c) != 'etf']
+    etf_codes = [c for c in code_list if FundTypeTools.classify(c) == 'etf']
+
+    logger.info(f"Update market data: fund codes:{fund_codes}, "
+                f"etf codes:{etf_codes}.")
+
+    fund_result = transport_netvalue_multiprocess(
+        code_list=fund_codes, fund_cpus=fund_cpus)
+    etf_result = transport_etf_daily_multiprocess(
+        code_list=etf_codes, etf_cpus=etf_cpus)
+
+    return {'fund': fund_result, 'etf': etf_result}
 
 
 def _upload_etf_daily(code):
@@ -163,17 +197,21 @@ def _upload_etf_daily(code):
 
 def _upload_backtest_data(code):
     '''
-    向 db_backtest 数据库上传基金的，半年、一年、三年回测数据
+    向 db_backtest 数据库上传基金的，各周期回测数据
     有新的计划就向 aip_plans 中加
     '''
-    aip_plans = [StupidPlan()]
+    try:
+        aip_plans = [StupidPlan()]
 
-    for plan in aip_plans:
-        backtest_df = pd.DataFrame()
-        for cycle in plan.InvestmentCycles:
-            df = plan.analysis_realtime(code, cycle)
-            backtest_df = pd.concat([backtest_df, df])
+        for plan in aip_plans:
+            backtest_df = pd.DataFrame()
+            for cycle in plan.InvestmentCycles:
+                df = plan.analysis_realtime(code, cycle)
+                backtest_df = pd.concat([backtest_df, df])
 
-        FundBacktest(code).to_sql(backtest_df)
-        logger.info(f"Upload backtest data({code}) success.")
-    return True
+            FundBacktest(code).to_sql(backtest_df)
+            logger.info(f"Upload backtest data({code}) success.")
+        return True
+    except Exception as error:
+        logger.error(f"Upload backtest data({code}) occurred an error: {error}.")
+        return False

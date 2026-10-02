@@ -1,7 +1,13 @@
 import os
 import yaml
 import threading
+from pathlib import Path
 from datetime import datetime
+
+
+# 仓库根目录（src/util/config.py 向上两级），配置与日志默认锚定于此
+REPO_ROOT = Path(__file__).resolve().parents[2]
+DEFAULT_CONFIG_PATH = REPO_ROOT / 'config.yaml'
 
 
 class Config(object):
@@ -9,8 +15,9 @@ class Config(object):
     _instance_lock = threading.Lock()
 
     def __init__(self):
-        config_path = os.getenv("FARM_CONFIG_PATH", None)
-        if not config_path:
+        # FARM_CONFIG_PATH 可选；缺省直接读仓库根 config.yaml，无需任何环境变量
+        config_path = os.getenv("FARM_CONFIG_PATH") or str(DEFAULT_CONFIG_PATH)
+        if not os.path.isfile(config_path):
             raise Exception(
                 f"Please check config file exist. config_path: {config_path}")
         self.config_data = self._read_from_yaml(config_path)
@@ -49,7 +56,7 @@ class Config(object):
 
     @property
     def db_fund(self):
-        # 存放个人基金的数据库
+        # 回测标的清单库（仅含 tbl_funds_for_backtest）
         return self.config_data.get("DB_FUND")
 
     @property
@@ -66,32 +73,6 @@ class Config(object):
     def db_etf(self):
         # 存放 ETF 日线行情的数据库
         return self.config_data.get("DB_ETF")
-
-    @property
-    def log_path(self):
-        # 日志配置文件路径
-        return os.path.join(os.path.dirname(os.path.abspath(__file__)), "log.conf")
-
-    @property
-    def position_csv_path(self):
-        # 以csv方式输入的仓位信息
-        return self.config_data.get("POSITION_CSV_PATH")
-
-    @property
-    def export_table_path(self):
-        # 导出的个人数据统计表的路径
-        path = self.config_data.get("EXPORT_TABLE_PATH")
-        path = os.path.join(path, datetime.today().strftime('%Y-%m-%d'))
-        os.makedirs(path, exist_ok=True)
-        return path
-
-    @property
-    def export_chart_path(self):
-        # 导出的个人数据图的路径
-        path = self.config_data.get("EXPORT_CHART_PATH")
-        path = os.path.join(path, datetime.today().strftime('%Y-%m-%d'))
-        os.makedirs(path, exist_ok=True)
-        return path
 
     @property
     def export_aip_plot_path(self):
@@ -113,13 +94,3 @@ class Config(object):
                             datetime.today().strftime('%Y-%m-%d'), 'stats')
         os.makedirs(path, exist_ok=True)
         return path
-
-    @property
-    def tiantian_username(self):
-        # 天天基金账户
-        return self.config_data.get("TIANTIAN_USERNAME")
-
-    @property
-    def tiantian_password(self):
-        # 天天基金密码
-        return self.config_data.get("TIANTIAN_PASSWORD")

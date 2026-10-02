@@ -2,7 +2,7 @@ import pandas as pd
 from sqlalchemy import create_engine, text
 from sqlalchemy import DateTime, DECIMAL
 
-from ChickenFarm.src.util.config import Config
+from src.util.config import Config
 
 
 config = Config()
@@ -15,9 +15,6 @@ class FundNetValue():
         self.engine = create_engine(
             f"mysql+pymysql://{config.db_username}:{config.db_password}@{config.db_address}:{config.db_port}/{config.db_netvalue}"
         )
-        # self.engine = create_engine(
-        #     f"mysql+pymysql://{config.db_username}@{config.db_address}:{config.db_port}/{config.db_netvalue}"
-        # )
         self.code = code
         self.tbl = f"tbl_{self.code}"
 
@@ -36,7 +33,6 @@ class FundNetValue():
         return self.tbl
 
     def read_sql(self):
-        # return pd.read_sql(self.tbl, self.engine)
         with self.engine.connect() as connection:
             sql = text(f"SELECT * FROM {self.tbl}")
             df = pd.read_sql(sql, con=connection)

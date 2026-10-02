@@ -2,7 +2,7 @@ import pandas as pd
 from sqlalchemy import create_engine, text
 from sqlalchemy import DateTime, DECIMAL, BIGINT
 
-from ChickenFarm.src.util.config import Config
+from src.util.config import Config
 
 
 config = Config()

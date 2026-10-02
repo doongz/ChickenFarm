@@ -5,7 +5,6 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib import font_manager
-from matplotlib.ticker import MultipleLocator
 import multiprocessing
 
 
@@ -18,19 +17,21 @@ def _setup_chinese_font():
     if chosen:
         matplotlib.rcParams['font.sans-serif'] = [chosen]
     matplotlib.rcParams['axes.unicode_minus'] = False
+    matplotlib.rcParams['figure.dpi'] = 100   # 显示分辨率
+    matplotlib.rcParams['savefig.dpi'] = 200  # 保存图片分辨率
 
 
 _setup_chinese_font()
 
 from src.module.backtest_mod import AutomaticInvestmentPlan
-from ChickenFarm.src.algorithm.significance import build_paired_matrix, \
+from src.algorithm.significance import build_paired_matrix, \
     bootstrap_median_ci, stability_verdict
-from ChickenFarm.src.db.tbl_funds_for_backtest import FundsForBacktestTable
-from ChickenFarm.src.db.db_backtest import FundBacktest
-from ChickenFarm.src.util.industry_class import get_fileds_en
-from ChickenFarm.src.util.tools import DateTools
-from ChickenFarm.src.util.config import Config
-from ChickenFarm.src.util.log import get_logger
+from src.db.tbl_funds_for_backtest import FundsForBacktestTable
+from src.db.db_backtest import FundBacktest
+from src.util.industry_class import get_fileds_en
+from src.util.tools import DateTools
+from src.util.config import Config
+from src.util.log import get_logger
 
 
 logger = get_logger(__file__)
@@ -121,7 +122,7 @@ def export_filed_stats(filed, fund_list):
     - ci：6 个分组的中位数 bootstrap 95% CI
     - stability：分时间块的 best day 与稳健结论
     """
-    from ChickenFarm.src.algorithm.significance import (
+    from src.algorithm.significance import (
         pairwise_wilcoxon, best_day_by_block)
 
     pairwise_rows, ci_rows, stability_rows = [], [], []
@@ -224,7 +225,7 @@ def export_aip_violin_plot_by_filed(filed, show=False):
                 low = min(low, bodies[i_i].min())
                 high = max(high, bodies[i_i].max())
             low_high[i//cols][i%cols] = (low, high)
-            
+
             ax = axs[math.floor(i/cols)][i % cols]
             violin_plot = ax.violinplot(bodies,
                                         showmeans=False,  # 均值

@@ -1,16 +1,24 @@
+"""
+ChickenFarm 定投回测 CLI。
+
+在仓库根目录直接运行（无需配置 PYTHONPATH）：
+    python chick.py -add -c 005827
+    python chick.py -job backtest_job
+    uv run chick.py -plots
+"""
 import sys
 import argparse
 from termcolor import colored
 from argparse import RawTextHelpFormatter
 
-from ChickenFarm.src.farm import Farmer
+from src.farm import Farmer
 
 
 farmer = Farmer()
 
 
 def main():
-    parser = argparse.ArgumentParser(description=f"欢迎进入养鸡场 (*^_^*)",
+    parser = argparse.ArgumentParser(description=f"欢迎进入养鸡场（定投回测）(*^_^*)",
                                      formatter_class=RawTextHelpFormatter)
 
     group = parser.add_mutually_exclusive_group(required=True)
@@ -20,9 +28,9 @@ def main():
     group.add_argument('-delete',
                        action='store_true',
                        help='向「回测列表」中「删除」基金')
-    group.add_argument('-netvalue',
+    group.add_argument('-fetch',
                        action='store_true',
-                       help='更新基金「历史净值」，为回测提供数据')
+                       help='采集行情：场外基金历史净值 + ETF 前复权日线，为回测提供数据')
     group.add_argument('-backtest',
                        action='store_true',
                        help='回测，并将回测数据上传')
@@ -30,43 +38,18 @@ def main():
                        dest='plots',
                        action='store_true',
                        help='绘制各领域基金回测的小提琴图')
-
-    group.add_argument('-update',
-                       dest='update',
-                       action='store_true',
-                       help='从天天基金获取最新资产数据，更新至数据库中')
-    group.add_argument('-record',
-                       dest='record',
-                       action='store_true',
-                       help='记录各个基金的持仓、净值、收益、收益率')
-    group.add_argument('-tables',
-                       action='store_true',
-                       help='导出基金最新数据总表、回测基金表，历史记录表')
-    group.add_argument('-charts',
-                       action='store_true',
-                       help='绘制个人数据图表')
-
     group.add_argument('-job',
                        dest='job',
-                       help="执行定制工作")
-    group.add_argument('-show',
-                       action='store_true',
-                       help='展示基金数据')
+                       help="执行定制工作：backtest_job（采集 → 回测 → 绘图）")
 
     parser.add_argument('-c', '--code',
                         dest='code',
                         help="基金代码")
-    parser.add_argument('-a', '--amount',
-                        dest='amount',
-                        help="数额")
 
     args = parser.parse_args()
 
     if args.job:
         farmer.job_run(args.job)
-        return 0
-    elif args.show:
-        farmer.statistician.show()
         return 0
 
     if args.add or args.delete:
@@ -78,21 +61,12 @@ def main():
         farmer.operator.add(args.code)
     elif args.delete:
         farmer.operator.delete(args.code)
-    elif args.netvalue:
-        farmer.analyst.transport_netvalue()
+    elif args.fetch:
+        farmer.analyst.fetch()
     elif args.backtest:
         farmer.analyst.backtest()
     elif args.plots:
         farmer.analyst.draw_backtest_plots()
-
-    elif args.update:
-        farmer.operator.update()
-    elif args.record:
-        farmer.statistician.record_history()
-    elif args.tables:
-        farmer.statistician.export_tables()
-    elif args.charts:
-        farmer.statistician.draw_charts()
 
     return 0
 

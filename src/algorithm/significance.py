@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 
-from ChickenFarm.src.util.log import get_logger
+from src.util.log import get_logger
 
 
 logger = get_logger(__file__)

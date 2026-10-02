@@ -1,49 +1,13 @@
-import os
 import pandas as pd
 import xalpha as xa
 from chinese_calendar import is_workday
 from datetime import datetime, timedelta
 
-
-from ChickenFarm.src.db.db_fund import Database
-from ChickenFarm.src.util.config import Config
-from ChickenFarm.src.util.log import get_logger
+from src.util.config import Config
+from src.util.log import get_logger
 
 
 logger = get_logger(__file__)
-
-
-class SheetTools:
-
-    @staticmethod
-    def read_buy_list():
-        # 从 position.csv 中读取已购买基金的代码列表
-        df = pd.read_csv(Config().position_csv_path, dtype={"code": str})
-        return df['code'].tolist()
-
-    @staticmethod
-    def read_latest_position():
-        # 从 position.csv 中读取已购买基金的最新持仓
-        latest_position = []
-        df = pd.read_csv(Config().position_csv_path, dtype={"code": str})
-
-        for index, row in df.iterrows():
-            latest_position.append((row['code'], row['position']))
-
-        return latest_position
-
-    @staticmethod
-    def export_tables():
-        # 从 db_fund 数据库中导出csv文件
-        table_names = ['tbl_assets',
-                       'tbl_funds_for_backtest', 'tbl_history']
-
-        for tbl in table_names:
-            df = Database().to_df(tbl)
-            tbl_path = os.path.join(Config().export_table_path, tbl+'.csv')
-            df.to_csv(tbl_path)
-
-            logger.info(f"Export table:{tbl} to {tbl_path} success.")
 
 
 class XAlphaTools:
@@ -165,7 +129,7 @@ class DateTools:
         得到指定天数前的日期区间，近半年，近一年，近三年
         :param  days  int   180
         :param  size  int   区间大小，30
-        :return       (datetime, datetime) 
+        :return       (datetime, datetime)
         '''
         nearly_date = DateTools.get_before_date(days)
         begin_date = nearly_date

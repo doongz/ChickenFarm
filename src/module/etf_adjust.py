@@ -6,8 +6,8 @@ ETF 前复权价合成
 """
 import pandas as pd
 
-from ChickenFarm.src.util.config import Config
-from ChickenFarm.src.util.log import get_logger
+from src.util.config import Config
+from src.util.log import get_logger
 
 
 logger = get_logger(__file__)

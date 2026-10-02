@@ -2,8 +2,8 @@ import pandas as pd
 from datetime import datetime
 from abc import ABC, abstractmethod
 
-from ChickenFarm.src.algorithm.stupid import StupidAlgorithm
-from ChickenFarm.src.util.log import get_logger
+from src.algorithm.stupid import StupidAlgorithm
+from src.util.log import get_logger
 
 
 logger = get_logger(__file__)

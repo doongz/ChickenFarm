@@ -9,7 +9,7 @@ import time
 import pandas as pd
 import requests
 
-from ChickenFarm.src.util.log import get_logger
+from src.util.log import get_logger
 
 
 logger = get_logger(__file__)

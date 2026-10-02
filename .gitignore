@@ -1,7 +1,20 @@
 __pycache__/
+*.pyc
+*.pyo
 .ipynb_checkpoints
 .DS_Store
 *dev*
-*.pyc
 *.log*
 *.lock
+
+# 虚拟环境（uv venv）
+.venv/
+venv/
+# 误建的虚拟环境目录
+/list/
+
+# 回测图表与统计产物
+output/
+
+# 本地工作文档（规格 / 调研记录）
+.trae/
