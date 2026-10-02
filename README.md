@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-  <a href="https://github.com/WalleDong/ChickenFarm"><img src="./docs/images/logo.png" alt="Chicken Farm"></a>
+  <a href="https://github.com/doongz/ChickenFarm"><img src="./docs/images/logo.png" alt="Chicken Farm"></a>
 </h1>
 <h4 align="center">一家小小的养鸡场 </h4>
 
@@ -11,20 +11,20 @@
     <a>
       <img alt="Python" src="https://img.shields.io/badge/Python-3.12-blue?logo=python&logoColor=white" />
     </a>
-    <a href="https://github.com/dowalle/ChickenFarm/graphs/commit-activity">
-      <img alt="commit-activity" src="https://img.shields.io/github/last-commit/dowalle/ChickenFarm.svg?logo=github&logoColor=white" />
+    <a href="https://github.com/doongz/ChickenFarm/graphs/commit-activity">
+      <img alt="commit-activity" src="https://img.shields.io/github/last-commit/doongz/ChickenFarm.svg?logo=github&logoColor=white" />
     </a>
-    <a href="https://github.com/dowalle/ChickenFarm/issues">
-      <img alt="Issues" src="https://img.shields.io/github/issues/dowalle/ChickenFarm?style=flat&color=6A5EF6&label=Issues&logo=github" />
+    <a href="https://github.com/doongz/ChickenFarm/issues">
+      <img alt="Issues" src="https://img.shields.io/github/issues/doongz/ChickenFarm?style=flat&color=6A5EF6&label=Issues&logo=github" />
     </a>
-    <a href="https://github.com/dowalle/ChickenFarm/pulls">
-      <img alt="GitHub pull requests" src="https://img.shields.io/github/issues-pr/dowalle/ChickenFarm?color=0088ff&logo=github" />
-    </a>
-    <a>
-      <img alt="stars" src="https://img.shields.io/github/stars/dowalle/ChickenFarm?color=E3BA3E&logo=github" />
+    <a href="https://github.com/doongz/ChickenFarm/pulls">
+      <img alt="GitHub pull requests" src="https://img.shields.io/github/issues-pr/doongz/ChickenFarm?color=0088ff&logo=github" />
     </a>
     <a>
-      <img alt="forks" src="https://img.shields.io/github/forks/dowalle/ChickenFarm?color=5EEDF6&logo=github" />
+      <img alt="stars" src="https://img.shields.io/github/stars/doongz/ChickenFarm?color=E3BA3E&logo=github" />
+    </a>
+    <a>
+      <img alt="forks" src="https://img.shields.io/github/forks/doongz/ChickenFarm?color=5EEDF6&logo=github" />
     </a>
   </p>
 <p align="center">
@@ -250,7 +250,7 @@ https://akshare.akfamily.xyz/introduction.html
 ## Contribute
 
 Contributions are always welcome!
-Please read the [contribution guidelines](https://github.com/WalleDong/ChickenFarm/blob/main/docs/contribution.md).:relaxed:
+Please read the [contribution guidelines](https://github.com/doongz/ChickenFarm/blob/main/docs/contribution.md).:relaxed:
 
 ## Community
 
@@ -258,6 +258,6 @@ Please read the [contribution guidelines](https://github.com/WalleDong/ChickenFa
 
 ## License
 
-[![License](https://img.shields.io/github/license/WalleDong/ChickenFarm?color=blue&label=license)](https://github.com/WalleDong/ChickenFarm/blob/main/LICENSE)
+[![License](https://img.shields.io/github/license/doongz/ChickenFarm?color=blue&label=license)](https://github.com/doongz/ChickenFarm/blob/main/LICENSE)
 
-Copyright © 2022 [Do Walle](https://github.com/dowalle). All rights reserved.
+Copyright © 2022 [doongz](https://github.com/doongz). All rights reserved.
