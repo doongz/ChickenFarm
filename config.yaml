@@ -18,6 +18,8 @@ EXPORT_AIP_PLOT_PATH: # 导出回测分析图的路径
 #  fund_fee_discount: 0.1 # 场外申购费率折扣（一折=0.1）
 #  significance_test: true  # 配对显著性检验（false 回退裸中位数选最优日）
 #  bootstrap: true          # bootstrap 置信区间误差线
+#  plot_metric: excess      # 小提琴口径：excess=同估值日相对daily的配对超额（默认，剔除市场β）/ absolute=绝对盯市收益率
+#  recent_years: 1          # 估值日近期窗口（年）：默认只取最近1年的估值日，收益预期更贴合当下；设0=全部历史
 #  export_stats: true       # 导出 p值/效应量/CI/稳健性到 stats/
 #  fund_type_overrides: {}  # 个别代码强制分类，如 {'510300': 'etf', '005827': 'fund'}
 #  split_factors: {}        # ETF 拆分因子，如 {'510300': {'2022-01-04': 2.0}}

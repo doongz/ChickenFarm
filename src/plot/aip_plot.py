@@ -25,7 +25,7 @@ _setup_chinese_font()
 
 from src.module.backtest_mod import AutomaticInvestmentPlan
 from src.algorithm.significance import build_paired_matrix, \
-    bootstrap_median_ci, stability_verdict
+    build_excess_matrix, bootstrap_median_ci, stability_verdict
 from src.db.tbl_funds_for_backtest import FundsForBacktestTable
 from src.db.db_backtest import FundBacktest
 from src.util.industry_class import get_fileds_en
@@ -35,6 +35,73 @@ from src.util.log import get_logger
 
 
 logger = get_logger(__file__)
+
+# 满 N 情景少于该数量时不出小提琴/不做检验/不导出 stats
+MIN_SCENARIOS = 8
+
+
+def eligible_scenarios(df):
+    """
+    只保留满 N 个完整周的估值日情景（sample_insufficient==0）。
+    不足 N 周的情景买入笔数少、噪声大，且与满 N 情景口径不一致，
+    按 spec FR-1 不得混入分布、检验与 CI；旧 schema（无该列）视为全部可用。
+    """
+    if df is None or df.empty or 'sample_insufficient' not in df.columns:
+        return df
+    return df[df['sample_insufficient'] == 0]
+
+
+def get_recent_years():
+    """
+    估值日 C 的近期窗口（年）：只保留「库内最后一个 C 往前 recent_years 年」
+    内的情景，使收益预期与当下市场环境贴合。
+    默认 1；设为 0（或负数）表示使用全部历史 C。
+    """
+    cfg = Config().backtest_config or {}
+    return float(cfg.get('recent_years', 1))
+
+
+def recent_scenarios(df):
+    """
+    按 recent_years 近期窗口过滤估值日情景：以该 df 内最后一个 mark_day
+    为锚点，只保留窗口内的 C（按自然年偏移）。未配置窗口、无数据或
+    旧 schema（无 mark_day 列）时原样返回。
+    """
+    if df is None or df.empty or 'mark_day' not in df.columns:
+        return df
+    years = get_recent_years()
+    if years <= 0:
+        return df
+    last_c = pd.to_datetime(df['mark_day']).max()
+    cutoff = last_c - pd.DateOffset(years=int(years))
+    return df[df['mark_day'] > cutoff]
+
+
+def analysis_scenarios(df):
+    """绘图/统计的统一读取口径：近期窗口 → 满 N 完整周过滤。"""
+    return eligible_scenarios(recent_scenarios(df))
+
+
+def window_desc():
+    """图标题用的估值日窗口说明。"""
+    years = get_recent_years()
+    return f'mark days within recent {years:g}y' if years > 0 \
+        else 'all historical mark days'
+
+
+def get_plot_metric():
+    """
+    小提琴口径：
+    - excess（默认）：同一估值日 C 下「工作日收益 − daily 收益」配对超额，
+      抵消市场 β，只呈现周几效应；
+    - absolute：原始盯市收益率（跨牛熊，分布宽，含市场 β）。
+    """
+    cfg = Config().backtest_config or {}
+    metric = cfg.get('plot_metric', 'excess')
+    if metric not in ('excess', 'absolute'):
+        logger.warning(f"Unknown plot_metric:{metric}, fallback to 'excess'.")
+        metric = 'excess'
+    return metric
 
 
 def export_violin_plot_multiprocess(cpus=8):
@@ -88,39 +155,73 @@ def get_best(fund_df, bodies=None):
         return int(np.argmax(medians))
 
     matrix = build_paired_matrix(fund_df)
-    if matrix.shape[0] < 8 or matrix.shape[1] < 5:
+    if matrix.shape[0] < MIN_SCENARIOS or matrix.shape[1] < 5:
         return None
     stable_day, block_days = stability_verdict(matrix)
     return stable_day - 1 if stable_day is not None else None
 
 
-def get_ci(fund_df):
+def bootstrap_ci_table(fund_df, cycle):
     """
-    对 6 个分组的中位数做 bootstrap 95% 置信区间（FR-3），返回按 bodies 顺序的数组。
-    配置 bootstrap=False 时关闭（返回 None）。
-    :return: (median[6], ci_low[6], ci_high[6])，数据不足或关闭时返回 None
+    满 N 情景的中位数 bootstrap 95% CI（长表，供绘图与 stats CSV 共用）。
+
+    移动分块 bootstrap，块长 L = min(周期完整周数 N, max(1, n//4))：
+    相邻估值日的买入窗口高度重叠（长周期 ≈99%），按时间块重采样才能
+    诚实反映有效样本量；L=1 时退化为旧的 i.i.d. bootstrap。
+    - excess 口径：5 个工作日超额组，另补一行 daily(group=-1) 恒为 0
+      以保持 CSV schema 稳定；
+    - absolute 口径：周一~周五 + daily 共 6 组。
+
+    :return: DataFrame[group, median, ci_low, ci_high, metric]；
+             样本不足或 bootstrap=False 时返回 None
     """
     cfg = Config().backtest_config or {}
     if not cfg.get('bootstrap', True):
         return None
 
-    matrix = build_full_matrix(fund_df)
-    if matrix.shape[0] < 8:
+    metric = get_plot_metric()
+    matrix = (build_excess_matrix(fund_df) if metric == 'excess'
+              else build_full_matrix(fund_df))
+    if matrix.shape[0] < MIN_SCENARIOS:
         return None
-    ci = bootstrap_median_ci(matrix)
-    # group 列按工作日 1..5 与 -1 排序；重排为 bodies 顺序（1..5, -1）
+
+    n_weeks = AutomaticInvestmentPlan.WeeksPerCycle[cycle]
+    block_len = min(n_weeks, max(1, matrix.shape[0] // 4))
+    ci = bootstrap_median_ci(matrix, block_len=block_len)
+
+    if metric == 'excess':
+        ci = pd.concat([ci, pd.DataFrame([{
+            'group': -1, 'median': 0.0, 'ci_low': 0.0,
+            'ci_high': 0.0}])], ignore_index=True)
+    ci['metric'] = metric
+    return ci
+
+
+def get_ci(fund_df, cycle):
+    """
+    绘图用 bootstrap 95% CI（百分制）。
+    :return: (groups, medians, ci_low, ci_high)，groups 形如 [1..5,-1]；
+             excess 口径下调用方只取前 5 个（daily 恒为 0，画为基准线）；
+             数据不足或关闭时返回 None
+    """
+    ci = bootstrap_ci_table(fund_df, cycle)
+    if ci is None:
+        return None
     order = [1, 2, 3, 4, 5, -1]
-    ci = ci.set_index('group').reindex(order)
-    return (ci['median'].values * 100,
+    ci = ci.set_index('group').reindex(order).dropna()
+    groups = [int(g) for g in ci.index]
+    return (groups, ci['median'].values * 100,
             ci['ci_low'].values * 100,
             ci['ci_high'].values * 100)
 
+
 def export_filed_stats(filed, fund_list):
     """
-    汇总该领域所有基金×周期的统计结果并导出 CSV：
+    汇总该领域所有基金×周期（仅满 N 情景）的统计结果并导出 CSV：
     - pairwise：工作日配对 Wilcoxon（median_diff/p/p_adj/effect_size）
-    - ci：6 个分组的中位数 bootstrap 95% CI
+    - ci：中位数分块 bootstrap 95% CI（含 metric 列；bootstrap=False 时不导出）
     - stability：分时间块的 best day 与稳健结论
+    满 N 情景 < MIN_SCENARIOS 的单元一律跳过。
     """
     from src.algorithm.significance import (
         pairwise_wilcoxon, best_day_by_block)
@@ -129,23 +230,27 @@ def export_filed_stats(filed, fund_list):
 
     for fund in fund_list:
         fund_df_all = FundBacktest(fund.code).read_sql()
+        # 与绘图一致：整只基金层面先近期窗口、再满 N 过滤
+        fund_df_win = eligible_scenarios(recent_scenarios(fund_df_all))
         for cycle in AutomaticInvestmentPlan.InvestmentCycles:
-            fund_df = fund_df_all[fund_df_all['cycle'] == cycle]
+            fund_df = fund_df_win[fund_df_win['cycle'] == cycle]
             matrix = build_paired_matrix(fund_df)
-            if matrix.shape[0] < 8 or matrix.shape[1] < 5:
+            if (matrix.shape[0] < MIN_SCENARIOS
+                    or matrix.shape[1] < 5):
                 continue
 
-            # 配对检验
+            # 配对检验（逐行减 daily 不改变工作日两两差值）
             pairs = pairwise_wilcoxon(matrix)
             pairs.insert(0, 'code', fund.code)
             pairs.insert(1, 'cycle', cycle)
             pairwise_rows.append(pairs)
 
-            # bootstrap CI（含 daily）
-            ci = bootstrap_median_ci(build_full_matrix(fund_df))
-            ci.insert(0, 'code', fund.code)
-            ci.insert(1, 'cycle', cycle)
-            ci_rows.append(ci)
+            # 分块 bootstrap CI（excess 5 组 + daily 零行 / absolute 6 组）
+            ci = bootstrap_ci_table(fund_df, cycle)
+            if ci is not None:
+                ci.insert(0, 'code', fund.code)
+                ci.insert(1, 'cycle', cycle)
+                ci_rows.append(ci)
 
             # 稳健性：分块 best day
             block_days = [day for _, day in
@@ -161,31 +266,67 @@ def export_filed_stats(filed, fund_list):
         pd.concat(pairwise_rows, ignore_index=True) \
             .to_csv(os.path.join(Config().export_stats_path,
                                  f'{filed}_pairwise.csv'), index=False)
-        pd.concat(ci_rows, ignore_index=True) \
-            .to_csv(os.path.join(Config().export_stats_path,
-                                 f'{filed}_ci.csv'), index=False)
+        if ci_rows:
+            pd.concat(ci_rows, ignore_index=True) \
+                .to_csv(os.path.join(Config().export_stats_path,
+                                     f'{filed}_ci.csv'), index=False)
         pd.concat(stability_rows, ignore_index=True) \
             .to_csv(os.path.join(Config().export_stats_path,
                                  f'{filed}_stability.csv'), index=False)
         logger.info(f"Export {filed} stats to {Config().export_stats_path}.")
 
 
+def _draw_placeholder(ax, name, n_groups):
+    """满 N 情景不足的子图：灰底占位 + 文字标注，不画小提琴。"""
+    ax.set_facecolor('#f2f2f2')
+    ax.set_xlim(0.5, n_groups + 0.5)
+    ax.set_xticks(range(1, n_groups + 1))
+    labels = [str(day) for day in range(1, 6)]
+    if n_groups == 6:
+        labels.append('daily')
+    ax.set_xticklabels(labels)
+    ax.text(0.5, 0.5, 'insufficient\nfull-window scenarios',
+            transform=ax.transAxes, fontsize=11,
+            horizontalalignment='center', verticalalignment='center',
+            color='gray')
+    ax.set_xlabel(name)
+    # 占位轴无数值口径，隐藏纵轴刻度，避免与同行正常子图混淆
+    ax.set_yticks([])
+    ax.yaxis.grid(False)
+
+
 def export_aip_violin_plot_by_filed(filed, show=False):
     '''
-    导出指定领域的周定投-小提琴图，「主要是用这个函数绘图」
+    导出指定领域的周定投-小提琴图，「主要是用这个函数绘图」。
+    默认 excess 口径：每把小提琴是「同一估值日 C 下该工作日收益 − daily 收益」
+    的配对超额分布，y=0 灰虚线即 daily 基准；absolute 口径为原始盯市收益率。
+    满 N 完整周情景 < MIN_SCENARIOS 的子图灰显占位。
     '''
     try:
         fund_list = FundsForBacktestTable.get_by_filed(filed)
-        df_dict = [] # [[code, name, fund_df], ]
+        df_dict = [] # [[code, name, fund_df, cycle], ]
 
         if len(fund_list) == 0:
             logger.info(f"filed: {filed} dont have any fund.")
             return True
 
+        metric = get_plot_metric()
+        is_excess = metric == 'excess'
+        n_groups = 5 if is_excess else 6
+        xticklabels = [str(day) for day in range(1, 6)]
+        if not is_excess:
+            xticklabels.append('daily')
+        y_label = ('Excess vs daily / %' if is_excess
+                   else 'Profit Rate / %')
+
         for fund in fund_list:
+            fund_df_all = FundBacktest(fund.code).read_sql()
+            # 近期窗口在整只基金层面过滤，保证各周期共用同一批估值日与锚点
+            fund_df_win = eligible_scenarios(recent_scenarios(fund_df_all))
             for cycle in AutomaticInvestmentPlan.InvestmentCycles:
-                df = FundBacktest(fund.code).read_sql()
-                df_dict.append([f'{fund.code}', f'定投{cycle}天', df.loc[df['cycle'] == cycle]])
+                fund_df = fund_df_win.loc[fund_df_win['cycle'] == cycle]
+                df_dict.append([f'{fund.code}', f'定投{cycle}天',
+                                fund_df, cycle])
                 logger.debug(f"Loaded {fund.name}-{cycle} to df_dict.")
 
         df_cnt = len(df_dict)
@@ -201,64 +342,91 @@ def export_aip_violin_plot_by_filed(filed, show=False):
                                 ncols=ncols,
                                 figsize=(20, 5*rows),  # Width, height
                                 )
-        plt.subplots_adjust(wspace=0.3, hspace=0.3)
+        plt.subplots_adjust(wspace=0.3, hspace=0.35, top=0.93)
+        metric_desc = ('excess vs daily (weekday − daily)' if is_excess
+                       else 'absolute mark-to-market profit rate')
         fig.suptitle(f"{filed} {DateTools.today()}  "
-                     f"(fund: totvalue nav / etf: adjusted close)",
-                     fontsize=24)
+                     f"[{metric_desc}; {window_desc()}; full-N-week scenarios; "
+                     f"fund: totvalue nav / etf: adjusted close]",
+                     fontsize=20)
 
         i = 0
-        low_high = [[(0,0) for _ in range(cols) ] for _ in range(rows)]
-        for _, name, fund_df in df_dict:
+        # None 表示占位子图，不参与同行纵坐标范围统一
+        low_high = [[None for _ in range(cols)] for _ in range(rows)]
+        for _, name, fund_df, cycle in df_dict:
+            ax = axs[i // cols][i % cols]
             # 短周期（30/60 天）每组仅 4~8 笔扣款，噪声大，加注提示
-            short_cycle = name in ('定投30天', '定投60天')
+            short_cycle = cycle in (30, 60)
+
+            # 满 N 配对情景不足：灰显占位并跳过所有统计元素
+            if build_paired_matrix(fund_df).shape[0] < MIN_SCENARIOS:
+                _draw_placeholder(ax, name, n_groups)
+                i += 1
+                continue
 
             # 这里 *100 变为百分比
-            bodies = [fund_df.loc[fund_df['week'] == day]
-                      ['profit_rate']*100 for day in range(1, 6)] # 5天
-            bodies.append(fund_df.loc[fund_df['week'] == -1]['profit_rate']*100) # 每天，-1是特殊标记
+            if is_excess:
+                excess = build_excess_matrix(fund_df)
+                bodies = [excess[day] * 100 for day in range(1, 6)]
+            else:
+                bodies = [fund_df.loc[fund_df['week'] == day]
+                          ['profit_rate'] * 100 for day in range(1, 6)]
+                # 每天，-1是特殊标记
+                bodies.append(
+                    fund_df.loc[fund_df['week'] == -1]
+                    ['profit_rate'] * 100)
 
             best_day_idx = get_best(fund_df, bodies)
 
-            low = float("inf")
-            high = float("-inf")
-            for i_i in range(6): # 5天+每天
-                low = min(low, bodies[i_i].min())
-                high = max(high, bodies[i_i].max())
-            low_high[i//cols][i%cols] = (low, high)
+            low = min(float(s.min()) for s in bodies)
+            high = max(float(s.max()) for s in bodies)
+            low_high[i // cols][i % cols] = (low, high)
 
-            ax = axs[math.floor(i/cols)][i % cols]
-            violin_plot = ax.violinplot(bodies,
-                                        showmeans=False,  # 均值
-                                        showmedians=True,  # 中位数
-                                        showextrema=True,  # 是否显示极值线（小提琴顶部 / 底部的短刻度，对应数据的最大值 / 最小值）
-                                        quantiles=[[0.25, 0.75] for _ in range(5+1)] # 显示 25%/75% 分位
-                                        )
+            violin_plot = ax.violinplot(
+                bodies,
+                showmeans=False,  # 均值
+                showmedians=True,  # 中位数
+                showextrema=True,  # 极值线（最大值/最小值处短刻度）
+                # 显示 25%/75% 分位
+                quantiles=[[0.25, 0.75] for _ in range(n_groups)]
+                )
 
-            # 设置每天定投的颜色
-            violin_plot['bodies'][5].set_facecolor('gold')      # 填充色
-            violin_plot['bodies'][5].set_edgecolor('orange')    # 边框色
+            if not is_excess:
+                # absolute 口径：每天定投的小提琴染金色
+                violin_plot['bodies'][5].set_facecolor('gold')
+                violin_plot['bodies'][5].set_edgecolor('orange')
+            else:
+                # excess 口径：y=0 灰虚线即 daily 基准
+                ax.axhline(0, color='gray', linestyle='--',
+                           linewidth=1.0, zorder=1)
 
             # 设置best day的颜色；不显著或不稳健则不标红并加注
             if best_day_idx is not None:
-                violin_plot['bodies'][best_day_idx].set_facecolor('red')    # 填充色
-                violin_plot['bodies'][best_day_idx].set_edgecolor('orange') # 边框色
+                violin_plot['bodies'][best_day_idx].set_facecolor('red')
+                violin_plot['bodies'][best_day_idx].set_edgecolor('orange')
             else:
                 ax.text(0.02, 0.98, 'no significant\nweekday effect',
                         transform=ax.transAxes, fontsize=9,
                         verticalalignment='top', color='gray')
 
-            # 短周期噪声提示（右上角）
+            # 短周期噪声提示（右下角）
             if short_cycle:
                 ax.text(0.98, 0.02, 'few buys\nhigh noise',
                         transform=ax.transAxes, fontsize=9,
-                        verticalalignment='bottom', horizontalalignment='right',
+                        verticalalignment='bottom',
+                        horizontalalignment='right',
                         color='darkorange')
 
-            # bootstrap 中位数 95% CI 误差线（黑色，覆盖 6 个分组）
-            ci_result = get_ci(fund_df)
+            # 分块 bootstrap 中位数 95% CI 误差线（黑色）；
+            # excess 口径仅 5 个工作日（daily 恒为 0，以基准线表示）
+            ci_result = get_ci(fund_df, cycle)
             if ci_result is not None:
-                medians, ci_low, ci_high = ci_result
-                x_pos = np.arange(1, 7)
+                groups, medians, ci_low, ci_high = ci_result
+                ci_n = min(n_groups, len(groups))
+                medians, ci_low, ci_high = (medians[:ci_n],
+                                            ci_low[:ci_n],
+                                            ci_high[:ci_n])
+                x_pos = np.arange(1, ci_n + 1)
                 ax.errorbar(x_pos, medians,
                             yerr=[medians - ci_low, ci_high - medians],
                             fmt='none', ecolor='black', capsize=3,
@@ -268,11 +436,16 @@ def export_aip_violin_plot_by_filed(filed, show=False):
             i += 1
 
         # 同一行（同一 ETF 的不同周期）统一绝对纵坐标范围，便于横向对比；
-        # 刻度间隔按范围动态选择，避免刻度过密（每图约 8~12 个刻度）
-        nice_steps = [1, 2, 5, 10, 20, 50, 100]
+        # 刻度间隔按范围动态选择（支持 0.1~100 的档位），每图约 8~12 个刻度；
+        # 占位子图不参与范围计算
+        nice_steps = [0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100]
         for r in range(rows):
-            row_low = min(low_high[r][c][0] for c in range(cols))
-            row_high = max(low_high[r][c][1] for c in range(cols))
+            valid = [low_high[r][c] for c in range(cols)
+                     if low_high[r][c] is not None]
+            if not valid:
+                continue
+            row_low = min(v[0] for v in valid)
+            row_high = max(v[1] for v in valid)
 
             span = row_high - row_low
             target_ticks = 10
@@ -285,27 +458,22 @@ def export_aip_violin_plot_by_filed(filed, show=False):
 
             ticks = np.arange(y_min, y_max + interval / 2, interval)
             for c in range(cols):
-                axs[r][c].set_yticks(ticks)
-                axs[r][c].set_ylim(y_min, y_max)
+                if low_high[r][c] is not None:
+                    axs[r][c].set_yticks(ticks)
+                    axs[r][c].set_ylim(y_min, y_max)
 
-        # 为每个子图添加水平线
-        idx = 0
+        # 网格、标题与统一 x 轴刻度（行 r 即第 r 只基金）
         for r in range(rows):
             for c in range(cols):
-                axs[r][c].yaxis.grid(True)
-                axs[r][c].set_xticks([i+1 for i in range(5)])
+                ax = axs[r][c]
+                ax.yaxis.grid(True)
+                ax.set_xticks(range(1, n_groups + 1))
+                ax.set_xticklabels(xticklabels)
                 if c == 0:
-                    axs[r][c].set_title(f"{fund_list[idx].name}")
-                    axs[r][c].set_ylabel(f"Profit Rate / %")
+                    ax.set_title(f"{fund_list[r].name}")
+                    ax.set_ylabel(y_label)
                 if c == 1:
-                    axs[r][c].set_title(f"{fund_list[idx].code}")
-                    idx += 1
-
-        # add x-tick labels
-        labels = [f"{day}" for day in range(1, 6)]
-        labels.append("daily")
-        plt.setp(axs, xticks=[i+1 for i in range(6)],
-                 xticklabels=labels)
+                    ax.set_title(f"{fund_list[r].code}")
 
         if show:
             plt.show()

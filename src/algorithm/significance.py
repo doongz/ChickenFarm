@@ -32,6 +32,29 @@ def build_paired_matrix(df):
     return matrix
 
 
+def build_excess_matrix(df):
+    """
+    配对超额收益矩阵：同一估值日 C 下，周一~周五收益减去 daily(week=-1) 基准。
+
+    各估值日情景的绝对收益主要由市场 β 决定（牛熊差异可达数十个百分点），
+    逐行减去同一 C 的 daily 基准后，公共的市场 β 被抵消，只剩下
+    「周几买入相对每日买入」的边际差异（实测约 ±1%），周几效应才可见。
+    配对 Wilcoxon 等只看工作日两两差值的检验，对逐行减常量不敏感，
+    因此在本矩阵与原配对矩阵上的检验结果数学等价。
+
+    :param df: 含 mark_day、week(1..5/-1)、profit_rate 的 DataFrame
+    :return: DataFrame，index=mark_day，columns=工作日 1..5
+    """
+    weekday = build_paired_matrix(df)
+    if weekday.empty:
+        return weekday
+    daily = df[df['week'] == -1].pivot_table(
+        index='mark_day', values='profit_rate', aggfunc='first')
+    daily = daily.rename(columns={'profit_rate': 'daily'})
+    joined = weekday.join(daily, how='inner').dropna()
+    return joined[[1, 2, 3, 4, 5]].sub(joined['daily'], axis=0)
+
+
 def _holm_correct(pairs):
     """
     Holm 法对 (pair, p) 列表做多重比较校正
@@ -99,21 +122,39 @@ def pairwise_wilcoxon(matrix):
         ['pair', 'day_a', 'day_b', 'median_diff', 'p', 'p_adj', 'effect_size']]
 
 
-def bootstrap_median_ci(matrix, n_boot=1000, alpha=0.05, seed=42):
+def bootstrap_median_ci(matrix, n_boot=1000, alpha=0.05, seed=42,
+                        block_len=1):
     """
     对「估值日情景」整体做非参数 bootstrap：每次重采同样数量的情景行
-    （保留 5 个工作日配对关系），计算各组中位数，取分位数得置信区间。
+    （保留组间配对关系），计算各组中位数，取分位数得置信区间。
 
-    :param matrix: index=情景、columns=分组（工作日 1..5，可含其他列）
+    估值日按每 5 个交易日采样，而买入窗口长达 N 周，相邻情景的窗口
+    高度重叠（长周期可达 99%），把每个情景当独立样本的 i.i.d. bootstrap
+    会严重低估不确定性。block_len>1 时改用移动分块 bootstrap
+    （moving-block bootstrap）：每次随机抽取长度为 block_len 的连续
+    情景块拼接，保留块内时间相关结构。block_len=1 时与旧的 i.i.d.
+    行重采样完全等价（同一 seed 下结果一致）。
+
+    :param matrix: index=情景(按时间有序)、columns=分组（工作日 1..5，可含其他列）
+    :param block_len: 分块长度（情景行数）
     :return: DataFrame[group, median, ci_low, ci_high]
     """
     rng = np.random.RandomState(seed)
-    data = matrix.astype(float)
+    data = matrix.astype(float).sort_index()
     n = data.shape[0]
+    values = data.values
+    block_len = max(1, min(int(block_len), n))
     boot_medians = []
     for _ in range(n_boot):
-        sample = data.iloc[rng.randint(0, n, size=n)]
-        boot_medians.append(sample.median().values)
+        if block_len == 1:
+            idx = rng.randint(0, n, size=n)
+        else:
+            # 随机块起点 + 连续偏移拼接至 n 行
+            n_blocks = int(np.ceil(n / block_len))
+            starts = rng.randint(0, n - block_len + 1, size=n_blocks)
+            idx = (starts[:, None]
+                   + np.arange(block_len)[None, :]).ravel()[:n]
+        boot_medians.append(np.median(values[idx], axis=0))
     boot_medians = np.array(boot_medians)
 
     lo_q, hi_q = 100 * alpha / 2, 100 * (1 - alpha / 2)
