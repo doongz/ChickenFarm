@@ -89,14 +89,18 @@ def pairwise_wilcoxon(matrix):
             p = 1.0
         else:
             try:
-                p = float(stats.wilcoxon(matrix[a], matrix[b]).pvalue)
+                # method='normal'：用正态近似（带连续性校正）。
+                # 新版 scipy 默认的精确置换检验在大量 tie（对齐窗口/浮点）时
+                # 枚举空间爆炸、看似卡死；n 较大时正态近似本就是标准选择。
+                p = float(stats.wilcoxon(matrix[a], matrix[b],
+                                         method='normal').pvalue)
             except ValueError:
                 p = 1.0
 
         # 效应量：配对符号秩 r = z / sqrt(n)，符号取差值中位数方向
         n = len(diff)
         try:
-            result = stats.wilcoxon(matrix[a], matrix[b], method='approx')
+            result = stats.wilcoxon(matrix[a], matrix[b], method='normal')
             z = result.zstatistic
             effect_size = float(z / np.sqrt(n)) if n else 0.0
             if median_diff < 0:

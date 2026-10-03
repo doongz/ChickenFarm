@@ -72,9 +72,11 @@ def recent_scenarios(df):
     years = get_recent_years()
     if years <= 0:
         return df
-    last_c = pd.to_datetime(df['mark_day']).max()
+    # SQLite 读回的日期列为字符串，统一转 Timestamp 再比较
+    mark_days = pd.to_datetime(df['mark_day'])
+    last_c = mark_days.max()
     cutoff = last_c - pd.DateOffset(years=int(years))
-    return df[df['mark_day'] > cutoff]
+    return df[mark_days > cutoff]
 
 
 def analysis_scenarios(df):

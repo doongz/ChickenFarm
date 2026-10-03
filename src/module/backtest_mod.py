@@ -40,9 +40,11 @@ class AutomaticInvestmentPlan(ABC):
                         .tolist())
         mark_days = trading_days[::self.MarkDayInterval]
 
-        df = pd.DataFrame(
-            columns=['start', 'mark_day', 'week', 'algorithm', 'cycle',
-                     'profit_rate', 'sample_insufficient', 'test_date'])
+        # 逐个估值日累积行记录，最后一次性构造 DataFrame；
+        # 循环内反复 pd.concat 会因 DataFrame 拼接的复制开销而平方级变慢
+        records = []
+        # 单次回测的同一时间戳，避免逐行 datetime.now() 产生无谓差异
+        test_date = datetime.now()
 
         for mark_day in mark_days:
             stupid.prepare_data(mark_day, n_weeks)
@@ -51,32 +53,21 @@ class AutomaticInvestmentPlan(ABC):
 
             insufficient = 1 if stupid.sample_insufficient else 0
             mark_ts = pd.Timestamp(mark_day)
+            start = stupid.start
 
             res = stupid.invest_weekly()
             for index, rate in enumerate(res):
-                tmp_pd = pd.DataFrame({'start': [stupid.start],
-                                'mark_day': [mark_ts],
-                                'week': [index+1],
-                                'algorithm': ['stupid'],
-                                'cycle': [cycle],
-                                'profit_rate': [rate],
-                                'sample_insufficient': [insufficient],
-                                'test_date': [datetime.now()]
-                                })
-                df = pd.concat([df, tmp_pd])
+                records.append([start, mark_ts, index + 1, 'stupid', cycle,
+                                rate, insufficient, test_date])
 
             profit_rate = stupid.invest_daily()
             if profit_rate is not None:
-                tmp_pd = pd.DataFrame({'start': [stupid.start],
-                                'mark_day': [mark_ts],
-                                'week': [-1],
-                                'algorithm': ['stupid'],
-                                'cycle': [cycle],
-                                'profit_rate': [profit_rate],
-                                'sample_insufficient': [insufficient],
-                                'test_date': [datetime.now()]
-                                })
-                df = pd.concat([df, tmp_pd])
+                records.append([start, mark_ts, -1, 'stupid', cycle,
+                                profit_rate, insufficient, test_date])
+
+        df = pd.DataFrame(records, columns=[
+            'start', 'mark_day', 'week', 'algorithm', 'cycle',
+            'profit_rate', 'sample_insufficient', 'test_date'])
 
         logger.info(f"统计完成:{code}, 周期:{cycle}天 N:{n_weeks}, "
                     f"估值日数:{len(mark_days)}.")

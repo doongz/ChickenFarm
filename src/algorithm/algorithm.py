@@ -54,6 +54,11 @@ class Algorithm(ABC):
             # 场外基金：用累计净值 totvalue
             self._value_df = FundNetValue(code).read_sql()[['date', 'totvalue']]
 
+        # 完整交易周缓存（与估值日无关，首次 prepare_data 时填充）
+        self._all_weeks = None
+        # date -> totvalue 映射缓存（首次盯市时填充）
+        self._price_map = None
+
     def effective_buy_price(self, close_price):
         """
         买入实际成交价：收盘价 + 价差 + 滑点（尾盘买入近似）。
@@ -106,8 +111,16 @@ class Algorithm(ABC):
         self.end = self.__check_end(mark_day)
         self.mark_price = self.__find_mark_price()
 
-        weeks = DateTools.complete_trade_weeks(
-            self._value_df[self._value_df['date'] < self.end])
+        # 完整周集合与估值日无关（只由交易日历决定），全历史只算一次并缓存，
+        # 避免每个估值日都重跑一次全量 groupby
+        if self._all_weeks is None:
+            self._all_weeks = DateTools.complete_trade_weeks(self._value_df)
+
+        # 只保留「整周全部交易日都早于 C」的完整周，再取最近 n_weeks 个；
+        # 以周内最后一天判断，确保与按 date < C 截断后重算的结果完全一致
+        end_date = self.end
+        weeks = [w for w in self._all_weeks
+                 if w['date'].iloc[-1] < end_date]
         self.sample_insufficient = len(weeks) < n_weeks
         self.n_weeks = min(len(weeks), n_weeks)
         self.weeks = weeks[-self.n_weeks:] if self.n_weeks > 0 else []
@@ -134,5 +147,8 @@ class Algorithm(ABC):
 
     def __find_mark_price(self):
         # 估值日 C 的累计净值（盯市价格，不产生卖出）
-        mark_price = self._value_df.loc[self._value_df['date'] == self.end]['totvalue']
-        return float(mark_price)
+        if self._price_map is None:
+            # date -> totvalue 映射，避免每个估值日都全表扫描
+            self._price_map = dict(zip(self._value_df['date'],
+                                       self._value_df['totvalue']))
+        return float(self._price_map[self.end])
