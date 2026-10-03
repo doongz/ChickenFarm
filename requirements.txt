@@ -7,7 +7,6 @@ xalpha
 chinese-calendar
 akshare
 SQLAlchemy
-PyMySQL
 cryptography
 python-dotenv
 termcolor

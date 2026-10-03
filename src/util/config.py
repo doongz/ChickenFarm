@@ -56,6 +56,7 @@ class Config(object):
 
     def _read_from_env(self, path):
         # dotenv_values 只解析文件，不污染进程环境变量
+        # strip_quotes 处理引号；行内说明统一写成「空格 + #」形式
         return {k: v for k, v in dotenv_values(path).items()
                 if v is not None and v != ''}
 
@@ -63,45 +64,17 @@ class Config(object):
         return self.config_data.get(key)
 
     @property
-    def db_username(self):
-        # 数据库账号
-        return self._get("DB_USERNAME")
-
-    @property
-    def db_password(self):
-        # 数据库密码
-        return self._get("DB_PASSWORD")
-
-    @property
-    def db_address(self):
-        # 数据库连接地址
-        return self._get("DB_ADDRESS")
-
-    @property
-    def db_port(self):
-        # 数据库连接端口
-        port = self._get("DB_PORT")
-        return int(port) if port else 3306
-
-    @property
-    def db_fund(self):
-        # 回测标的清单库（仅含 tbl_funds_for_backtest）
-        return self._get("DB_FUND")
-
-    @property
-    def db_netvalue(self):
-        # 存放净值数据的数据库
-        return self._get("DB_NETVALUE")
-
-    @property
-    def db_backtest(self):
-        # 存放回测数据的数据库
-        return self._get("DB_BACKTEST")
-
-    @property
-    def db_etf(self):
-        # 存放 ETF 日线行情的数据库
-        return self._get("DB_ETF")
+    def db_path(self):
+        """
+        SQLite 数据库文件路径（零安装）。
+        相对路径相对仓库根解析；缺省 data/chickenfarm.db。
+        文件与父目录在建立连接/写入时自动创建。
+        """
+        raw = self._get("DB_PATH") or os.path.join('data', 'chickenfarm.db')
+        path = Path(raw).expanduser()
+        if not path.is_absolute():
+            path = REPO_ROOT / path
+        return str(path)
 
     @property
     def export_aip_plot_path(self):

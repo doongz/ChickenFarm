@@ -1,20 +1,14 @@
 import pandas as pd
-from sqlalchemy import create_engine, text
+from sqlalchemy import text
 from sqlalchemy import DateTime, DECIMAL, BIGINT
 
-from src.util.config import Config
-
-
-config = Config()
+from src.db.connection import get_engine
 
 
 class ETFDaily:
 
     def __init__(self, code):
-
-        self.engine = create_engine(
-            f"mysql+pymysql://{config.db_username}:{config.db_password}@{config.db_address}:{config.db_port}/{config.db_etf}"
-        )
+        self.engine = get_engine()
         self.code = code
         self.tbl = f"etf_{self.code}"
 
@@ -29,7 +23,7 @@ class ETFDaily:
 
     def to_sql(self, price_df, if_exists='replace'):
 
-        with self.engine.connect() as conn:
+        with self.engine.begin() as conn:
             price_df.to_sql(name=self.tbl,
                             con=conn,
                             if_exists=if_exists,
@@ -42,4 +36,7 @@ class ETFDaily:
         with self.engine.connect() as connection:
             sql = text(f"SELECT * FROM {self.tbl}")
             df = pd.read_sql(sql, con=connection)
+        # SQLite 无原生日期类型，读回为字符串，统一转回 datetime
+        if 'date' in df.columns:
+            df['date'] = pd.to_datetime(df['date'])
         return df

@@ -1,20 +1,14 @@
 import pandas as pd
-from sqlalchemy import create_engine, text
+from sqlalchemy import text
 from sqlalchemy import DateTime, DECIMAL, INT, VARCHAR
 
-from src.util.config import Config
-
-
-config = Config()
+from src.db.connection import get_engine
 
 
 class FundBacktest():
 
     def __init__(self, code):
-
-        self.engine = create_engine(
-            f"mysql+pymysql://{config.db_username}:{config.db_password}@{config.db_address}:{config.db_port}/{config.db_backtest}"
-        )
+        self.engine = get_engine()
         self.code = code
         self.tbl = f"tbl_{self.code}"
 
@@ -29,8 +23,8 @@ class FundBacktest():
                         }
 
     def to_sql(self, df, if_exists='replace'):
-        # 注意使用 append 会导致数据库连接数爆掉，整表 replace
-        with self.engine.connect() as conn:
+        # 由主进程统一串行写入；整表 replace
+        with self.engine.begin() as conn:
             df.to_sql(name=self.tbl,
                       con=conn,
                       if_exists=if_exists,
@@ -43,4 +37,8 @@ class FundBacktest():
         with self.engine.connect() as connection:
             sql = text(f"SELECT * FROM {self.tbl}")
             df = pd.read_sql(sql, con=connection)
+        # SQLite 无原生日期类型，读回为字符串，统一转回 datetime
+        for col in ('mark_day', 'test_date'):
+            if col in df.columns:
+                df[col] = pd.to_datetime(df[col])
         return df

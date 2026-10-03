@@ -49,41 +49,13 @@
 
 ## Installation
 
-### 1、准备 MySQL 数据库
+### 1、准备数据库（SQLite，零安装）
 
-```bash
-brew install mysql
-brew services start mysql
-brew services stop mysql
-brew services restart mysql
-brew services info mysql
-```
-
-创建四个数据库：
-
-| 数据库 | 是否需要建表 | 用途 |
-| :-- | :-- | :-- |
-| `db_fund` | 是，使用 [sql 文件](./sql/DDL_db_fund.sql) 建表 | 回测标的清单（tbl_funds_for_backtest） |
-| `db_netvalue` | 否（程序自动建表） | 场外基金历史净值，每只基金一张表 |
-| `db_backtest` | 否（程序自动建表） | 回测结果，每只基金一张表 |
-| `db_etf` | 否（程序自动建表） | ETF 前复权日线，每只 ETF 一张表 |
-
-```bash
-mysql -u <user> -p -e "CREATE DATABASE IF NOT EXISTS db_fund DEFAULT CHARACTER SET utf8mb4;"
-mysql -u <user> -p db_fund < sql/DDL_db_fund.sql
-mysql -u <user> -p -e "CREATE DATABASE IF NOT EXISTS db_netvalue; CREATE DATABASE IF NOT EXISTS db_backtest; CREATE DATABASE IF NOT EXISTS db_etf;"
-```
-
-回测多进程并发写入需要较多连接，建议调大最大连接数（Linux/macOS：`/etc/mysql/my.cnf`）：
-
-```ini
-[mysqld]
-max_connections = 500
-```
+数据存储使用 Python 内置的 **SQLite**：无需安装或启动任何数据库服务、无需账号密码，整个数据库就是一个本地文件，在首次运行时于 `DB_PATH`（默认 `data/chickenfarm.db`）自动创建，全部数据表也会自动建立。
 
 ### 2、填写配置文件
 
-复制根目录的 [.env.example](./.env.example) 为 `.env`，填写数据库账号与图表导出目录；回测参数（`BACKTEST_` 前缀）为可选项，缺省使用代码内默认值。
+复制根目录的 [.env.example](./.env.example) 为 `.env`，填写图表导出目录；`DB_PATH` 与回测参数（`BACKTEST_` 前缀）为可选项，缺省使用代码内默认值。
 
 ```shell
 cp .env.example .env
@@ -174,12 +146,13 @@ ChickenFarm/
 ├── chick.py                  # CLI 入口（argparse），仓库根直接运行
 ├── .env.example            # 配置模板（复制为 .env 后填写，.env 不提交）
 ├── requirements.txt
-├── sql/DDL_db_fund.sql       # 回测标的清单建表脚本
+├── scripts/migrate_mysql_to_sqlite.py  # 旧 MySQL 数据一次性迁移到 SQLite
+├── data/chickenfarm.db       # SQLite 数据库（默认路径，自动创建，不提交）
 ├── docs/backtest.md          # 回测原理与图表解读
 └── src/                      # 顶层包（import src.xxx，无需 PYTHONPATH）
     ├── farm.py               # 角色编排（Farmer / Operator / Analyst）
     ├── algorithm/            # 定投算法（algorithm / stupid）与显著性检验
-    ├── db/                   # 数据库连接与表模型（清单库 / 净值 / 回测 / ETF）
+    ├── db/                   # SQLite 连接工厂与表模型（清单 / 净值 / 回测 / ETF）
     ├── module/               # 业务模块（回测计划、行情采集、清单维护、传输编排）
     ├── plot/                 # 回测小提琴图与 stats CSV 导出
     └── util/                 # 配置、日志、交易日工具、领域定义、异常

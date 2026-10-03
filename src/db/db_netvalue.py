@@ -1,20 +1,14 @@
 import pandas as pd
-from sqlalchemy import create_engine, text
+from sqlalchemy import text
 from sqlalchemy import DateTime, DECIMAL
 
-from src.util.config import Config
-
-
-config = Config()
+from src.db.connection import get_engine
 
 
 class FundNetValue():
 
     def __init__(self, code):
-
-        self.engine = create_engine(
-            f"mysql+pymysql://{config.db_username}:{config.db_password}@{config.db_address}:{config.db_port}/{config.db_netvalue}"
-        )
+        self.engine = get_engine()
         self.code = code
         self.tbl = f"tbl_{self.code}"
 
@@ -36,6 +30,9 @@ class FundNetValue():
         with self.engine.connect() as connection:
             sql = text(f"SELECT * FROM {self.tbl}")
             df = pd.read_sql(sql, con=connection)
+        # SQLite 无原生日期类型，读回为字符串，统一转回 datetime
+        if 'date' in df.columns:
+            df['date'] = pd.to_datetime(df['date'])
         return df
 
     @property

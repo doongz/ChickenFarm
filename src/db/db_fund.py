@@ -1,11 +1,7 @@
 import pandas as pd
-from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from src.util.config import Config
-
-
-config = Config()
+from src.db.connection import get_engine
 
 
 class Singleton(type):
@@ -21,9 +17,10 @@ class Singleton(type):
 class Database(metaclass=Singleton):
 
     def __init__(self):
-        self.engine = create_engine(
-            f"mysql+pymysql://{config.db_username}:{config.db_password}@{config.db_address}:{config.db_port}/{config.db_fund}"
-        )
+        self.engine = get_engine()
+        # 标的清单表自动建表（ORM metadata；首次使用、替代原 MySQL DDL）
+        from src.db.tbl_funds_for_backtest import Base
+        Base.metadata.create_all(self.engine)
         # 创建DBSession类型:
         DBSession = sessionmaker(bind=self.engine)
         # 创建session对象:
@@ -51,9 +48,6 @@ class Database(metaclass=Singleton):
 
     def rollback(self):
         self.session.rollback()
-
-    def update_tbl(self, clz):
-        return self.session.update(clz)
 
     def save(self, obj):
         if not self.session.object_session(obj):
