@@ -104,7 +104,7 @@ C 总数 ≈ 交易日总数 / MarkDayInterval
 
 ## 四、标的类型与下单口径
 
-`FundTypeTools`（[tools.py](../src/util/tools.py)）按 6 位代码前缀区分类型（沪市 51/56/58、深市 15/16 为 ETF，其余为场外基金），也可用 `BACKTEST.fund_type_overrides` 强制指定。两类标的的下单模型在 [algorithm.py](../src/algorithm/algorithm.py) 中分流：
+`FundTypeTools`（[tools.py](../src/util/tools.py)）按 6 位代码前缀区分类型（沪市 51/56/58、深市 15/16 为 ETF，其余为场外基金），也可用 `BACKTEST_FUND_TYPE_OVERRIDES` 强制指定。两类标的的下单模型在 [algorithm.py](../src/algorithm/algorithm.py) 中分流：
 
 | 口径 | 场外基金 fund | 场内 ETF etf |
 | :-- | :-- | :-- |
@@ -252,22 +252,24 @@ L = min(N, max(1, n // 4))        # N=周期完整周数，n=过滤后情景数�
 
 ## 九、配置项一览
 
-`BACKTEST` 下全部可选项（缺省时使用括号内默认值）：
+配置通过仓库根 `.env` 提供（复制 `.env.example` 得到，不提交）；默认读取该文件，也可用 `FARM_CONFIG_PATH` 指向其他位置。必填项为数据库账号与 `EXPORT_AIP_PLOT_PATH`。
 
-| 配置 | 默认 | 说明 |
+回测参数全部可选，均为 `BACKTEST_` 前缀；值会自动转换类型（true/false → 布尔、整数/浮点 → 数值、`{...}`/`[...]` → JSON），缺省时使用括号内默认值：
+
+| .env 配置键 | 默认 | 说明 |
 | :-- | :-- | :-- |
-| `etf_lots` | 1 | ETF 每期买入手数（1手=100份） |
-| `spread` | 0.0005 | 尾盘买入相对价差（万5） |
-| `commission` | 0 | ETF 佣金率（免5账户可设0） |
-| `slippage` | 0 | 滑点 |
-| `fund_fee_discount` | 0.1 | 场外申购费率折扣（一折） |
-| `significance_test` | true | 配对显著性检验（false 回退裸中位数选最优日） |
-| `bootstrap` | true | 分块 bootstrap CI 误差线（false 同时不产出 CI CSV） |
-| `plot_metric` | excess | excess=配对超额 / absolute=绝对收益率 |
-| `recent_years` | 1 | 估值日近期窗口年数（0=全部历史） |
-| `export_stats` | true | 导出 stats CSV |
-| `fund_type_overrides` | {} | 强制指定个别代码类型 |
-| `split_factors` | {} | ETF 拆分因子 |
+| `BACKTEST_ETF_LOTS` | 1 | ETF 每期买入手数（1手=100份） |
+| `BACKTEST_SPREAD` | 0.0005 | 尾盘买入相对价差（万5） |
+| `BACKTEST_COMMISSION` | 0 | ETF 佣金率（免5账户可设0） |
+| `BACKTEST_SLIPPAGE` | 0 | 滑点 |
+| `BACKTEST_FUND_FEE_DISCOUNT` | 0.1 | 场外申购费率折扣（一折） |
+| `BACKTEST_SIGNIFICANCE_TEST` | true | 配对显著性检验（false 回退裸中位数选最优日） |
+| `BACKTEST_BOOTSTRAP` | true | 分块 bootstrap CI 误差线（false 同时不产出 CI CSV） |
+| `BACKTEST_PLOT_METRIC` | excess | excess=配对超额 / absolute=绝对收益率 |
+| `BACKTEST_RECENT_YEARS` | 1 | 估值日近期窗口年数（0=全部历史） |
+| `BACKTEST_EXPORT_STATS` | true | 导出 stats CSV |
+| `BACKTEST_FUND_TYPE_OVERRIDES` | {} | 强制指定个别代码类型，如 `{"510300":"etf"}` |
+| `BACKTEST_SPLIT_FACTORS` | {} | ETF 拆分因子，如 `{"510300":{"2022-01-04":2.0}}` |
 
 ## 十、局限与注意事项
 

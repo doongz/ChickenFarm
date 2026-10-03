@@ -10,11 +10,12 @@ __pycache__/
 # 虚拟环境（uv venv）
 .venv/
 venv/
-# 误建的虚拟环境目录
-/list/
 
 # 回测图表与统计产物
 output/
+
+# 本地配置（模板为 .env.example，真实配置 .env 不提交）
+.env
 
 # 本地工作文档（规格 / 调研记录）
 .trae/

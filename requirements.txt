@@ -9,6 +9,6 @@ akshare
 SQLAlchemy
 PyMySQL
 cryptography
-PyYAML
+python-dotenv
 termcolor
 concurrent-log-handler

@@ -83,7 +83,13 @@ max_connections = 500
 
 ### 2、填写配置文件
 
-编辑根目录 [config.yaml](./config.yaml)，填写数据库账号与图表导出目录；`BACKTEST` 回测参数为可选项，缺省使用代码内默认值。
+复制根目录的 [.env.example](./.env.example) 为 `.env`，填写数据库账号与图表导出目录；回测参数（`BACKTEST_` 前缀）为可选项，缺省使用代码内默认值。
+
+```shell
+cp .env.example .env
+```
+
+`.env` 已被 `.gitignore` 忽略，不会提交。
 
 ### 3、安装依赖（uv）
 
@@ -104,10 +110,10 @@ uv pip install -r requirements.txt
 python3 -m pip install -r requirements.txt
 ```
 
-配置文件默认读取仓库根 `config.yaml`；如需自定义位置，可设置环境变量：
+配置文件默认读取仓库根 `.env`；如需自定义位置，可设置环境变量：
 
 ```shell
-export FARM_CONFIG_PATH=/your/path/config.yaml
+export FARM_CONFIG_PATH=/your/path/.env
 ```
 
 > [!IMPORTANT]
@@ -166,7 +172,7 @@ uv run chick.py -job backtest_job  # 后续可反复运行，更新行情、回�
 ```text
 ChickenFarm/
 ├── chick.py                  # CLI 入口（argparse），仓库根直接运行
-├── config.yaml               # 数据库 / 导出路径 / 回测参数配置
+├── .env.example            # 配置模板（复制为 .env 后填写，.env 不提交）
 ├── requirements.txt
 ├── sql/DDL_db_fund.sql       # 回测标的清单建表脚本
 ├── docs/backtest.md          # 回测原理与图表解读
