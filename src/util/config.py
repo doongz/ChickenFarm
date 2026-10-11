@@ -95,6 +95,16 @@ class Config(object):
         return result
 
     @property
+    def intraday_config(self):
+        # 日内择时相关配置（窗口、完整交易日阈值、成交字段等），均为 INTRADAY_ 前缀的可选项
+        result = {}
+        for key, value in self.config_data.items():
+            if key.startswith("INTRADAY_"):
+                name = key[len("INTRADAY_"):].lower()
+                result[name] = _parse_backtest_value(value)
+        return result
+
+    @property
     def export_stats_path(self):
         # 回测统计结果（p 值/效应量/CI/稳健性）导出目录，与图同级 stats/
         path = os.path.join(self._get("EXPORT_AIP_PLOT_PATH"),

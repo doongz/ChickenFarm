@@ -210,3 +210,37 @@ def _compute_backtest(code):
     except Exception as error:
         logger.error(f"Compute backtest({code}) occurred an error: {error}.")
         return None
+
+
+def transport_etf_minute_serial(code_list=None):
+    """
+    【串行】采集 ETF 1 分钟分时并由主进程逐只写库。
+    新浪分钟接口每日仅约 10 次配额，严禁多进程；单只失败记入 fails 后继续，
+    不中断整轮、不向上抛出。
+
+    :param code_list: 指定代码列表；None 时取清单中全部 etf 类型代码
+    :return: (successes, fails)
+    """
+    # 函数内导入，避免给周定投路径增加额外的模块加载耦合
+    from src.module.etf_intraday_mod import fetch_etf_minute
+    from src.db.db_etf_intraday import ETFMinute
+
+    if code_list is None:
+        code_list = [c for c in FundsForBacktestTable.get_all_code()
+                     if FundTypeTools.classify(c) == 'etf']
+
+    successes, fails = [], []
+    for code in code_list:
+        try:
+            # 串行：取数与写库均在主进程逐只完成
+            new_df = fetch_etf_minute(code)
+            ETFMinute(code).upsert(new_df)
+            successes.append(code)
+        except Exception as error:
+            # 单只失败不中断整轮
+            logger.error(f"Fetch ETF minute({code}) occurred an error: {error}.")
+            fails.append(code)
+
+    logger.info(
+        f"Transport ETF minute:{successes} successful. fails:{fails}.")
+    return successes, fails

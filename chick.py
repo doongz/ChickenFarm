@@ -31,6 +31,14 @@ def main():
     group.add_argument('-fetch',
                        action='store_true',
                        help='采集行情：场外基金历史净值 + ETF 前复权日线，为回测提供数据')
+    group.add_argument('-intraday-fetch',
+                       dest='intraday_fetch',
+                       action='store_true',
+                       help='串行采集 ETF 1 分钟分时数据并入库（接口限频，勿并发）')
+    group.add_argument('-intraday',
+                       dest='intraday',
+                       action='store_true',
+                       help='基于库内 ETF 分钟数据分析日内最佳买入时刻并按领域出图（不联网采集）')
     group.add_argument('-backtest',
                        action='store_true',
                        help='回测，并将回测数据上传')
@@ -40,7 +48,7 @@ def main():
                        help='绘制各领域基金回测的小提琴图')
     group.add_argument('-job',
                        dest='job',
-                       help="执行定制工作：backtest_job（采集 → 回测 → 绘图）")
+                       help="执行定制工作：backtest_job（采集 → 回测 → 绘图）、intraday_job（分钟采集 → 日内择时出图）")
 
     parser.add_argument('-c', '--code',
                         dest='code',
@@ -63,6 +71,10 @@ def main():
         farmer.operator.delete(args.code)
     elif args.fetch:
         farmer.analyst.fetch()
+    elif args.intraday_fetch:
+        farmer.analyst.intraday_fetch()
+    elif args.intraday:
+        farmer.analyst.intraday_analysis()
     elif args.backtest:
         farmer.analyst.backtest()
     elif args.plots:

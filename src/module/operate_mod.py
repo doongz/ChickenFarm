@@ -30,7 +30,11 @@ def add_fund(code, *args, **kwargs):
     fund_dpt.code = code
     fund_dpt.filed = kwargs.get("filed", None)
     fund_dpt.comment = kwargs.get("comment", None)
-    fund_dpt.buy_rate = fundinfo.rate / 100
+    # 场内 ETF 在 xalpha 可能返回空费率（''/None），按 0 处理，避免 float 转换失败
+    try:
+        fund_dpt.buy_rate = float(fundinfo.rate) / 100
+    except (TypeError, ValueError):
+        fund_dpt.buy_rate = 0.0
     fund_dpt.sell_rate_info = str(fundinfo.feeinfo)
     fund_dpt.url = fundinfo._url
 

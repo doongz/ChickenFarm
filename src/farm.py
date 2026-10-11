@@ -6,7 +6,9 @@ from src.module.operate_mod import add_fund, delete_fund
 from src.module.transport_mod import (
     update_market_data_multiprocess,
     transport_backtest_data_multiprocess,
+    transport_etf_minute_serial,
 )
+from src.util.config import Config
 from src.util.industry_class import get_fileds_en
 from src.util.log import get_logger
 
@@ -63,6 +65,18 @@ class Analyst():
                 print(colored(f"{fund_type} 行情采集失败 {len(fails)} 条: {fails}",
                               "red"))
 
+    def intraday_fetch(self):
+        # 串行采集清单中全部 etf 的 1 分钟分时数据并增量入库（接口限频，禁止并发）
+        if not Config().intraday_config.get('enabled', True):
+            print(colored("日内择时已禁用（INTRADAY_ENABLED=false）", "yellow"))
+            return
+        successes, fails = transport_etf_minute_serial()
+        print(colored(f"分钟行情采集成功 {len(successes)} 条: {successes}",
+                      "green"))
+        if fails:
+            print(colored(f"分钟行情采集失败 {len(fails)} 条: {fails}",
+                          "red"))
+
     def backtest(self):
         # 回测，并将回测数据上传
         successes, fails = transport_backtest_data_multiprocess()
@@ -75,6 +89,17 @@ class Analyst():
         aip_plot.export_violin_plot_multiprocess()
         print(colored(f"绘制各领域基金回测的小提琴图完成。", "green"))
 
+    def intraday_analysis(self):
+        # 基于库内 ETF 分钟数据按领域导出日内买入时刻图与 stats（不联网采集）
+        if not Config().intraday_config.get('enabled', True):
+            print(colored("日内择时已禁用（INTRADAY_ENABLED=false）", "yellow"))
+            return
+        from src.plot.intraday_plot import export_intraday_plot_multiprocess
+        successes, fails = export_intraday_plot_multiprocess()
+        print(colored(f"日内择时图导出成功领域: {successes}", "green"))
+        if fails:
+            print(colored(f"日内择时图导出失败/无数据领域: {fails}", "red"))
+
 
 class Farmer:
 
@@ -86,8 +111,10 @@ class Farmer:
     def job_run(self, job):
         if job == "backtest_job":
             self.backtest_job()
+        elif job == "intraday_job":
+            self.intraday_job()
         else:
-            print(colored(f"输入的任务 {job} 无效，可选：backtest_job", "red"))
+            print(colored(f"输入的任务 {job} 无效，可选：backtest_job、intraday_job", "red"))
             sys.exit(-1)
 
     def backtest_job(self):
@@ -99,3 +126,12 @@ class Farmer:
         self.analyst.fetch()
         self.analyst.backtest()
         self.analyst.draw_backtest_plots()
+
+    def intraday_job(self):
+        """
+        ETF 日内择时串行任务：
+        1. 串行采集分钟分时数据入库（接口限频，禁止并发）
+        2. 日内分析并按领域出图、导出 stats
+        """
+        self.analyst.intraday_fetch()
+        self.analyst.intraday_analysis()
